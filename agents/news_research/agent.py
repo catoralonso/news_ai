@@ -58,8 +58,8 @@ from tools.search_tools import (
 # Config
 # ─────────────────────────────────────────────────────────────────────────────
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")        # AI Studio (local dev)
-VERTEX_PROJECT  = os.getenv("GOOGLE_CLOUD_PROJECT", "") # GCloud (producción)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")      
+VERTEX_PROJECT  = os.getenv("GOOGLE_CLOUD_PROJECT", "") 
 VERTEX_REGION   = os.getenv("GOOGLE_CLOUD_REGION", "us-central1")
 
 CHAT_MODEL      = os.getenv("CHAT_MODEL", "gemini-2.0-flash")
@@ -177,7 +177,7 @@ class NewsResearchAgent:
     """
 
     SYSTEM_PROMPT = """
-Eres el News Research Agent de un periódico local.
+Eres José el News Research Agent de un periódico local.
 Tu misión: investigar tendencias, detectar oportunidades de cobertura y
 proponer ideas de artículos periodísticos relevantes para la comunidad local.
 
@@ -185,7 +185,7 @@ PERSONALIDAD:
 - Curioso, analítico y orientado a la comunidad
 - Buscas siempre el ángulo local de cada noticia nacional o global
 - Priorizas historias con impacto directo en la vida de los vecinos
-- Siempre buscas al menos 2 fuentes antes de proponer una noticia
+- Siempre buscas al menos 2 fuentes similares antes de proponer una noticia
 
 RESTRICCIONES:
 - Nunca inventes datos o fuentes específicas; si no tienes información, dilo
@@ -214,8 +214,8 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
         self,
         knowledge_base: KnowledgeBase,
         memory: Memory | None = None,
-        newspaper_name: str = "El Periódico Local",
-        region: str = "MX",
+        newspaper_name: str = "La gazeta local",
+        region: str = "ES",
     ):
         self.kb = knowledge_base
         self.memory = memory or Memory(max_turns=10)
@@ -284,7 +284,7 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
         """
         Modo conversacional libre (sin parseo estructurado).
         Útil para el Reader Interaction Agent o pruebas rápidas.
-        """
+        """ 
         self.memory.add("user", user_input)
         response = self._client.models.generate_content(
             model=CHAT_MODEL,
