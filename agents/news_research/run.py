@@ -91,7 +91,7 @@ def main():
     memory = Memory(max_turns=10)
 
     # 2. Cargar artículos de ejemplo en el RAG
-    print(f"\n📚 Cargando {len(SAMPLE_ARTICLES)} artículos en ChromaDB...")
+    print(f"\n Cargando {len(SAMPLE_ARTICLES)} artículos en ChromaDB...")
     kb.add_documents(SAMPLE_ARTICLES)
     print(f"   → {kb.count()} chunks indexados\n")
 
@@ -105,16 +105,16 @@ def main():
 
     # 4. Consulta de investigación
     query = "¿Qué temas de comunidad deberíamos cubrir esta semana?"
-    print(f"🔍 Query: {query}\n")
+    print(f"Query: {query}\n")
 
     report = agent.run(query)
 
     # 5. Mostrar resultados
-    print("📈 TRENDING TOPICS:")
+    print("TRENDING TOPICS:")
     for t in report.trending_topics[:5]:
         print(f"   • {t}")
 
-    print(f"\n💡 IDEAS DE ARTÍCULOS ({len(report.article_ideas)}):")
+    print(f"\nIDEAS DE ARTÍCULOS ({len(report.article_ideas)}):")
     for i, idea in enumerate(report.article_ideas, 1):
         print(f"\n  [{i}] {idea.title}")
         print(f"      Ángulo: {idea.angle}")
