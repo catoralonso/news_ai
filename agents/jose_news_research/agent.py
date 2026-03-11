@@ -200,7 +200,7 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
       "title": "Título sugerido del artículo",
       "angle": "Enfoque o ángulo periodístico específico",
       "category": "política|deportes|cultura|economía|sucesos|comunidad",
-      "local_relevance_score": 0.0,
+      "local_relevance_score": 0.95,
       "sources": ["fuente1", "fuente2"],
       "keywords": ["keyword1", "keyword2"],
       "priority": "alta|media|baja"
@@ -208,6 +208,12 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
   ],
   "summary": "Resumen ejecutivo del panorama informativo actual"
 }
+
+REGLAS para "local_relevance_score":
+número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la comunidad local, donde:
+    - 1.0 = afecta directamente a vecinos del municipio (obras, eventos, política local)
+    - 0.5 = tema nacional con impacto local moderado
+    - 0.0 = tema sin conexión con la comunidad local,
 """.strip()
 
     def __init__(
@@ -362,7 +368,7 @@ para {self.newspaper_name}. Responde en el formato JSON indicado.
                     title=i.get("title", "Sin título"),
                     angle=i.get("angle", ""),
                     category=i.get("category", "general"),
-                    local_relevance_score=float(i.get("local_relevance_score", 0.5)),
+                    local_relevance_score=float(i.get("local_relevance_score",0.5)),
                     sources=i.get("sources", []),
                     keywords=i.get("keywords", []),
                     priority=i.get("priority", "media"),
@@ -376,7 +382,7 @@ para {self.newspaper_name}. Responde en el formato JSON indicado.
                     title="Investigación pendiente de parseo",
                     angle=raw_text[:200],
                     category="general",
-                    local_relevance_score=0.5,
+                    local_relevance_score=0.0,
                     priority="baja",
                 )
             ]
