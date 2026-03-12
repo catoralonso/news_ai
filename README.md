@@ -1,4 +1,4 @@
-# news_ai — Local AI Newspaper System
+# Local AI Newspaper System
 
 An autonomous multi-agent system that helps local newspapers gain visibility, track trends, and generate content efficiently — so journalists can focus on deep investigative work.
 
