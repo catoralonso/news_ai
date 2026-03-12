@@ -50,6 +50,7 @@ from tools.search_tools import (
     TOOL_SCHEMAS,
     TOOL_DISPATCH,
 )
+from agents.jose_news_research.agent import ArticleIdea
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -142,30 +143,30 @@ class KnowledgeBase:
 # News Research Agent
 # ─────────────────────────────────────────────────────────────────────────────
 
-class NewsResearchAgent:
+class ArticleGenerationAgent:
     """
     Agente de investigación de noticias.
 
     Flujo de .run(query):
     ┌─────────────────────────────────────────────────────────────┐
     │ 1. Recuperar contexto histórico del periódico (RAG)         │
-    │ 2. Obtener trending topics locales                          │
-    │ 3. Buscar noticias recientes en la web                      │
-    │ 4. Enviar todo a Gemini con system prompt especializado      │
+    │ 2. Leer las tendencias que ha generado JoSE                 │
+    │ 3. Construir un articulo sobre alguna de las tendencias     │
+    │ 4. Enviar todo a Gemini con system prompt especializado     │
     │ 5. Parsear respuesta → ResearchReport                       │
     └─────────────────────────────────────────────────────────────┘
     """
 
     SYSTEM_PROMPT = """
-Eres José el News Research Agent de un periódico local.
-Tu misión: investigar tendencias, detectar oportunidades de cobertura y
-proponer ideas de artículos periodísticos relevantes para la comunidad local.
+Eres Manuel el Article Generation Agent de un periódico local.
+Tu misión: analizar las tendencias locales que ha generado Jose el News
+Research Agent y que tuvo un Fact Check por Camilia Agent.
 
 PERSONALIDAD:
 - Curioso, analítico y orientado a la comunidad
 - Buscas siempre el ángulo local de cada noticia nacional o global
 - Priorizas historias con impacto directo en la vida de los vecinos
-- Siempre buscas al menos 2 fuentes similares antes de proponer una noticia
+- Siempre buscas al menos 2 fuentes similares antes de construir el artículo
 
 RESTRICCIONES:
 - Nunca inventes datos o fuentes específicas; si no tienes información, dilo
@@ -178,9 +179,9 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
   "article_ideas": [
     {
       "title": "Título sugerido del artículo",
-      "": "Enfoque o ángulo periodístico específico",
+      "angle": "Enfoque o ángulo periodístico específico",
       "category": "política|deportes|cultura|economía|sucesos|comunidad",
-      "local_relevance_score": 0.0,
+      "contenido": str
       "sources": ["fuente1", "fuente2"],
       "keywords": ["keyword1", "keyword2"],
       "priority": "alta|media|baja"
@@ -194,8 +195,8 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
         self,
         knowledge_base: KnowledgeBase,
         memory: Memory | None = None,
-        newspaper_name: str = "La gazeta local",
-        region: str = "ES",
+        newspaper_name: str = NEWSPAPER_NAME,
+        region: str = PAIS,
     ):
         self.kb = knowledge_base
         self.memory = memory or Memory(max_turns=10)
@@ -205,16 +206,16 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
 
     # ── Método principal ──────────────────────────────────────────────────────
 
-    def run(self, query: str) -> ResearchReport:
+    def run(self, idea: ArticleIdea) -> CreateArticle:
         """
         Ejecuta el ciclo completo de investigación.
 
         Args:
-            query: Tema o pregunta de investigación.
-                   Ej: "¿Qué pasa con el transporte público esta semana?"
+            idea: Tema o idea para el árticulo
+                   Ej: "Nuevos métodos para adelgazar, ¿son confiables?"
 
         Returns:
-            ResearchReport con ideas de artículos estructuradas.
+            CreateArticle con artículos estructuradas.
         """
         # 1. RAG: contexto histórico del periódico
         context_snippets = self.kb.retrieve(query, top_k=4)
@@ -326,7 +327,7 @@ para {self.newspaper_name}. Responde en el formato JSON indicado.
             )
         return result
 
-    def _parse_ideas(self, raw_text: str) -> list[ArticleIdea]:
+    def _parse_articles(self, raw_text: str) -> list[ArticleIdea]:
         """Extrae ArticleIdea[] del JSON que devuelve Gemini."""
         try:
             # Limpia posibles bloques markdown ```json ... ```
