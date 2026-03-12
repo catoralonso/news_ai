@@ -177,21 +177,21 @@ class NewsResearchAgent:
     """
 
     SYSTEM_PROMPT = """
-Eres José el News Research Agent de un periódico local.
+Eres el News Research Agent de un periódico local.
 Tu misión: investigar tendencias, detectar oportunidades de cobertura y
 proponer ideas de artículos periodísticos relevantes para la comunidad local.
-
+ 
 PERSONALIDAD:
 - Curioso, analítico y orientado a la comunidad
 - Buscas siempre el ángulo local de cada noticia nacional o global
 - Priorizas historias con impacto directo en la vida de los vecinos
-- Siempre buscas al menos 2 fuentes similares antes de proponer una noticia
-
+- Siempre buscas al menos 2 fuentes antes de proponer una noticia
+ 
 RESTRICCIONES:
 - Nunca inventes datos o fuentes específicas; si no tienes información, dilo
 - No cubras temas fuera del ámbito periodístico local
 - Prioriza la verificabilidad de la información
-
+ 
 FORMATO DE SALIDA:
 Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
 {
@@ -200,7 +200,7 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
       "title": "Título sugerido del artículo",
       "angle": "Enfoque o ángulo periodístico específico",
       "category": "política|deportes|cultura|economía|sucesos|comunidad",
-      "local_relevance_score": 0.95,
+      "local_relevance_score": 0.0,
       "sources": ["fuente1", "fuente2"],
       "keywords": ["keyword1", "keyword2"],
       "priority": "alta|media|baja"
@@ -220,8 +220,8 @@ número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la co
         self,
         knowledge_base: KnowledgeBase,
         memory: Memory | None = None,
-        newspaper_name: str = "La gazeta local",
-        region: str = "ES",
+        newspaper_name: str = NEWSPAPER_NAME,
+        region: str = PAIS,
     ):
         self.kb = knowledge_base
         self.memory = memory or Memory(max_turns=10)
@@ -251,12 +251,16 @@ número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la co
         # 3. Búsqueda web
         web_results = web_search(query, num_results=5)
 
-        # 4. Construir prompt enriquecido
+        # 4. Clickstream — qué están leyendo los lectores esta semana
+        clickstream = get_clickstream_insights(days=7)
+
+        # 5. Construir prompt enriquecido
         user_prompt = self._build_prompt(
             query=query,
             context_snippets=context_snippets,
             trending=trending,
             web_results=web_results,
+            clickstream=clickstream,
         )
 
         # 5. Llamar a Gemini
@@ -316,6 +320,7 @@ número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la co
         context_snippets: list[str],
         trending: list[str],
         web_results: list[dict],
+        clickstream: dict | None = None,
     ) -> str:
         ctx_block = "\n".join(f"- {s[:300]}" for s in context_snippets) or "Sin contexto previo."
         trend_block = ", ".join(trending[:5]) or "No disponible."
@@ -323,6 +328,12 @@ número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la co
             f"• {r['title']} ({r['source']}): {r['snippet'][:200]}"
             for r in web_results
         ) or "Sin resultados web."
+
+        click_block = (
+            format_insights_for_prompt(clickstream)
+            if clickstream
+            else "Sin datos de comportamiento de lectores todavía."
+        )
 
         return f"""
 CONSULTA DE INVESTIGACIÓN: {query}
@@ -335,9 +346,13 @@ TEMAS EN TENDENCIA HOY:
 
 NOTICIAS RECIENTES EN LA WEB:
 {web_block}
-
+ 
+{click_block}
+ 
 Con base en toda la información anterior, propón 3 ideas de artículos
-para {self.newspaper_name}. Responde en el formato JSON indicado.
+para {self.newspaper_name}. Prioriza los temas que combinan tendencia
+externa con alto engagement histórico de los lectores.
+Responde en el formato JSON indicado.
 """.strip()
 
     def _messages_to_contents(self, messages: list[dict]) -> list[types.Content]:
