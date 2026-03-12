@@ -12,8 +12,7 @@ Arquitectura:
     manuel_article_generation.run(query)
           │
           ├─► KnowledgeBase.retrieve()   ← ChromaDB local
-          ├─► web_search()               ← Google CSE o mock
-          ├─► get_trending_topics()      ← pytrends o mock
+          ├─► 
           └─► Gemini generate_content()  ← google-genai (Vertex AI)
                     │
                     └─► Respuesta estructurada (ArticleIdea[])
@@ -88,36 +87,18 @@ def _build_client() -> genai.Client:
 # ─────────────────────────────────────────────────────────────────────────────
 # Modelos de datos de salida
 # ─────────────────────────────────────────────────────────────────────────────
-
 @dataclass
-class ArticleIdea:
+class CreateArticle:
     title: str
     angle: str                          # enfoque periodístico sugerido
     category: str                       # política, deportes, cultura…
     local_relevance_score: float        # 0–1
+    article_content: str
     sources: list[str] = field(default_factory=list)
     keywords: list[str] = field(default_factory=list)
-    priority: str = "media"             # alta / media / baja
 
     def to_dict(self) -> dict:
         return self.__dict__
-
-
-@dataclass
-class ResearchReport:
-    query: str
-    trending_topics: list[str]
-    article_ideas: list[ArticleIdea]
-    context_snippets: list[str]         # fragmentos RAG usados
-    raw_web_results: list[dict]
-
-    def to_dict(self) -> dict:
-        return {
-            "query":            self.query,
-            "trending_topics":  self.trending_topics,
-            "article_ideas":    [a.to_dict() for a in self.article_ideas],
-            "context_snippets": self.context_snippets,
-        }
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -197,7 +178,7 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
   "article_ideas": [
     {
       "title": "Título sugerido del artículo",
-      "angle": "Enfoque o ángulo periodístico específico",
+      "": "Enfoque o ángulo periodístico específico",
       "category": "política|deportes|cultura|economía|sucesos|comunidad",
       "local_relevance_score": 0.0,
       "sources": ["fuente1", "fuente2"],
