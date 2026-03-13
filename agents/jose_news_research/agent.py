@@ -50,7 +50,6 @@ from core.chunker import chunk_document
 from tools.search_tools import (
     web_search,
     get_trending_topics,
-    score_local_relevance,
     get_clickstream_insights,
     format_insights_for_prompt,
     TOOL_SCHEMAS,
