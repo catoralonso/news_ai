@@ -139,7 +139,7 @@ class KnowledgeBase:
     def __init__(self, persist_dir: str = "data/embeddings"):
         self._store = VectorStore(
             collection_name="news_research",
-            persist_dir=persist_dir,
+            persist_dir="data/embeddings/news_research",
         )
 
     def add_document(self, doc: dict) -> None:
