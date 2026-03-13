@@ -10,8 +10,8 @@ An autonomous multi-agent system that helps local newspapers gain visibility, tr
 newspaper_ai/
 ├── agents/
 │   ├── jose_news_research/
-│   │   ├── agent.py        ← NewsResearchAgent (main class)
-│   │   └── run.py          ← Demo and conversational loop
+│   │   ├── agent.py        
+│   │   └── run.py          
 │   ├── camila_fact_checking/
 │   │   ├── agent.py
 │   │   └── run.py
@@ -36,12 +36,45 @@ newspaper_ai/
 │   └── search_tools.py     ← web_search, trending_topics, local_relevance
 ├── data/
 │   ├── raw_news/           ← .txt articles from Content Engineer
-│   └── embeddings/         ← ChromaDB persists here
+│   └── embeddings/
+│       ├── global_nutrition/   ← shared knowledge base (studies, guides)
+│       ├── news_research/      ← José: topics already covered
+│       ├── article_style/      ← Manuel: writing style examples
+│       ├── article_published/  ← Manuel: published articles
+│       ├── fact_checking/      ← Camila: fake news patterns, trusted sources
+│       ├── reader_interaction/ ← Mauro: FAQs, reader context
+│       └── social_media/       ← Asti: successful post examples
 ├── tests/
 ├── requirements.txt
 └── .env.example
 ```
+RAG Architecture
+Each agent has its own ChromaDB collection scoped to its specific task. This avoids loading unnecessary data into memory and keeps each collection clean and purposeful.
+Collections
+CollectionOwner (writes)Who can readPurposeglobal_nutritionContent Engineer (ingestion script)All agentsScientific studies, dietary guides, general nutrition knowledgenews_researchJoséJosé, Manuel, CamilaTopics and angles already covered — avoids repetitionarticle_styleManuelManuelStyle examples and newspaper writing guidearticle_publishedManuelJosé, Mauro, AstiPublished articles — José avoids duplicates, Mauro answers readers, Asti creates postsfact_checkingCamilaCamilaFake news patterns, trusted source index, known misinformationreader_interactionMauroMauroReader FAQs and recurring question patternssocial_mediaAstiAstiHigh-performing post examples per platform
+Rules
 
+Write only to your own collection. An agent never calls upsert() on another agent's collection.
+Read across collections freely. Any agent can query another agent's collection when it adds value.
+Each collection loads independently. ChromaDB only loads the queried collection into memory — agents don't pay the cost of collections they don't need.
+
+Cross-collection reads in practice
+José.run(query)
+    ├── reads news_research/      ← what has already been covered
+    └── reads article_published/  ← what has already been written
+
+Manuel.run(idea)
+    ├── reads article_style/      ← how the newspaper writes
+    ├── reads article_published/  ← what has already been published
+    └── reads news_research/      ← context from José's research
+
+Mauro.chat(question)
+    ├── reads reader_interaction/ ← recurring question patterns
+    └── reads article_published/  ← answer grounded in real articles
+
+Asti.run(article)
+    ├── reads social_media/       ← successful post formats
+    └── reads article_published/  ← source article contentxo
 ---
 
 ## Agents
@@ -142,7 +175,7 @@ JOURNALIST / CRON (Monday)
 orchestrator
     ├── jose_news_research + camila_fact_checking  (always together)
     ├── manuel_article_generation (optional — if an idea is approved)
-    └── asti_social_media        (optional — if article is ready to publish)
+    └── asti_social_media        (optional — if article is ready to publish)    
 ```
 
 ---
@@ -176,9 +209,10 @@ python agents/orchestrator/run.py
 
 - [x] Agent skeleton (all 6 agents)
 - [x] ChromaDB RAG core
+- [x] RAG collection architecture (per-agent + global)
 - [ ] Orchestrator task routing with Gemini
 - [ ] Camila external fact-check integration
 - [ ] Asti Phase 1 — text posts (Twitter, LinkedIn, Instagram)
 - [ ] Monday cron automation
 - [ ] Asti Phase 2 — AI image generation for Instagram
-- [ ] Deep investigative tools for journalists
+- [ ] Deep investigative tools for journalists    
