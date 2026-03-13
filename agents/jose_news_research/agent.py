@@ -139,7 +139,11 @@ class KnowledgeBase:
     def __init__(self, persist_dir: str = "data/embeddings"):
         self._store = VectorStore(
             collection_name="news_research",
-            persist_dir="data/embeddings/news_research",
+            persist_dir=f"{persist_dir}/news_research",
+        )
+        self._published_store = VectorStore(
+            collection_name="article_published",
+            persist_dir=f"{persist_dir}/article_published",
         )
 
     def add_document(self, doc: dict) -> None:
@@ -156,8 +160,12 @@ class KnowledgeBase:
             self.add_document(doc)
 
     def retrieve(self, query: str, top_k: int = 4) -> list[str]:
-        results = self._store.query(query, top_k=top_k)
-        return [r.text for r in results]
+        news_result = self._store.query(query, top_k=top_k)
+        article_result = self._published_store.query(query, top_k=top_k)
+        
+        all_results = news_result + article_result
+        all_results.sort(key=lambda r: r.score) 
+        return [r.text for r in all_results[:top_k]]      
 
     def count(self) -> int:
         return self._store.count()
