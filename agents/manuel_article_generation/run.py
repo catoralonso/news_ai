@@ -110,7 +110,7 @@ def main():
 
     # 2. Cargar artículos de estilo en el RAG
     print(f"\nCargando {len(SAMPLE_ARTICLES)} artículos de estilo en ChromaDB...")
-    kb.add_documents(SAMPLE_ARTICLES)
+    kb.add_style_documents(SAMPLE_ARTICLES)
     print(f"   → {kb.count()} chunks indexados\n")
 
     # 3. Crear agente
