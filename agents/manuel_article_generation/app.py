@@ -178,7 +178,7 @@ Cuando se te pida escribir un artículo, responde SIEMPRE con JSON válido:
 {
       "title": "Título del artículo",
       "angle": "Enfoque periodístico",
-      "category": "política|deportes|cultura|economía|sucesos|comunidad",
+      "category": "nutrición|recetas|bienestar|suplementos|dietas|comunidad",
       "local_relevance_score": 0.85,
       "article_content": "Cuerpo completo del artículo...",
       "sources": ["fuente1", "fuente2"],
