@@ -192,26 +192,8 @@ def _mock_trending_topics() -> list[str]:
         "superalimentos mitos y realidad",
     ]
 
-
 # ─────────────────────────────────────────────────────────────────────────────
-# 3. Relevancia dinámica (basada en trending topics del CSV)
-# ─────────────────────────────────────────────────────────────────────────────
-
-def score_relevance(text: str, trending_topics: list[str]) -> float:
-    """
-    Puntúa qué tan relevante es un texto respecto a las tendencias actuales.
-    Retorna float en [0, 1].
-
-    Al usar los trending_topics del CSV, la relevancia es dinámica —
-    cambia automáticamente cuando el compañero actualiza el archivo.
-    """
-    text_lower = text.lower()
-    hits = sum(1 for topic in trending_topics if topic.lower() in text_lower)
-    return min(hits / 5.0, 1.0)  # normalizado: 5+ keywords → score 1.0
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 4. Clickstream — comportamiento real de lectores en el sitio
+# 3. Clickstream — comportamiento real de lectores en el sitio
 # ─────────────────────────────────────────────────────────────────────────────
 
 CLICKSTREAM_DIR  = os.getenv("CLICKSTREAM_DIR", "data/clickstream")
@@ -419,7 +401,7 @@ def format_insights_for_prompt(insights: dict) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 5. Descriptores para ADK / LangChain function-calling
+# 4. Descriptores para ADK / LangChain function-calling
 # ─────────────────────────────────────────────────────────────────────────────
 
 TOOL_SCHEMAS: list[dict[str, Any]] = [
@@ -454,25 +436,6 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         },
     },
     {
-        "name": "score_relevance",
-        "description": (
-            "Evalúa qué tan relevante es un texto respecto a las tendencias actuales de nutrición (0-1). "
-            "Requiere la lista de trending_topics del CSV."
-        ),
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "text":             {"type": "string", "description": "Texto a evaluar"},
-                "trending_topics":  {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "description": "Lista de temas trending obtenida de get_trending_topics",
-                },
-            },
-            "required": ["text", "trending_topics"],
-        },
-    },
-    {
         "name": "get_clickstream_insights",
         "description": (
             "Analiza el comportamiento real de los lectores en el sitio del periódico. "
@@ -494,6 +457,5 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
 TOOL_DISPATCH: dict[str, Any] = {
     "web_search":               web_search,
     "get_trending_topics":      get_trending_topics,
-    "score_relevance":          score_relevance,
     "get_clickstream_insights": get_clickstream_insights,
 }
