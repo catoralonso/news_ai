@@ -4,16 +4,23 @@ tools/search_tools.py
 Herramientas que el News Research Agent puede invocar.
 
 Cada tool es una función Python pura + su descriptor para ADK/LangChain.
-Diseñadas para correr 100 % local; la búsqueda web real se activa solo
-cuando hay API key de Google Custom Search o SerpAPI disponible.
+Diseñadas para correr 100 % local; sin dependencias de GCloud.
+
+Búsqueda web:
+    Fuente principal → RSS de PubMed + Healthline
+    Fallback         → mock para desarrollo offline
+
+Tendencias:
+    Fuente principal → CSV de Google Trends (manual y local)
+    Fallback         → mock para desarrollo offline
 
 Clickstream:
-    El sitio web del periódico (aún no construido) escribirá eventos en
+    El sitio web del periódico escribirá eventos en
     data/clickstream/events.jsonl con este formato por línea:
     {
-      "article_id":   "nueva-ruta-transporte-2025-02-15",
-      "title":        "Nueva ruta de transporte...",
-      "category":     "comunidad",
+      "article_id":   "dieta-mediterranea-2025-02-15",
+      "title":        "Dieta mediterránea y diabetes tipo 2",
+      "category":     "enfermedades y dieta",
       "event":        "read" | "click" | "scroll",
       "duration_sec": 142,      # solo en event="read"
       "scroll_pct":   87,       # solo en event="scroll" (0-100)
@@ -25,6 +32,7 @@ Clickstream:
 
 from __future__ import annotations
 
+import csv
 import json
 import os
 from collections import defaultdict
@@ -32,54 +40,77 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+import feedparser  # pip install feedparser
 import requests
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 1. Búsqueda web (Google Custom Search API o fallback mock)
+# 1. Búsqueda web (RSS de PubMed + Healthline → fallback mock)
 # ─────────────────────────────────────────────────────────────────────────────
 
-GOOGLE_CSE_KEY = os.getenv("GOOGLE_CSE_KEY", "")
-GOOGLE_CSE_CX  = os.getenv("GOOGLE_CSE_CX", "")
+RSS_SOURCES = {
+    "pubmed": "https://pubmed.ncbi.nlm.nih.gov/rss/search/?term={query}&format=rss",
+    "healthline": "https://www.healthline.com/rss/health-news",
+}
 
 
 def web_search(query: str, num_results: int = 5) -> list[dict]:
     """
-    Busca noticias recientes sobre `query`.
+    Busca artículos recientes de nutrición y salud.
+
+    Fuente principal: RSS de PubMed + Healthline (gratis, sin API key).
+    Fallback:         mock para desarrollo offline.
 
     Devuelve lista de:
         {"title": str, "url": str, "snippet": str, "source": str}
-
-    Si no hay API key configurada → devuelve resultados mock para desarrollo.
     """
-    if GOOGLE_CSE_KEY and GOOGLE_CSE_CX:
-        return _google_cse_search(query, num_results)
-    else:
-        return _mock_search(query, num_results)
+    results = _rss_search(query, num_results)
+    if results:
+        return results
+    return _mock_search(query, num_results)
 
 
-def _google_cse_search(query: str, num: int) -> list[dict]:
-    url = "https://www.googleapis.com/customsearch/v1"
-    params = {
-        "key": GOOGLE_CSE_KEY,
-        "cx": GOOGLE_CSE_CX,
-        "q": query,
-        "num": min(num, 10),
-        "dateRestrict": "d7",   # últimos 7 días
-        "lr": "lang_es",
-    }
-    resp = requests.get(url, params=params, timeout=10)
-    resp.raise_for_status()
-    items = resp.json().get("items", [])
-    return [
-        {
-            "title":   i.get("title", ""),
-            "url":     i.get("link", ""),
-            "snippet": i.get("snippet", ""),
-            "source":  i.get("displayLink", ""),
-        }
-        for i in items
-    ]
+def _rss_search(query: str, num: int) -> list[dict]:
+    """
+    Busca en RSS de PubMed (query-specific) y Healthline (feed general).
+    Devuelve lista vacía si ambas fuentes fallan — web_search cae al mock.
+    """
+    results: list[dict] = []
+
+    # PubMed — RSS específico por query
+    try:
+        pubmed_url = RSS_SOURCES["pubmed"].format(query=requests.utils.quote(query))
+        feed = feedparser.parse(pubmed_url)
+        for entry in feed.entries[:num]:
+            results.append({
+                "title":   entry.get("title", ""),
+                "url":     entry.get("link", ""),
+                "snippet": entry.get("summary", "")[:200],
+                "source":  "PubMed",
+            })
+    except Exception:
+        pass
+
+    # Healthline — feed general, filtramos por query en título/resumen
+    if len(results) < num:
+        try:
+            feed = feedparser.parse(RSS_SOURCES["healthline"])
+            query_lower = query.lower()
+            for entry in feed.entries:
+                text = f"{entry.get('title', '')} {entry.get('summary', '')}".lower()
+                if query_lower in text:
+                    results.append({
+                        "title":   entry.get("title", ""),
+                        "url":     entry.get("link", ""),
+                        "snippet": entry.get("summary", "")[:200],
+                        "source":  "Healthline",
+                    })
+                if len(results) >= num:
+                    break
+        except Exception:
+            pass
+
+    return results[:num]
 
 
 def _mock_search(query: str, num: int) -> list[dict]:
@@ -87,64 +118,96 @@ def _mock_search(query: str, num: int) -> list[dict]:
     today = datetime.now().strftime("%d/%m/%Y")
     return [
         {
-            "title":   f"[MOCK] Tendencia: {query} — perspectiva local",
+            "title":   f"[MOCK] Evidencia científica: {query}",
             "url":     "https://example.com/mock-1",
-            "snippet": f"Análisis local sobre '{query}'. Expertos señalan impacto en comunidades cercanas.",
-            "source":  "mock-news.local",
+            "snippet": f"Estudio reciente sobre '{query}'. Expertos en nutrición señalan nuevos hallazgos.",
+            "source":  "mock-nutrition.local",
         },
         {
-            "title":   f"[MOCK] Cobertura regional: {query} ({today})",
+            "title":   f"[MOCK] Guía práctica: {query} ({today})",
             "url":     "https://example.com/mock-2",
-            "snippet": f"Residentes reaccionan ante los últimos desarrollos sobre '{query}'.",
-            "source":  "mock-regional.local",
+            "snippet": f"Recomendaciones dietéticas basadas en evidencia sobre '{query}'.",
+            "source":  "mock-nutrition.local",
         },
     ][:num]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 2. Extractor de tendencias (Google Trends vía pytrends — local, sin API key)
+# 2. Tendencias (CSV de Google Trends → fallback mock)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def get_trending_topics(region: str = "MX", category: str = "news") -> list[str]:
+TRENDS_CSV = os.getenv("TRENDS_CSV_PATH", "data/trends/trends.csv")
+
+def get_trending_topics(region: str = "ES") -> list[str]:
     """
-    Obtiene temas en tendencia para la región dada.
-    Usa pytrends (scraping libre de Google Trends).
-    Fallback a lista mock si pytrends no está instalado.
+    Obtiene temas en tendencia de nutrición.
+
+    Fuente principal: CSV exportado manualmente de Google Trends.
+    Fallback:         mock para desarrollo offline.
+
+    El parámetro `region` se mantiene para cuando el orchestrador lo pase,
+    aunque el CSV ya viene filtrado por región desde Google Trends.
     """
+    if os.path.exists(TRENDS_CSV):
+        return _read_trends_csv(TRENDS_CSV)
+    return _mock_trending_topics()
+
+
+def _read_trends_csv(path: str) -> list[str]:
+    """
+    Lee el CSV exportado de Google Trends.
+    TODO: ajustar el nombre de columna cuando el compañero suba el CSV real.
+
+    Formato esperado (Google Trends export):
+        Término de búsqueda, Valor
+        proteínas y músculo,  100
+        dieta cetogénica,      85
+        ...
+    """
+    topics: list[str] = []
     try:
-        from pytrends.request import TrendReq  # type: ignore
-        pt = TrendReq(hl="es-MX", tz=360)
-        df = pt.trending_searches(pn="mexico")
-        return df[0].tolist()[:10]
+        with open(path, encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                # TODO: confirmar nombre exacto de columna con el compañero
+                term = row.get("Término de búsqueda") or row.get("term") or ""
+                if term:
+                    topics.append(term.strip())
     except Exception:
-        return [
-            "presupuesto municipal 2025",
-            "transporte público reforma",
-            "seguridad ciudadana estadísticas",
-            "elecciones locales candidatos",
-            "cultura festival próximo",
-        ]
+        pass
+    return topics[:10]
+
+
+def _mock_trending_topics() -> list[str]:
+    return [
+        "proteínas y pérdida de peso",
+        "dieta cetogénica efectos",
+        "suplementos omega-3 beneficios",
+        "alimentación antiinflamatoria",
+        "microbiota intestinal salud",
+        "ayuno intermitente evidencia",
+        "vitamina D deficiencia",
+        "dieta mediterránea longevidad",
+        "azúcar y enfermedades crónicas",
+        "superalimentos mitos y realidad",
+    ]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 3. Clasificador de relevancia local
+# 3. Relevancia dinámica (basada en trending topics del CSV)
 # ─────────────────────────────────────────────────────────────────────────────
 
-LOCAL_KEYWORDS = [
-    "municipio", "alcaldía", "ayuntamiento", "vecinos", "colonia",
-    "barrio", "delegación", "presidente municipal", "cabildo",
-    "parque", "mercado", "transporte local", "fiestas patronales",
-]
-
-
-def score_local_relevance(text: str) -> float:
+def score_relevance(text: str, trending_topics: list[str]) -> float:
     """
-    Puntúa qué tan relevante es un texto para un periódico local.
+    Puntúa qué tan relevante es un texto respecto a las tendencias actuales.
     Retorna float en [0, 1].
+
+    Al usar los trending_topics del CSV, la relevancia es dinámica —
+    cambia automáticamente cuando el compañero actualiza el archivo.
     """
     text_lower = text.lower()
-    hits = sum(1 for kw in LOCAL_KEYWORDS if kw in text_lower)
-    return min(hits / 5.0, 1.0)   # normalizado: 5+ keywords → score 1.0
+    hits = sum(1 for topic in trending_topics if topic.lower() in text_lower)
+    return min(hits / 5.0, 1.0)  # normalizado: 5+ keywords → score 1.0
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -165,7 +228,7 @@ def log_event(
 ) -> None:
     """
     Registra un evento de comportamiento del lector.
-    Llamado desde el sitio web cuando se construya.
+    Llamado desde el sitio web del diario cuando se construya.
 
     El archivo events.jsonl crece con una línea JSON por evento.
     """
@@ -191,8 +254,8 @@ def get_clickstream_insights(days: int = 7) -> dict:
     Retorna:
     {
       "by_category": {
-        "deportes":   {"clicks": 120, "avg_read_sec": 187, "avg_scroll_pct": 82},
-        "comunidad":  {"clicks": 95,  "avg_read_sec": 143, "avg_scroll_pct": 71},
+        "recetas":         {"clicks": 312, "avg_read_sec": 198, "avg_scroll_pct": 84},
+        "pérdida de peso": {"clicks": 287, "avg_read_sec": 231, "avg_scroll_pct": 79},
         ...
       },
       "top_articles": [
@@ -206,8 +269,7 @@ def get_clickstream_insights(days: int = 7) -> dict:
     """
     if os.path.exists(CLICKSTREAM_FILE):
         return _parse_clickstream(days)
-    else:
-        return _mock_clickstream_insights()
+    return _mock_clickstream_insights()
 
 
 def _parse_clickstream(days: int) -> dict:
@@ -251,13 +313,12 @@ def _parse_clickstream(days: int) -> dict:
             elif evt == "scroll" and e.get("scroll_pct", 0) > 0:
                 by_category[cat]["scroll_pcts"].append(e["scroll_pct"])
 
-    # Calcular promedios
     def _avg(lst): return round(sum(lst) / len(lst)) if lst else 0
 
     summary_by_cat = {
         cat: {
-            "clicks":        data["clicks"],
-            "avg_read_sec":  _avg(data["read_times"]),
+            "clicks":         data["clicks"],
+            "avg_read_sec":   _avg(data["read_times"]),
             "avg_scroll_pct": _avg(data["scroll_pcts"]),
         }
         for cat, data in by_category.items()
@@ -289,32 +350,33 @@ def _parse_clickstream(days: int) -> dict:
 def _mock_clickstream_insights() -> dict:
     """
     Datos mock realistas para cuando el sitio aún no existe.
-    Simula una semana típica de un periódico local pequeño.
+    Simula una semana típica del periódico de nutrición.
+    TODO: actualizar categorías cuando el Content Engineer defina las oficiales.
     """
     return {
         "by_category": {
-            "deportes":  {"clicks": 312, "avg_read_sec": 198, "avg_scroll_pct": 84},
-            "comunidad": {"clicks": 287, "avg_read_sec": 231, "avg_scroll_pct": 79},
-            "política":  {"clicks": 201, "avg_read_sec": 176, "avg_scroll_pct": 65},
-            "cultura":   {"clicks": 143, "avg_read_sec": 154, "avg_scroll_pct": 58},
-            "economía":  {"clicks": 98,  "avg_read_sec": 142, "avg_scroll_pct": 51},
+            "recetas":              {"clicks": 312, "avg_read_sec": 198, "avg_scroll_pct": 84},
+            "pérdida de peso":      {"clicks": 287, "avg_read_sec": 231, "avg_scroll_pct": 79},
+            "suplementos":          {"clicks": 201, "avg_read_sec": 176, "avg_scroll_pct": 65},
+            "ciencia y evidencia":  {"clicks": 143, "avg_read_sec": 154, "avg_scroll_pct": 58},
+            "enfermedades y dieta": {"clicks": 98,  "avg_read_sec": 142, "avg_scroll_pct": 51},
         },
         "top_articles": [
             {
-                "title":        "Leones de San Cristóbal avanzan a semifinales",
-                "category":     "deportes",
+                "title":        "10 alimentos que aceleran el metabolismo",
+                "category":     "pérdida de peso",
                 "clicks":       147,
                 "avg_read_sec": 214,
             },
             {
-                "title":        "Nueva ruta de transporte conectará norte y sur",
-                "category":     "comunidad",
+                "title":        "Omega-3: qué dice la evidencia científica",
+                "category":     "suplementos",
                 "clicks":       134,
                 "avg_read_sec": 243,
             },
             {
-                "title":        "Alcalde presenta presupuesto municipal 2025",
-                "category":     "política",
+                "title":        "Dieta mediterránea y diabetes tipo 2",
+                "category":     "enfermedades y dieta",
                 "clicks":       98,
                 "avg_read_sec": 189,
             },
@@ -364,13 +426,14 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
     {
         "name": "web_search",
         "description": (
-            "Busca noticias recientes en la web sobre un tema. "
-            "Úsala cuando necesites información actual que no esté en la base de conocimiento."
+            "Busca artículos recientes de nutrición y salud. "
+            "Consulta PubMed y Healthline vía RSS. "
+            "Úsala cuando necesites información actualizada que no esté en la base de conocimiento."
         ),
         "parameters": {
             "type": "object",
             "properties": {
-                "query":       {"type": "string",  "description": "Términos de búsqueda"},
+                "query":       {"type": "string",  "description": "Términos de búsqueda en nutrición"},
                 "num_results": {"type": "integer", "description": "Número de resultados (1-10)", "default": 5},
             },
             "required": ["query"],
@@ -378,24 +441,35 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
     },
     {
         "name": "get_trending_topics",
-        "description": "Obtiene los temas más buscados/trending en la región para detectar oportunidades de cobertura.",
+        "description": (
+            "Obtiene los temas de nutrición más buscados actualmente. "
+            "Lee el CSV exportado de Google Trends por el equipo."
+        ),
         "parameters": {
             "type": "object",
             "properties": {
-                "region": {"type": "string", "description": "Código de país ISO (MX, ES, AR…)", "default": "MX"},
+                "region": {"type": "string", "description": "Código de país ISO (ES, MX, AR…)", "default": "ES"},
             },
             "required": [],
         },
     },
     {
-        "name": "score_local_relevance",
-        "description": "Evalúa qué tan relevante es un texto para cobertura local (0-1).",
+        "name": "score_relevance",
+        "description": (
+            "Evalúa qué tan relevante es un texto respecto a las tendencias actuales de nutrición (0-1). "
+            "Requiere la lista de trending_topics del CSV."
+        ),
         "parameters": {
             "type": "object",
             "properties": {
-                "text": {"type": "string", "description": "Texto a evaluar"},
+                "text":             {"type": "string", "description": "Texto a evaluar"},
+                "trending_topics":  {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Lista de temas trending obtenida de get_trending_topics",
+                },
             },
-            "required": ["text"],
+            "required": ["text", "trending_topics"],
         },
     },
     {
@@ -420,6 +494,6 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
 TOOL_DISPATCH: dict[str, Any] = {
     "web_search":               web_search,
     "get_trending_topics":      get_trending_topics,
-    "score_local_relevance":    score_local_relevance,
+    "score_relevance":          score_relevance,
     "get_clickstream_insights": get_clickstream_insights,
 }
