@@ -1,10 +1,10 @@
 """
-agents/news_research/run.py
+agents/jose_news_research/run.py
 ───────────────────────────
 Script de demo / desarrollo local del News Research Agent.
 
 Uso:
-    python agents/news_research/run.py
+    python agents/jose_news_research/run.py
 
 Variables de entorno (.env o export):
     GEMINI_API_KEY=AIza...     ← para desarrollo local (AI Studio)
@@ -26,7 +26,7 @@ try:
 except ImportError:
     pass
 
-from agents.news_research.agent import NewsResearchAgent, KnowledgeBase
+from agents.jose_news_research.agent import NewsResearchAgent, KnowledgeBase
 from core.memory import Memory
 
 
@@ -36,42 +36,45 @@ from core.memory import Memory
 
 SAMPLE_ARTICLES = [
     {
-        "title": "Nueva ruta de transporte conectará el norte y sur del municipio",
-        "date": "2025-02-15",
-        "category": "comunidad",
+        "title": "Los alimentos de temporada que fortalecen tu sistema inmune este invierno",
+        "date": "2025-01-10",
+        "category": "nutrición",
         "content": (
-            "El ayuntamiento anunció esta semana la creación de una nueva ruta de "
-            "autobús que conectará las colonias del norte con el centro histórico. "
-            "La medida beneficiará a más de 15 000 vecinos que actualmente tienen "
-            "que realizar al menos dos trasbordos para llegar al trabajo. "
-            "El presidente municipal señaló que el servicio iniciará en junio. "
-            "Los vecinos del barrio de San Marcos celebraron la noticia aunque "
-            "piden más frecuencia de paso en horas pico."
+            "Con la llegada del frío, los nutricionistas recomiendan incorporar "
+            "alimentos ricos en vitamina C y zinc a la dieta diaria. "
+            "Las naranjas, mandarinas y el brócoli son opciones accesibles y de "
+            "temporada que ayudan a reforzar las defensas del organismo. "
+            "La doctora Martínez, nutricionista del centro de salud municipal, "
+            "señala que una dieta variada es más efectiva que cualquier suplemento. "
+            "Los mercados locales ofrecen estas opciones a precios asequibles para todas las familias."
         ),
     },
     {
-        "title": "Equipo local avanza a semifinales del torneo regional",
-        "date": "2025-03-01",
-        "category": "deportes",
+        "title": "Mitos y verdades sobre las dietas detox que arrasan en redes sociales",
+        "date": "2025-02-03",
+        "category": "nutrición",
         "content": (
-            "Los Leones de San Cristóbal derrotaron 3-1 al Atlético del Valle en "
-            "un emocionante partido disputado en el estadio municipal. "
-            "Con este resultado, el equipo avanza a las semifinales del Torneo "
-            "Regional de Fútbol Aficionado. El entrenador destacó el trabajo "
-            "colectivo y pidió apoyo de la afición para el próximo encuentro. "
-            "El partido semifinal se jugará el próximo 20 de marzo."
+            "Cada enero se repite el mismo fenómeno: las dietas detox inundan "
+            "Instagram y TikTok prometiendo resultados milagrosos en pocos días. "
+            "Pero los expertos advierten que el hígado y los riñones ya realizan "
+            "esa función de forma natural y que estos regímenes pueden ser perjudiciales. "
+            "El nutricionista Carlos Ruiz explica que la clave está en mantener "
+            "hábitos sostenibles en el tiempo, no en soluciones rápidas. "
+            "Consultar a un profesional antes de seguir cualquier dieta es siempre lo más recomendable."
         ),
     },
     {
-        "title": "Festival de cultura local reunirá a 30 artistas del municipio",
-        "date": "2025-03-05",
-        "category": "cultura",
+        "title": "Guía práctica para leer etiquetas nutricionales en el supermercado",
+        "date": "2025-02-20",
+        "category": "bienestar",
         "content": (
-            "La Casa de la Cultura anuncia el Primer Festival de Arte Local, "
-            "que se celebrará del 22 al 24 de marzo en la plaza principal. "
-            "Participarán pintores, músicos y artesanos de todas las colonias. "
-            "La entrada es gratuita y habrá actividades para niños. "
-            "El objetivo es visibilizar el talento local y fomentar el turismo cultural."
+            "Saber interpretar una etiqueta nutricional puede marcar la diferencia "
+            "a la hora de elegir productos más saludables sin gastar más dinero. "
+            "Los expertos recomiendan fijarse primero en el tamaño de la porción, "
+            "luego en el contenido de azúcares añadidos y grasas saturadas. "
+            "Un producto con menos de cinco ingredientes suele ser más natural. "
+            "La Asociación de Consumidores local ofrece talleres gratuitos cada mes "
+            "para aprender a comprar de forma más consciente e informada."
         ),
     },
 ]
@@ -91,7 +94,7 @@ def main():
     memory = Memory(max_turns=10)
 
     # 2. Cargar artículos de ejemplo en el RAG
-    print(f"\n Cargando {len(SAMPLE_ARTICLES)} artículos en ChromaDB...")
+    print(f"\nCargando {len(SAMPLE_ARTICLES)} artículos en ChromaDB...")
     kb.add_documents(SAMPLE_ARTICLES)
     print(f"   → {kb.count()} chunks indexados\n")
 
@@ -99,12 +102,10 @@ def main():
     agent = NewsResearchAgent(
         knowledge_base=kb,
         memory=memory,
-        newspaper_name="El Cronista Municipal",
-        region="MX",
     )
 
     # 4. Consulta de investigación
-    query = "¿Qué temas de comunidad deberíamos cubrir esta semana?"
+    query = "¿Qué temas de nutrición deberíamos cubrir esta semana?"
     print(f"Query: {query}\n")
 
     report = agent.run(query)
@@ -137,7 +138,7 @@ def main():
         if user_input.lower() in ("salir", "exit", "quit"):
             break
         reply = agent.chat(user_input)
-        print(f"\nAgente: {reply}\n")
+        print(f"\nJosé: {reply}\n")
 
 
 if __name__ == "__main__":
