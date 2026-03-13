@@ -1,24 +1,24 @@
 """
 agents/manuel_article_generation/agent.py
-──────────────────────────────
-Article Generation Agent 
-───────────────────
-Responsabilidad: Escribe articulos cortos, amigables con piezas optimizadas para generar visibilidad y engagement.
+──────────────────────────────────────────
+Article Generation Agent
+─────────────────────────
+Responsabilidad: Recibe una ArticleIdea verificada y escribe un artículo
+corto, cercano y optimizado para visibilidad y engagement digital.
 
 Arquitectura:
-    Usuario / Orchestrator
+    Orchestrator / Periodista
           │
-          ▼
-    manuel_article_generation.run(query)
+          ▼ ArticleIdea (producida por José + verificada por Camila)
+    ArticleGenerationAgent.run(idea)
           │
-          ├─► KnowledgeBase.retrieve()   ← ChromaDB local
-          ├─► 
+          ├─► KnowledgeBase.retrieve()   ← ChromaDB local (estilo del periódico)
           └─► Gemini generate_content()  ← google-genai (Vertex AI)
                     │
-                    └─► Respuesta estructurada (ArticleIdea[])
+                    └─► Respuesta estructurada (CreateArticle)
 
 Dependencias:
-    pip install google-genai chromadb pytrends requests
+    pip install google-genai chromadb
 
 Uso local (sin GCloud):
     Configurar GEMINI_API_KEY en .env con una key de AI Studio.
@@ -43,13 +43,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from core.vector_store import VectorStore
 from core.memory import Memory
 from core.chunker import chunk_document
-from tools.search_tools import (
-    web_search,
-    get_trending_topics,
-    score_local_relevance,
-    TOOL_SCHEMAS,
-    TOOL_DISPATCH,
-)
 from agents.jose_news_research.agent import ArticleIdea
 
 
@@ -61,9 +54,13 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 VERTEX_PROJECT  = os.getenv("GOOGLE_CLOUD_PROJECT", "") 
 VERTEX_REGION   = os.getenv("GOOGLE_CLOUD_REGION", "us-central1")
 
+# CAMBIAR CUANDO HAYA ORQUESTADOR
+NEWSPAPER_NAME = os.getenv("NEWSPAPER_NAME", "El Cronista Municipal")
+REGION_NEWS    = os.getenv("REGION_NEWS", "ES")
+
 CHAT_MODEL      = os.getenv("CHAT_MODEL", "gemini-2.0-flash")
 MAX_OUTPUT_TOKENS = 4096
-TEMPERATURE       = 0.4
+TEMPERATURE       = 0.2
 
 
 def _build_client() -> genai.Client:
@@ -114,7 +111,7 @@ class KnowledgeBase:
 
     def __init__(self, persist_dir: str = "data/embeddings"):
         self._store = VectorStore(
-            collection_name="news_research",
+            collection_name="article_generation",
             persist_dir=persist_dir,
         )
 
@@ -145,16 +142,15 @@ class KnowledgeBase:
 
 class ArticleGenerationAgent:
     """
-    Agente de investigación de noticias.
+    Agente escritor de artículos de acuerdo a las tendencias que identificó Jose.
 
-    Flujo de .run(query):
-    ┌─────────────────────────────────────────────────────────────┐
-    │ 1. Recuperar contexto histórico del periódico (RAG)         │
-    │ 2. Leer las tendencias que ha generado JoSE                 │
-    │ 3. Construir un articulo sobre alguna de las tendencias     │
-    │ 4. Enviar todo a Gemini con system prompt especializado     │
-    │ 5. Parsear respuesta → ResearchReport                       │
-    └─────────────────────────────────────────────────────────────┘
+    Flujo de .run(idea):
+    ┌─────────────────────────────────────────────────────────────────┐
+    │ 1. Recuperar contexto histórico del periódico (RAG)             │
+    │ 2. Construir prompt con la ArticleIdea recibida + contexto RAG  │
+    │ 3. Llamar a Gemini con system prompt especializado              │
+    │ 4. Parsear respuesta → CreateArticle                            │
+    └─────────────────────────────────────────────────────────────────┘
     """
 
     SYSTEM_PROMPT = """
@@ -173,22 +169,23 @@ RESTRICCIONES:
 - No cubras temas fuera del ámbito periodístico local
 - Prioriza la verificabilidad de la información
 
+REGLAS DE ESCRITURA DE ARTÍCULO:
+- El artículo debe tener entre 3 y 5 párrafos
+- Tono cercano y directo, evita lenguaje técnico o burocrático
+- El primer párrafo debe responder: qué pasó, dónde y a quién afecta
+
 FORMATO DE SALIDA:
-Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
+Cuando se te pida escribir un artículo, responde SIEMPRE con JSON válido:
 {
-  "article_ideas": [
-    {
-      "title": "Título sugerido del artículo",
-      "angle": "Enfoque o ángulo periodístico específico",
+      "title": "Título del artículo",
+      "angle": "Enfoque periodístico",
       "category": "política|deportes|cultura|economía|sucesos|comunidad",
-      "contenido": str
+      "local_relevance_score": 0.85,
+      "article_content": "Cuerpo completo del artículo...",
       "sources": ["fuente1", "fuente2"],
-      "keywords": ["keyword1", "keyword2"],
-      "priority": "alta|media|baja"
-    }
-  ],
-  "summary": "Resumen ejecutivo del panorama informativo actual"
+      "keywords": ["keyword1", "keyword2"]
 }
+
 """.strip()
 
     def __init__(
@@ -196,7 +193,7 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
         knowledge_base: KnowledgeBase,
         memory: Memory | None = None,
         newspaper_name: str = NEWSPAPER_NAME,
-        region: str = PAIS,
+        region: str = REGION_NEWS,
     ):
         self.kb = knowledge_base
         self.memory = memory or Memory(max_turns=10)
@@ -208,33 +205,21 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
 
     def run(self, idea: ArticleIdea) -> CreateArticle:
         """
-        Ejecuta el ciclo completo de investigación.
+        Escribe un artículo completo a partir de una ArticleIdea verificada.
 
         Args:
-            idea: Tema o idea para el árticulo
-                   Ej: "Nuevos métodos para adelgazar, ¿son confiables?"
-
+            idea: Idea de artículo producida por José y verificada por Camila.
+        
         Returns:
-            CreateArticle con artículos estructuradas.
+            CreateArticle con el artículo listo para publicar.
         """
         # 1. RAG: contexto histórico del periódico
-        context_snippets = self.kb.retrieve(query, top_k=4)
+        context_snippets = self.kb.retrieve(idea.title, top_k=4)
 
-        # 2. Trending topics
-        trending = get_trending_topics(region=self.region)
-
-        # 3. Búsqueda web
-        web_results = web_search(query, num_results=5)
-
-        # 4. Construir prompt enriquecido
-        user_prompt = self._build_prompt(
-            query=query,
-            context_snippets=context_snippets,
-            trending=trending,
-            web_results=web_results,
-        )
-
-        # 5. Llamar a Gemini
+        # 2. Construir prompt con RAG y ArticleIdea de Jose
+        user_prompt = self._build_prompt(idea=idea, context_snippets=context_snippets)
+        
+        # 3. Llamar a Gemini
         self.memory.add("user", user_prompt)
 
         response = self._client.models.generate_content(
@@ -250,16 +235,7 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
         raw_text = response.candidates[0].content.parts[0].text
         self.memory.add("model", raw_text)
 
-        # 6. Parsear respuesta
-        article_ideas = self._parse_ideas(raw_text)
-
-        return ResearchReport(
-            query=query,
-            trending_topics=trending,
-            article_ideas=article_ideas,
-            context_snippets=context_snippets,
-            raw_web_results=web_results,
-        )
+        return self._parse_article(raw_text, idea)
 
     def chat(self, user_input: str) -> str:
         """
@@ -285,34 +261,21 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
     def _personalized_system_prompt(self) -> str:
         return f"{self.SYSTEM_PROMPT}\n\nPeriódico: {self.newspaper_name}. Región: {self.region}."
 
-    def _build_prompt(
-        self,
-        query: str,
-        context_snippets: list[str],
-        trending: list[str],
-        web_results: list[dict],
-    ) -> str:
+    def _build_prompt(self, idea: ArticleIdea, context_snippets: list[str]) -> str:
         ctx_block = "\n".join(f"- {s[:300]}" for s in context_snippets) or "Sin contexto previo."
-        trend_block = ", ".join(trending[:5]) or "No disponible."
-        web_block = "\n".join(
-            f"• {r['title']} ({r['source']}): {r['snippet'][:200]}"
-            for r in web_results
-        ) or "Sin resultados web."
-
+        sources_block = ", ".join(idea.sources) or "No disponibles."
+    
         return f"""
-CONSULTA DE INVESTIGACIÓN: {query}
+IDEA A DESARROLLAR: {idea.title}
+ÁNGULO: {idea.angle}
+CATEGORÍA: {idea.category}
+PALABRAS CLAVE: {", ".join(idea.keywords)}
+FUENTES DISPONIBLES: {sources_block}
 
-CONTEXTO HISTÓRICO DEL PERIÓDICO (RAG):
+ESTILO DEL PERIÓDICO (RAG):
 {ctx_block}
 
-TEMAS EN TENDENCIA HOY:
-{trend_block}
-
-NOTICIAS RECIENTES EN LA WEB:
-{web_block}
-
-Con base en toda la información anterior, propón 3 ideas de artículos
-para {self.newspaper_name}. Responde en el formato JSON indicado.
+Escribe el artículo completo para {self.newspaper_name}. Responde en el formato JSON indicado.
 """.strip()
 
     def _messages_to_contents(self, messages: list[dict]) -> list[types.Content]:
@@ -327,37 +290,30 @@ para {self.newspaper_name}. Responde en el formato JSON indicado.
             )
         return result
 
-    def _parse_articles(self, raw_text: str) -> list[ArticleIdea]:
-        """Extrae ArticleIdea[] del JSON que devuelve Gemini."""
+    def _parse_article(self, raw_text: str, idea: ArticleIdea) -> CreateArticle:
         try:
-            # Limpia posibles bloques markdown ```json ... ```
             clean = raw_text.strip()
             if clean.startswith("```"):
                 clean = clean.split("```")[1]
                 if clean.startswith("json"):
                     clean = clean[4:]
             data = json.loads(clean)
-            ideas_raw = data.get("article_ideas", [])
-            return [
-                ArticleIdea(
-                    title=i.get("title", "Sin título"),
-                    angle=i.get("angle", ""),
-                    category=i.get("category", "general"),
-                    local_relevance_score=float(i.get("local_relevance_score", 0.5)),
-                    sources=i.get("sources", []),
-                    keywords=i.get("keywords", []),
-                    priority=i.get("priority", "media"),
-                )
-                for i in ideas_raw
-            ]
+            return CreateArticle(
+                title=data.get("title", idea.title),
+                angle=data.get("angle", idea.angle),
+                category=data.get("category", idea.category),
+                local_relevance_score=float(data.get("local_relevance_score", idea.local_relevance_score)),
+                article_content=data.get("article_content", ""),
+                sources=data.get("sources", idea.sources),
+                keywords=data.get("keywords", idea.keywords),
+            )
         except (json.JSONDecodeError, KeyError, TypeError):
-            # Si Gemini no devuelve JSON válido → idea genérica de fallback
-            return [
-                ArticleIdea(
-                    title="Investigación pendiente de parseo",
-                    angle=raw_text[:200],
-                    category="general",
-                    local_relevance_score=0.5,
-                    priority="baja",
-                )
-            ]
+            return CreateArticle(
+                title=idea.title,
+                angle=idea.angle,
+                category=idea.category,
+                local_relevance_score=0.0,
+                article_content=raw_text,
+                sources=idea.sources,
+                keywords=idea.keywords,
+            )
