@@ -204,7 +204,7 @@ Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
     {
       "title": "Título sugerido del artículo",
       "angle": "Enfoque o ángulo periodístico específico",
-      "category": "política|deportes|cultura|economía|sucesos|comunidad",
+      "category": "nutrición|recetas|bienestar|suplementos|dietas|comunidad",
       "local_relevance_score": 0.0,
       "sources": ["fuente1", "fuente2"],
       "keywords": ["keyword1", "keyword2"],
