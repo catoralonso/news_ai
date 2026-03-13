@@ -3,7 +3,7 @@ agents/camila_fact_checking/agent.py
 ─────────────────────────────────────
 Fact Checking Agent
 ────────────────────
-Responsabilidad: ...  # TODO: describe en tus palabras
+Responsabilidad: Verifica la información 
 
 Arquitectura:
     # TODO: dibuja el flujo como en José y Manuel
