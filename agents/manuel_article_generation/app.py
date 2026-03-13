@@ -120,31 +120,44 @@ class KnowledgeBase:
             persist_dir=f"{persist_dir}/news_research",
         )
 
-    def add_document(self, doc: dict) -> None:
+        # RAG de articulos escritos
+        self._published_store = VectorStore(
+            collection_name="article_published",
+            persist_dir=f"{persist_dir}/article_published",
+        )
+
+    def add_style_document(self, doc: dict) -> None:
         """
         doc = {"title": ..., "date": ..., "category": ..., "content": ...}
         """
         chunks = chunk_document(doc)
         texts = [c["text"] for c in chunks]
         metas = [{k: v for k, v in c.items() if k != "text"} for c in chunks]
-        self._store.upsert(texts=texts, metadatas=metas)
+        self._style_store.upsert(texts=texts, metadatas=metas)
 
-    def add_documents(self, docs: list[dict]) -> None:
+    def add_style_documents(self, docs: list[dict]) -> None:
         for doc in docs:
-            self.add_document(doc)
+            self.add_style_document(doc)
+
+    def add_published_article(self, doc: dict) -> None:
+        """Guarda el artículo ya generado en article_published/"""
+        chunks = chunk_document(doc)
+        texts = [c["text"] for c in chunks]
+        metas = [{k: v for k, v in c.items() if k != "text"} for c in chunks]
+        self._published_store.upsert(texts=texts, metadatas=metas)
 
     def retrieve(self, query: str, top_k: int = 4) -> list[str]:
         style_results = self._style_store.query(query, top_k=top_k)
         research_results = self._research_store.query(query, top_k=top_k)
+        article_results = self._published_store.query(query, top_k=top_k)
         
         # Combina y devuelve los mejores de ambos
-        all_results = style_results + research_results
+        all_results = style_results + research_results + article_results
         all_results.sort(key=lambda r: r.score)  
         return [r.text for r in all_results[:top_k]]
 
     def count(self) -> int:
-        return self._store.count()
-
+        return self._style_store.count()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Article Generation Agent
@@ -244,6 +257,10 @@ Cuando se te pida escribir un artículo, responde SIEMPRE con JSON válido:
 
         raw_text = response.candidates[0].content.parts[0].text
         self.memory.add("model", raw_text)
+
+        # Guardar articulo en RAG
+        article = self._parse_article(raw_text, idea)
+        self.kb.add_published_article(article.to_dict())
 
         return self._parse_article(raw_text, idea)
 
