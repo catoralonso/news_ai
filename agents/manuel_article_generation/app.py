@@ -109,9 +109,15 @@ class KnowledgeBase:
     """
 
     def __init__(self, persist_dir: str = "data/embeddings"):
-        self._store = VectorStore(
+        # Su propio RAG → aprende el estilo del periódico
+        self._style_store = VectorStore(
             collection_name="article_generation",
-            persist_dir=persist_dir,
+            persist_dir=f"{persist_dir}/article_generation",
+        )
+        # RAG de José → sabe qué temas ya se cubrieron
+        self._research_store = VectorStore(
+            collection_name="news_research",
+            persist_dir=f"{persist_dir}/news_research",
         )
 
     def add_document(self, doc: dict) -> None:
@@ -128,8 +134,13 @@ class KnowledgeBase:
             self.add_document(doc)
 
     def retrieve(self, query: str, top_k: int = 4) -> list[str]:
-        results = self._store.query(query, top_k=top_k)
-        return [r.text for r in results]
+        style_results = self._style_store.query(query, top_k=top_k)
+        research_results = self._research_store.query(query, top_k=top_k)
+        
+        # Combina y devuelve los mejores de ambos
+        all_results = style_results + research_results
+        all_results.sort(key=lambda r: r.score)  
+        return [r.text for r in all_results[:top_k]]
 
     def count(self) -> int:
         return self._store.count()
