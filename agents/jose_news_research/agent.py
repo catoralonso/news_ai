@@ -67,7 +67,7 @@ VERTEX_REGION   = os.getenv("GOOGLE_CLOUD_REGION", "us-central1")
 NEWSPAPER_NAME = os.getenv("NEWSPAPER_NAME", "Nutrición AI")
 PAIS           = os.getenv("REGION_NEWS", "ES")
 
-CHAT_MODEL      = os.getenv("CHAT_MODEL", "gemini-2.0-flash")
+CHAT_MODEL      = os.getenv("CHAT_MODEL", "gemini-2.5-flash")
 MAX_OUTPUT_TOKENS = 4096
 TEMPERATURE       = 0.4
 
@@ -98,8 +98,8 @@ def _build_client() -> genai.Client:
 @dataclass
 class ArticleIdea:
     title: str
-    angle: str                          # enfoque periodístico sugerido
-    category: str                       # política, deportes, cultura…
+    angle: str                         
+    category: str                      
     local_relevance_score: float        # 0–1
     sources: list[str] = field(default_factory=list)
     keywords: list[str] = field(default_factory=list)
