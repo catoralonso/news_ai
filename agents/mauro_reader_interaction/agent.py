@@ -70,9 +70,7 @@ PAIS            = os.getenv("REGION_NEWS", "ES")
 
 CHAT_MODEL        = os.getenv("CHAT_MODEL", "gemini-2.5-flash")
 MAX_OUTPUT_TOKENS = 2048
-TEMPERATURE       = 0.5   # Balanced: warm personality + factual grounding
-
-# Confidence threshold below which Mauro escalates to the journalist
+TEMPERATURE       = 0.5   
 ESCALATION_THRESHOLD = 0.4
 
 
@@ -106,7 +104,7 @@ class ReaderResponse:
     The UI can use each field independently — e.g. show recommended_article
     as a card below the main response text.
     """
-    message: str                            # Mauro's response (Spanish, Italian accent)
+    message: str                            
     intent: str                             # "fact_check" | "question" | "escalated"
     recommended_article: str = ""           # Article title if one was surfaced
     fact_check_verdict: str = ""            # "truthful" | "doubtful" | "untruthful" | ""
@@ -168,7 +166,7 @@ class KnowledgeBase:
         published_results = self._published_store.query(query, top_k=top_k)
 
         all_results = faq_results + published_results
-        all_results.sort(key=lambda r: r.score)  # lower cosine = more similar
+        all_results.sort(key=lambda r: r.score)  
         return [r.text for r in all_results[:top_k]]
 
     def find_article(self, query: str) -> str:
@@ -180,7 +178,6 @@ class KnowledgeBase:
         results = self._published_store.query(query, top_k=1)
         if not results:
             return ""
-        # Extract title from metadata if available, otherwise return snippet
         meta = results[0].metadata
         return meta.get("title", results[0].text[:80])
 
@@ -282,13 +279,12 @@ Input: {user_input}
         region: str = PAIS,
     ):
         self.kb = knowledge_base
-        self.memory = memory or Memory(max_turns=20)  # longer window — conversational
+        self.memory = memory or Memory(max_turns=20)  
         self.newspaper_name = newspaper_name
         self.region = region
         self._client = _build_client()
 
         # Camila is instantiated lazily — only created when a fact-check is needed
-        # This avoids loading Camila's RAG collections into memory on every startup
         self._camila_kb = camila_knowledge_base
         self._camila: FactCheckingAgent | None = None
 
@@ -312,7 +308,6 @@ Input: {user_input}
         if intent == "fact_check":
             return self._handle_fact_check(user_input)
         else:
-            # Both "question" and "other" go through the standard RAG flow
             return self._handle_question(user_input, intent)
 
     # ── Intent routing ────────────────────────────────────────────────────────
@@ -336,7 +331,7 @@ Input: {user_input}
                 ],
                 config=types.GenerateContentConfig(
                     max_output_tokens=10,
-                    temperature=0.0,  # deterministic classification
+                    temperature=0.0,  
                 ),
             )
             intent = response.candidates[0].content.parts[0].text.strip().lower()
@@ -344,7 +339,7 @@ Input: {user_input}
                 return intent
         except Exception:
             pass
-        return "question"  # safe default
+        return "question" 
 
     # ── Fact-check handler ────────────────────────────────────────────────────
 
@@ -368,7 +363,7 @@ Input: {user_input}
         )
 
         fact_result = camila.run(claim)
-
+        
         # Build Mauro's response based on Camila's verdict
         verdict_context = self._format_verdict_for_reader(fact_result)
 
