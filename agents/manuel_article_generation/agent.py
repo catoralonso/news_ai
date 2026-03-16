@@ -26,8 +26,11 @@ Local usage (without GCloud):
 """
 
 from __future__ import annotations
-# for when the orchestaror is build uncomment
-# from config import NEWSPAPER_NAME, PAIS 
+from config import (
+    NEWSPAPER_NAME, REGION as PAIS,
+    CHAT_MODEL, GEMINI_API_KEY,
+    VERTEX_PROJECT, VERTEX_REGION,
+)
 
 import json
 import os
@@ -51,15 +54,6 @@ from agents.jose_news_research.agent import ArticleIdea
 # Config
 # ─────────────────────────────────────────────────────────────────────────────
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")      
-VERTEX_PROJECT  = os.getenv("GOOGLE_CLOUD_PROJECT", "") 
-VERTEX_REGION   = os.getenv("GOOGLE_CLOUD_REGION", "us-central1")
-
-# TODO: move to orchestrator when ready
-NEWSPAPER_NAME = os.getenv("NEWSPAPER_NAME", "El Cronista Municipal")
-REGION_NEWS    = os.getenv("REGION_NEWS", "ES")
-
-CHAT_MODEL      = os.getenv("CHAT_MODEL", "gemini-2.5-flash")
 MAX_OUTPUT_TOKENS = 4096
 TEMPERATURE       = 0.2
 
