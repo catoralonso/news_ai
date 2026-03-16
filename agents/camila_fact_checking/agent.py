@@ -1,22 +1,23 @@
 """
 agents/camila_fact_checking/agent.py
 ─────────────────────────────────────
-Fact Checking Agent
-────────────────────
+Fact Checking Agent — Camila
+─────────────────────────────
 Responsibility: Verifies ArticleIdeas from Jose and handles
 fact-checking requests from Mauro's reader chatbot.
 
 Architecture:
-     User / Orchestrator
+     Orchestrator / Mauro
           │
-          ▼
-    FactCheckingAgent.run(idea)
+          ▼ ArticleIdea (from Jose) or str (reader claim)
+    FactCheckingAgent.run(idea) / .verify_url(text)
           │
-          ├─► KnowledgeBase.retrieve()   ← ChromaDB local
+          ├─► KnowledgeBase.retrieve()   ← fact_checking/ + news_research/ + article_published/
           ├─► web_search()               ← RSS / mock fallback
           └─► Gemini generate_content()  ← google-genai (Vertex AI)
                     │
-                    └─► FactCheckResult (verdict + confidence + reason + sources)
+                    ├── FactCheckResult   (pipeline: idea + verdict + confidence + reason + sources)
+                    └── VerificationResult (reader: input_text + verdict + confidence + reason + sources)
 
 Dependencies:
     pip install google-genai chromadb requests feedparser
@@ -80,11 +81,12 @@ def _build_client() -> genai.Client:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Output data model
+# Output data models
 # ─────────────────────────────────────────────────────────────────────────────
 
 @dataclass
 class FactCheckResult:
+    """Returned by run() — pipeline path from Jose via Orchestrator."""
     idea: ArticleIdea
     verdict: str            # "truthful" | "doubtful" | "untruthful"
     reason: str             # explanation of the verdict
@@ -101,15 +103,28 @@ class FactCheckResult:
         }
 
 
+@dataclass
+class VerificationResult:
+    """Returned by verify_url() — reader claim path via Mauro."""
+    input_text: str         # raw URL or claim submitted by the reader
+    verdict: str            # "truthful" | "doubtful" | "untruthful"
+    reason: str
+    confidence: float
+    sources: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        return self.__dict__
+
+
 # ─────────────────────────────────────────────────────────────────────────────
-# Knowledge Base
+# Knowledge Base (RAG)
 # ─────────────────────────────────────────────────────────────────────────────
 
 class KnowledgeBase:
     """
     Three collections:
-    - fact_checking/    (own) → known fake news patterns
-    - news_research/    (Jose, read-only) → research context
+    - fact_checking/     (own) → known fake news patterns, grows over time
+    - news_research/     (Jose, read-only) → research context
     - article_published/ (Manuel, read-only) → published articles
     """
 
@@ -154,7 +169,7 @@ class KnowledgeBase:
         article_results  = self._published_store.query(query, top_k=top_k)
 
         all_results = fact_results + research_results + article_results
-        all_results.sort(key=lambda r: r.score)  # lower score = more similar
+        all_results.sort(key=lambda r: r.score)  
         return [r.text for r in all_results[:top_k]]
 
     def count(self) -> int:
@@ -169,7 +184,7 @@ class FactCheckingAgent:
     """
     Verifies ArticleIdeas produced by Jose and claims submitted via Mauro.
 
-    Flow of .run(idea):
+    run(idea) flow:
     ┌─────────────────────────────────────────────────────────────────┐
     │ 1. Retrieve fake news patterns and context from RAG             │
     │ 2. Web search the main claim                                    │
@@ -178,6 +193,9 @@ class FactCheckingAgent:
     │ 5. Parse response → FactCheckResult                             │
     │ 6. If untruthful → persist to fact_checking RAG                 │
     └─────────────────────────────────────────────────────────────────┘
+
+    verify_url(text) flow: same steps but input is free text from a reader,
+    returns VerificationResult instead of FactCheckResult.
     """
 
     SYSTEM_PROMPT = """
@@ -206,7 +224,6 @@ VERDICT SCALE:
 - "truthful"   → confidence 0.7 - 1.0  (supported by reliable sources)
 - "doubtful"   → confidence 0.4 - 0.69 (conflicting or insufficient evidence)
 - "untruthful" → confidence 0.0 - 0.39 (contradicted by reliable sources)
-- "no informtation" → confidence 0.5 (no sources found to verify the claim)
 
 OUTPUT FORMAT:
 When asked to verify a claim, ALWAYS respond with valid JSON:
@@ -231,7 +248,7 @@ When asked to verify a claim, ALWAYS respond with valid JSON:
         self.region = region
         self._client = _build_client()
 
-    # ── Main method ───────────────────────────────────────────────────────────
+    # ── Pipeline method (Jose → Orchestrator → Camila) ───────────────────────
 
     def run(self, idea: ArticleIdea) -> FactCheckResult:
         """
@@ -272,16 +289,11 @@ When asked to verify a claim, ALWAYS respond with valid JSON:
         raw_text = response.candidates[0].content.parts[0].text
         self.memory.add("model", raw_text)
 
-        # 5. Parse response
+        # 5. Parse response → FactCheckResult
         result = self._parse_result(raw_text, idea)
 
-        # 6. If untruthful → persist to fact_checking RAG for future reference
-        if result.verdict == "untruthful":
-            self.kb.add_fake_news_example({
-                "title":    idea.title,
-                "content":  result.reason,
-                "category": idea.category,
-            })
+        # 6. If untruthful → persist to RAG for future reference
+        self._persist_if_fake(result.verdict, idea.title, result.reason, idea.category)
 
         return result
 
@@ -295,10 +307,82 @@ When asked to verify a claim, ALWAYS respond with valid JSON:
         results.sort(key=lambda r: r.confidence, reverse=True)
         return results
 
+    # ── Reader path (Mauro → Camila) ─────────────────────────────────────────
+
+    def verify_url(self, input_text: str) -> VerificationResult:
+        """
+        Verifies a raw claim or URL submitted by a reader via Mauro.
+        Unlike run(), this method has no ArticleIdea — it works with free text.
+
+        Args:
+            input_text: Raw claim, headline, or URL from the reader.
+
+        Returns:
+            VerificationResult with verdict, confidence, reason and sources.
+        """
+        # 1. RAG — retrieve fake news patterns similar to this claim
+        context_snippets = self.kb.retrieve(input_text, top_k=4)
+
+        # 2. Web search the claim
+        web_results = web_search(input_text, num_results=5)
+
+        # 3. Build prompt
+        ctx_block = (
+            "\n".join(f"- {s[:300]}" for s in context_snippets)
+            or "No prior context available."
+        )
+        web_block = (
+            "\n".join(
+                f"• {r['title']} ({r['source']}): {r['snippet'][:200]}"
+                for r in web_results
+            )
+            or "No web results found."
+        )
+
+        user_prompt = f"""
+READER CLAIM TO VERIFY:
+{input_text}
+
+SIMILAR PATTERNS FROM FACT-CHECKING RAG:
+{ctx_block}
+
+WEB SEARCH RESULTS:
+{web_block}
+
+Evaluate this claim and respond with the JSON format specified in your instructions.
+""".strip()
+
+        # 4. Call Gemini
+        self.memory.add("user", user_prompt)
+
+        response = self._client.models.generate_content(
+            model=CHAT_MODEL,
+            contents=self._messages_to_contents(self.memory.as_messages()),
+            config=types.GenerateContentConfig(
+                system_instruction=self._personalized_system_prompt(),
+                max_output_tokens=MAX_OUTPUT_TOKENS,
+                temperature=TEMPERATURE,
+            ),
+        )
+
+        raw_text = response.candidates[0].content.parts[0].text
+        self.memory.add("model", raw_text)
+
+        # 5. Parse → VerificationResult
+        result = self._parse_verification(raw_text, input_text)
+
+        # 6. Persist if fake
+        self._persist_if_fake(result.verdict, input_text, result.reason, "reader_submission")
+
+        return result
+
     # ── Private helpers ───────────────────────────────────────────────────────
 
     def _personalized_system_prompt(self) -> str:
-        return f"{self.SYSTEM_PROMPT}\n\nNewspaper: {self.newspaper_name}. Region: {self.region}."
+        return (
+            f"{self.SYSTEM_PROMPT}\n\n"
+            f"Newspaper: {self.newspaper_name}. Region: {self.region}."
+        )
 
     def _build_prompt(
         self,
@@ -306,12 +390,18 @@ When asked to verify a claim, ALWAYS respond with valid JSON:
         context_snippets: list[str],
         web_results: list[dict],
     ) -> str:
-        ctx_block = "\n".join(f"- {s[:300]}" for s in context_snippets) or "No prior context available."
+        ctx_block = (
+            "\n".join(f"- {s[:300]}" for s in context_snippets)
+            or "No prior context available."
+        )
         sources_block = ", ".join(idea.sources) or "No sources provided by Jose."
-        web_block = "\n".join(
-            f"• {r['title']} ({r['source']}): {r['snippet'][:200]}"
-            for r in web_results
-        ) or "No web results found."
+        web_block = (
+            "\n".join(
+                f"• {r['title']} ({r['source']}): {r['snippet'][:200]}"
+                for r in web_results
+            )
+            or "No web results found."
+        )
 
         return f"""
 CLAIM TO VERIFY: {idea.title}
@@ -341,6 +431,21 @@ for {self.newspaper_name}. Respond in the JSON format specified.
             )
         return result
 
+    def _persist_if_fake(
+        self,
+        verdict: str,
+        title: str,
+        reason: str,
+        category: str,
+    ) -> None:
+        """Persists untruthful content to the RAG so future checks benefit from it."""
+        if verdict == "untruthful":
+            self.kb.add_fake_news_example({
+                "title":    title,
+                "content":  reason,
+                "category": category,
+            })
+
     def _parse_result(self, raw_text: str, idea: ArticleIdea) -> FactCheckResult:
         """
         Parses Gemini's JSON response into a FactCheckResult.
@@ -363,7 +468,36 @@ for {self.newspaper_name}. Respond in the JSON format specified.
         except (json.JSONDecodeError, KeyError, TypeError):
             return FactCheckResult(
                 idea=idea,
-                verdict="no_information",
+                verdict="doubtful",
+                reason=raw_text[:300],
+                confidence=0.5,
+                sources=[],
+            )
+
+    def _parse_verification(self, raw_text: str, input_text: str) -> VerificationResult:
+        """
+        Parses Gemini's JSON response into a VerificationResult.
+        Same logic as _parse_result but returns VerificationResult.
+        Falls back to 'doubtful' if parsing fails.
+        """
+        try:
+            clean = raw_text.strip()
+            if clean.startswith("```"):
+                clean = clean.split("```")[1]
+                if clean.startswith("json"):
+                    clean = clean[4:]
+            data = json.loads(clean)
+            return VerificationResult(
+                input_text=input_text,
+                verdict=data.get("verdict", "doubtful"),
+                reason=data.get("reason", ""),
+                confidence=float(data.get("confidence", 0.5)),
+                sources=data.get("sources", []),
+            )
+        except (json.JSONDecodeError, KeyError, TypeError):
+            return VerificationResult(
+                input_text=input_text,
+                verdict="doubtful",
                 reason=raw_text[:300],
                 confidence=0.5,
                 sources=[],
