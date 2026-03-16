@@ -3,29 +3,28 @@ agents/mauro_reader_interaction/agent.py
 ─────────────────────────────────────────
 Reader Interaction Agent — Mauro
 ─────────────────────────────────
-Responsibility: Public-facing chatbot. Answers reader questions grounded
-in published articles, routes external news claims to Camila for fact-checking,
-recommends relevant articles, logs FAQs, and escalates unanswerable questions
+Responsibility: Handles reader conversations using all pipeline outputs.
+Routes fact-check requests to Camila. Escalates unanswerable questions
 to the journalist team.
 
 Architecture:
-    Reader (via website / Streamlit UI)
+     Reader (via UI / chatbot)
           │
-          ▼
+          ▼ free text
     ReaderInteractionAgent.chat(user_input)
           │
-          ├─► _detect_intent()             ← classifies input before routing
+          ├─► _detect_intent()              ← lightweight Gemini call (no RAG, no memory)
+          │         │
+          │    "fact_check" ──────────────► Camila.verify_url(input_text)
+          │    "question"   ──────────────► KnowledgeBase.retrieve() + Gemini
+          │    "other"      ──────────────► Gemini (friendly deflection)
           │
-          ├─► [fact_check] FactCheckingAgent.run()   ← Camila integration
-          │       └─► returns verdict + reason to reader
-          │
-          ├─► [question]  KnowledgeBase.retrieve()   ← RAG grounded response
-          │       └─► Gemini generate_content()
-          │       └─► _recommend_article()           ← surfaces Manuel's work
-          │
-          ├─► [escalate]  _escalate()                ← saves to escalated/
-          │
-          └─► _log_faq()                             ← persists Q&A to RAG
+          └─► ReaderResponse
+                  ├── message
+                  ├── intent
+                  ├── fact_check_verdict / confidence  (fact_check path only)
+                  ├── recommended_article              (question path only)
+                  └── was_escalated
 
 Dependencies:
     pip install google-genai chromadb
@@ -36,13 +35,9 @@ Local usage (without GCloud):
 """
 
 from __future__ import annotations
-# Uncomment when orchestrator is ready:
-# from config import NEWSPAPER_NAME, PAIS
 
-import json
 import os
 from dataclasses import dataclass, field
-from datetime import datetime
 
 from google import genai
 from google.genai import types
@@ -53,9 +48,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from core.vector_store import VectorStore
 from core.memory import Memory
 from core.chunker import chunk_document
-from agents.jose_news_research.agent import ArticleIdea
-from agents.camila_fact_checking.agent import FactCheckingAgent
-from agents.camila_fact_checking.agent import KnowledgeBase as CamilaKnowledgeBase
+from agents.camila_fact_checking.agent import (
+    FactCheckingAgent,
+    KnowledgeBase as CamilaKnowledgeBase,
+)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -70,8 +66,7 @@ PAIS            = os.getenv("REGION_NEWS", "ES")
 
 CHAT_MODEL        = os.getenv("CHAT_MODEL", "gemini-2.5-flash")
 MAX_OUTPUT_TOKENS = 2048
-TEMPERATURE       = 0.5   
-ESCALATION_THRESHOLD = 0.4
+TEMPERATURE       = 0.7   # warmer — this is a conversational agent
 
 
 def _build_client() -> genai.Client:
@@ -99,16 +94,12 @@ def _build_client() -> genai.Client:
 
 @dataclass
 class ReaderResponse:
-    """
-    Structured response returned to the reader interface.
-    The UI can use each field independently — e.g. show recommended_article
-    as a card below the main response text.
-    """
-    message: str                            
-    intent: str                             # "fact_check" | "question" | "escalated"
-    recommended_article: str = ""           # Article title if one was surfaced
-    fact_check_verdict: str = ""            # "truthful" | "doubtful" | "untruthful" | ""
-    fact_check_confidence: float = 0.0
+    """Everything Mauro returns after handling a reader message."""
+    message: str
+    intent: str = ""                        # "fact_check" | "question" | "other"
+    fact_check_verdict: str = ""            # populated on fact_check path
+    fact_check_confidence: float = 0.0      # populated on fact_check path
+    recommended_article: str = ""           # populated on question path
     was_escalated: bool = False
 
     def to_dict(self) -> dict:
@@ -122,67 +113,52 @@ class ReaderResponse:
 class KnowledgeBase:
     """
     Two collections:
-    - reader_interaction/  (own) → FAQ patterns learned from past conversations
-    - article_published/   (Manuel, read-only) → grounding for responses
-                                                  and article recommendations
+    - reader_interaction/ (own) → FAQ log, past Q&A, reader patterns
+    - article_published/  (Manuel, read-only) → articles to recommend
     """
 
     def __init__(self, persist_dir: str = "data/embeddings"):
-        # Own RAG → grows with every conversation (FAQ learning)
-        self._faq_store = VectorStore(
+        # Own RAG → FAQ and conversation log
+        self._reader_store = VectorStore(
             collection_name="reader_interaction",
             persist_dir=f"{persist_dir}/reader_interaction",
         )
-        # Manuel's RAG → read-only, used to ground answers and recommend articles
+        # Manuel's RAG → read-only, source for article recommendations
         self._published_store = VectorStore(
             collection_name="article_published",
             persist_dir=f"{persist_dir}/article_published",
         )
 
-    def log_faq(self, question: str, answer: str, category: str = "general") -> None:
-        """
-        Persists a Q&A pair into the reader_interaction collection.
-        Over time this teaches Mauro the most common reader questions
-        and the best answers the newspaper has given.
-        """
-        doc = {
-            "title":    question[:100],
-            "content":  f"Q: {question}\nA: {answer}",
-            "category": category,
-            "date":     datetime.now().isoformat(),
-        }
+    def log_faq(self, question: str, answer: str, category: str = "") -> None:
+        """Indexes a Q&A pair for future retrieval."""
+        doc = {"content": f"Q: {question}\nA: {answer}", "category": category}
         chunks = chunk_document(doc)
         texts = [c["text"] for c in chunks]
         metas = [{k: v for k, v in c.items() if k != "text"} for c in chunks]
-        self._faq_store.upsert(texts=texts, metadatas=metas)
+        self._reader_store.upsert(texts=texts, metadatas=metas)
 
     def retrieve(self, query: str, top_k: int = 4) -> list[str]:
-        """
-        Queries both collections and returns the most relevant results.
-        FAQ patterns help Mauro recognize recurring questions.
-        Published articles ground his answers in real content.
-        """
-        faq_results       = self._faq_store.query(query, top_k=top_k)
-        published_results = self._published_store.query(query, top_k=top_k)
+        """Queries both collections and returns the most relevant results."""
+        reader_results    = self._reader_store.query(query, top_k=top_k)
+        published_results = self._published_store.query(query, top_k=2)
 
-        all_results = faq_results + published_results
-        all_results.sort(key=lambda r: r.score)  
+        all_results = reader_results + published_results
+        all_results.sort(key=lambda r: r.score)  # lower score = more similar
         return [r.text for r in all_results[:top_k]]
 
     def find_article(self, query: str) -> str:
         """
-        Searches the published articles collection and returns the title
-        of the most relevant article to recommend to the reader.
+        Returns the title of the most relevant published article for the query.
         Returns empty string if nothing relevant is found.
         """
         results = self._published_store.query(query, top_k=1)
-        if not results:
-            return ""
-        meta = results[0].metadata
-        return meta.get("title", results[0].text[:80])
+        if results:
+            # Titles are stored as metadata or at the start of the text chunk
+            return results[0].text[:80].split("\n")[0]
+        return ""
 
     def count(self) -> int:
-        return self._faq_store.count()
+        return self._reader_store.count()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -191,67 +167,35 @@ class KnowledgeBase:
 
 class ReaderInteractionAgent:
     """
-    Public-facing chatbot — Mauro.
+    Conversational agent for newspaper readers — Mauro.
 
-    chat(user_input) routing:
-    ┌──────────────────────────────────────────────────────────────────────┐
-    │ 1. Detect intent: fact_check | question | other                      │
-    │ 2a. [fact_check] → wrap in ArticleIdea → call Camila → format reply  │
-    │ 2b. [question]   → RAG retrieve → Gemini → recommend article         │
-    │ 3. Evaluate confidence → escalate if below threshold                 │
-    │ 4. Log Q&A to reader_interaction RAG (FAQ learning)                  │
-    │ 5. Return ReaderResponse                                             │
-    └──────────────────────────────────────────────────────────────────────┘
+    chat(user_input) flow:
+    ┌─────────────────────────────────────────────────────────────────┐
+    │ 1. Detect intent (lightweight Gemini call, no memory)           │
+    │ 2a. fact_check → verify_url() via injected Camila instance      │
+    │ 2b. question   → RAG + Gemini, recommend article, maybe escalate│
+    │ 2c. other      → friendly Gemini response                       │
+    │ 3. Log Q&A to reader_interaction RAG                            │
+    │ 4. Return ReaderResponse                                        │
+    └─────────────────────────────────────────────────────────────────┘
     """
 
     SYSTEM_PROMPT = """
-You are Mauro, the reader-facing chatbot of a local nutrition newspaper.
-You are inspired by an Italian professor — fun, loves a good time, but
-serious and direct when it matters. You bring warmth and humor to every
-interaction without ever sacrificing accuracy.
+You are Mauro, the reader interaction assistant of a local nutrition newspaper.
+Your role: answer readers' nutrition and health questions using the newspaper's
+published articles and verified information.
 
 PERSONALITY:
-- Warm, entertaining, and genuinely curious about people
-- You celebrate food and nutrition with Italian passion: "Mamma mia, questa
-  domanda è fantastica!" or "Allora, let me tell you something important..."
-- Direct and honest when delivering bad news (fake info, lack of evidence)
-- You never talk down to readers — you are their knowledgeable friend
-- When something is serious (health misinformation, dangerous advice),
-  your tone shifts immediately: clear, direct, no jokes
-
-ITALIAN ACCENT RULES (apply naturally, not in every sentence):
-- Sprinkle Italian expressions: "Allora...", "Mamma mia!", "Dai!",
-  "Capisce?", "Perfetto!", "Esatto!", "Madonna...", "Andiamo!"
-- Occasional Italian-style phrasing: "This, it is very important"
-  or "You see, the science, it says..."
-- Exclamation points used with Italian enthusiasm, not sparingly
-- When very excited: mix a full Italian phrase with Spanish translation
-  e.g. "Come si dice... cómo se dice, la variedad es la clave!"
-- Keep it natural — Mauro is fluent in Spanish, the accent is flavor not noise
-
-CORE RESPONSIBILITIES:
-1. Answer reader questions about nutrition grounded in published articles
-2. Verify external news claims via Camila (fact-checking agent)
-3. Recommend relevant articles from the newspaper's archive
-4. Escalate genuinely unanswerable questions to the journalist team
-
-WHEN DELIVERING A FACT-CHECK RESULT:
-- "truthful"   → celebrate it! Confirm it with enthusiasm and add context
-- "doubtful"   → be honest but gentle, explain what is uncertain and why
-- "untruthful" → be direct and clear, explain WHY it is false with sources,
-                 no jokes here — misinformation is serious business
+- Warm, approachable, and enthusiastic about nutrition
+- You occasionally use Italian expressions for flavor (ciao, allora, bravissimo)
+  but always communicate primarily in Spanish
+- You are honest when you don't know something — you never invent answers
+- You reference the newspaper's articles naturally in conversation
 
 RESTRICTIONS:
-- Never invent scientific data, studies, or specific statistics
-- Never give personalized medical advice — always recommend consulting a doctor
-- Stay within the nutrition and health domain
-- If you don't know something, say so with Mauro's charm — don't fake it
-
-ESCALATION:
-- If you genuinely cannot answer a question with confidence, tell the reader
-  you are passing it to the journalist team and they will get a proper answer
-- Phrase it warmly: "Questa domanda merita una risposta seria —
-  I'm sending this to our team of experts, they will answer you properly!"
+- Only answer questions related to nutrition, health, and the newspaper's content
+- Never give medical diagnoses or prescribe treatments
+- If you don't have enough information, say so and escalate to the team
 
 LANGUAGE: Always respond in Spanish. Italian expressions are accent only.
 """.strip()
@@ -273,20 +217,44 @@ Input: {user_input}
     def __init__(
         self,
         knowledge_base: KnowledgeBase,
-        camila_knowledge_base: CamilaKnowledgeBase | None = None,
+        camila: FactCheckingAgent,
         memory: Memory | None = None,
         newspaper_name: str = NEWSPAPER_NAME,
         region: str = PAIS,
     ):
         self.kb = knowledge_base
-        self.memory = memory or Memory(max_turns=20)  
+        self.memory = memory or Memory(max_turns=20)  # longer window — conversational
         self.newspaper_name = newspaper_name
         self.region = region
         self._client = _build_client()
 
-        # Camila is instantiated lazily — only created when a fact-check is needed
-        self._camila_kb = camila_knowledge_base
-        self._camila: FactCheckingAgent | None = None
+        # Camila is injected by the Orchestrator — not created here
+        self._camila = camila
+
+        # Context injected by Orchestrator after Manuel and Asti finish
+        self._article = None
+        self._social_pack = None
+
+    # ── Setup (called by Orchestrator after pipeline completes) ──────────────
+
+    def setup(self, article, social_pack) -> None:
+        """
+        Called by the Orchestrator after Manuel and Asti finish.
+        Injects the latest article and social pack so Mauro can
+        answer questions about them and recommend them.
+
+        Args:
+            article:     CreateArticle produced by Manuel.
+            social_pack: SocialMediaPack produced by Asti.
+        """
+        self._article = article
+        self._social_pack = social_pack
+        # Index the new article in the reader RAG so retrieve() finds it
+        self.kb.log_faq(
+            question=article.title,
+            answer=article.article_content,
+            category=article.category,
+        )
 
     # ── Main method ───────────────────────────────────────────────────────────
 
@@ -308,6 +276,7 @@ Input: {user_input}
         if intent == "fact_check":
             return self._handle_fact_check(user_input)
         else:
+            # Both "question" and "other" go through the standard RAG flow
             return self._handle_question(user_input, intent)
 
     # ── Intent routing ────────────────────────────────────────────────────────
@@ -331,7 +300,7 @@ Input: {user_input}
                 ],
                 config=types.GenerateContentConfig(
                     max_output_tokens=10,
-                    temperature=0.0,  
+                    temperature=0.0,  # deterministic classification
                 ),
             )
             intent = response.candidates[0].content.parts[0].text.strip().lower()
@@ -339,50 +308,40 @@ Input: {user_input}
                 return intent
         except Exception:
             pass
-        return "question" 
+        return "question"  # safe default
 
     # ── Fact-check handler ────────────────────────────────────────────────────
 
     def _handle_fact_check(self, user_input: str) -> ReaderResponse:
         """
-        Wraps the reader's claim in a minimal ArticleIdea and passes it
-        to Camila. Formats Camila's verdict into Mauro's voice.
+        Passes the reader's claim directly to Camila via verify_url().
+        Formats Camila's VerificationResult into Mauro's voice.
         """
-        # Lazy-initialize Camila only when needed
-        camila = self._get_camila()
+        # Call Camila with the reader's raw text — no ArticleIdea needed
+        verification = self._camila.verify_url(user_input)
 
-        # Wrap claim in a minimal ArticleIdea — Camila expects this type
-        claim = ArticleIdea(
-            title=user_input,
-            angle="Reader-submitted claim for fact-checking",
-            category="general",
-            local_relevance_score=0.5,
-            sources=[],
-            keywords=[],
-            priority="media",
-        )
-
-        fact_result = camila.run(claim)
-        
         # Build Mauro's response based on Camila's verdict
-        verdict_context = self._format_verdict_for_reader(fact_result)
+        verdict_context = self._format_verdict_for_reader(
+            verification.verdict, verification.confidence
+        )
 
         user_prompt = f"""
 The reader submitted this claim for fact-checking: "{user_input}"
 
-Camila's verdict: {fact_result.verdict} (confidence: {fact_result.confidence:.0%})
-Reason from Camila: {fact_result.reason}
-Sources found: {', '.join(fact_result.sources) or 'None'}
+Camila's verdict: {verification.verdict} (confidence: {verification.confidence:.0%})
+Reason from Camila: {verification.reason}
+Sources found: {', '.join(verification.sources) or 'None'}
 
 {verdict_context}
 
 Respond to the reader as Mauro. Be warm or serious depending on the verdict.
-Remember: if untruthful, be direct and explain WHY with the sources available.
-"""
+If untruthful, be direct and explain WHY with the sources available.
+""".strip()
+
         self.memory.add("user", user_prompt)
         reply = self._call_gemini()
 
-        # Log this interaction as a FAQ for future reference
+        # Log this interaction for future RAG retrieval
         self.kb.log_faq(
             question=user_input,
             answer=reply,
@@ -392,17 +351,17 @@ Remember: if untruthful, be direct and explain WHY with the sources available.
         return ReaderResponse(
             message=reply,
             intent="fact_check",
-            fact_check_verdict=fact_result.verdict,
-            fact_check_confidence=fact_result.confidence,
+            fact_check_verdict=verification.verdict,
+            fact_check_confidence=verification.confidence,
         )
 
-    def _format_verdict_for_reader(self, fact_result) -> str:
-        """Builds verdict-specific instruction for Mauro's tone."""
-        if fact_result.verdict == "truthful":
+    def _format_verdict_for_reader(self, verdict: str, confidence: float) -> str:
+        """Builds verdict-specific tone instruction for Mauro's response."""
+        if verdict == "truthful":
             return "This is TRUE — respond with enthusiasm and add useful context."
-        elif fact_result.verdict == "doubtful":
+        elif verdict == "doubtful":
             return "This is UNCERTAIN — be honest, explain what is unclear, be gentle."
-        elif fact_result.verdict == "untruthful":
+        elif verdict == "untruthful":
             return (
                 "This is FALSE — be direct, serious, explain clearly why it is "
                 "misinformation. No jokes. Use the sources to back up the explanation."
@@ -447,32 +406,27 @@ CONTEXT FROM NEWSPAPER ARCHIVE (RAG):
 Answer the reader's question as Mauro. Ground your answer in the context above.
 If you recommend the article, mention it naturally in your response.
 If the context is insufficient to answer confidently, say so honestly.
-"""
+""".strip()
+
         self.memory.add("user", user_prompt)
         reply = self._call_gemini()
 
-        # 4. Evaluate whether to escalate
-        # Escalate if: no RAG context AND Gemini gave a very short/uncertain reply
-        should_escalate = (
-            not has_context
-            and len(reply.split()) < 40
-        )
+        # 4. Escalate if: no RAG context AND Gemini gave a very short/uncertain reply
+        should_escalate = not has_context and len(reply.split()) < 40
 
         if should_escalate:
             self._escalate(user_input)
-            # Append escalation notice to Mauro's reply in his voice
-            escalation_notice = (
+            reply += (
                 "\n\nAllora — questa domanda merita una risposta seria! "
                 "La he enviado a nuestro equipo de expertos. "
                 "¡Te responderán pronto con toda la información!"
             )
-            reply += escalation_notice
 
-        # 5. Log FAQ for future RAG learning
+        # 5. Log Q&A for future RAG retrieval
         self.kb.log_faq(
             question=user_input,
             answer=reply,
-            category="question",
+            category=intent,
         )
 
         return ReaderResponse(
@@ -482,13 +436,10 @@ If the context is insufficient to answer confidently, say so honestly.
             was_escalated=should_escalate,
         )
 
-    # ── Gemini call ───────────────────────────────────────────────────────────
+    # ── Private helpers ───────────────────────────────────────────────────────
 
     def _call_gemini(self) -> str:
-        """
-        Calls Gemini with current memory and Mauro's system prompt.
-        Saves the model reply to memory before returning.
-        """
+        """Calls Gemini with the current memory and returns the response text."""
         response = self._client.models.generate_content(
             model=CHAT_MODEL,
             contents=self._messages_to_contents(self.memory.as_messages()),
@@ -502,44 +453,15 @@ If the context is insufficient to answer confidently, say so honestly.
         self.memory.add("model", reply)
         return reply
 
-    # ── Escalation ────────────────────────────────────────────────────────────
-
-    def _escalate(self, question: str) -> None:
+    def _escalate(self, user_input: str) -> None:
         """
-        Saves unanswerable questions to data/escalated/questions.jsonl
-        so the journalist team can review and respond.
-        Each line is a self-contained JSON object.
+        Logs an unanswerable question for the journalist team.
+        TODO: replace with email/Slack notification in production.
         """
-        escalation_dir = os.getenv("ESCALATION_DIR", "data/escalated")
-        os.makedirs(escalation_dir, exist_ok=True)
-        filepath = os.path.join(escalation_dir, "questions.jsonl")
-
-        entry = {
-            "question":   question,
-            "timestamp":  datetime.now().isoformat(),
-            "newspaper":  self.newspaper_name,
-            "status":     "pending",   # journalist marks as "resolved" when done
-        }
-        with open(filepath, "a", encoding="utf-8") as f:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-
-    # ── Lazy Camila initialization ────────────────────────────────────────────
-
-    def _get_camila(self) -> FactCheckingAgent:
-        """
-        Instantiates Camila's FactCheckingAgent only on first fact-check request.
-        Avoids loading Camila's ChromaDB collections into RAM on every startup.
-        """
-        if self._camila is None:
-            kb = self._camila_kb or CamilaKnowledgeBase()
-            self._camila = FactCheckingAgent(
-                knowledge_base=kb,
-                newspaper_name=self.newspaper_name,
-                region=self.region,
-            )
-        return self._camila
-
-    # ── Private helpers ───────────────────────────────────────────────────────
+        escalation_log = os.getenv("ESCALATION_LOG", "data/escalations.log")
+        os.makedirs(os.path.dirname(escalation_log), exist_ok=True)
+        with open(escalation_log, "a", encoding="utf-8") as f:
+            f.write(f"{user_input}\n")
 
     def _personalized_system_prompt(self) -> str:
         return (
