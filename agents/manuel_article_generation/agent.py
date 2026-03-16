@@ -3,29 +3,31 @@ agents/manuel_article_generation/agent.py
 ──────────────────────────────────────────
 Article Generation Agent
 ─────────────────────────
-Responsabilidad: Recibe una ArticleIdea verificada y escribe un artículo
-corto, cercano y optimizado para visibilidad y engagement digital.
+Responsibility: Receives a verified ArticleIdea and writes a short,
+friendly article optimized for visibility and digital engagement.
 
-Arquitectura:
-    Orchestrator / Periodista
+Architecture:
+    Orchestrator / Journalist
           │
-          ▼ ArticleIdea (producida por José + verificada por Camila)
+          ▼ ArticleIdea (produced by José + verified by Camila)
     ArticleGenerationAgent.run(idea)
           │
-          ├─► KnowledgeBase.retrieve()   ← ChromaDB local (estilo del periódico)
+          ├─► KnowledgeBase.retrieve()   ← local ChromaDB (newspaper style)
           └─► Gemini generate_content()  ← google-genai (Vertex AI)
                     │
-                    └─► Respuesta estructurada (CreateArticle)
+                    └─► Structured response (CreateArticle)
 
-Dependencias:
+Dependencies:
     pip install google-genai chromadb
 
-Uso local (sin GCloud):
-    Configurar GEMINI_API_KEY en .env con una key de AI Studio.
-    Vertex AI se activa automáticamente cuando se detecte PROJECT_ID.
+Local usage (without GCloud):
+    Set GEMINI_API_KEY in .env with an AI Studio key.
+    Vertex AI activates automatically when PROJECT_ID is detected.
 """
 
 from __future__ import annotations
+# for when the orchestaror is build uncomment
+# from config import NEWSPAPER_NAME, PAIS 
 
 import json
 import os
@@ -35,7 +37,7 @@ from dataclasses import dataclass, field
 from google import genai
 from google.genai import types
 
-# ── Módulos internos ──────────────────────────────────────────────────────────
+# ── Internal modules ──────────────────────────────────────────────────────────
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -53,7 +55,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 VERTEX_PROJECT  = os.getenv("GOOGLE_CLOUD_PROJECT", "") 
 VERTEX_REGION   = os.getenv("GOOGLE_CLOUD_REGION", "us-central1")
 
-# CAMBIAR CUANDO HAYA ORQUESTADOR
+# TODO: move to orchestrator when ready
 NEWSPAPER_NAME = os.getenv("NEWSPAPER_NAME", "El Cronista Municipal")
 REGION_NEWS    = os.getenv("REGION_NEWS", "ES")
 
@@ -64,9 +66,9 @@ TEMPERATURE       = 0.2
 
 def _build_client() -> genai.Client:
     """
-    Prioridad de autenticación:
-    1. Vertex AI (si hay PROJECT_ID en env) → producción
-    2. GEMINI_API_KEY                        → desarrollo local
+    Authentication priority:
+    1. Vertex AI (if PROJECT_ID is set in env) → production
+    2. GEMINI_API_KEY                           → local development
     """
     if VERTEX_PROJECT:
         return genai.Client(
@@ -77,12 +79,12 @@ def _build_client() -> genai.Client:
     if GEMINI_API_KEY:
         return genai.Client(api_key=GEMINI_API_KEY)
     raise EnvironmentError(
-        "Configura GEMINI_API_KEY (local) o GOOGLE_CLOUD_PROJECT (Vertex AI)."
+        "Set GEMINI_API_KEY (local) or GOOGLE_CLOUD_PROJECT (Vertex AI)."
     )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Modelos de datos de salida
+# Output data models
 # ─────────────────────────────────────────────────────────────────────────────
 @dataclass
 class CreateArticle:
@@ -104,23 +106,22 @@ class CreateArticle:
 
 class KnowledgeBase:
     """
-    Indexa documentos del periódico (artículos históricos, estilo, contexto)
-    y los recupera semánticamente para enriquecer las respuestas del agente.
+    Indexes newspaper documents (historical articles, style, context)
+    and retrieves them semantically to enrich the agent's responses.
     """
 
     def __init__(self, persist_dir: str = "data/embeddings"):
-        # Su propio RAG → aprende el estilo del periódico
+        # Style RAG → learns the newspaper's writing style
         self._style_store = VectorStore(
             collection_name="article_generation",
             persist_dir=f"{persist_dir}/article_generation",
         )
-        # RAG de José → sabe qué temas ya se cubrieron
+        # José's RAG → knows which topics have already been covered
         self._research_store = VectorStore(
             collection_name="news_research",
             persist_dir=f"{persist_dir}/news_research",
         )
-
-        # RAG de articulos escritos
+        # Published articles RAG
         self._published_store = VectorStore(
             collection_name="article_published",
             persist_dir=f"{persist_dir}/article_published",
@@ -140,7 +141,7 @@ class KnowledgeBase:
             self.add_style_document(doc)
 
     def add_published_article(self, doc: dict) -> None:
-        """Guarda el artículo ya generado en article_published/"""
+        """Saves a generated article into the article_published collection."""
         chunks = chunk_document(doc)
         texts = [c["text"] for c in chunks]
         metas = [{k: v for k, v in c.items() if k != "text"} for c in chunks]
@@ -151,7 +152,7 @@ class KnowledgeBase:
         research_results = self._research_store.query(query, top_k=top_k)
         article_results = self._published_store.query(query, top_k=top_k)
         
-        # Combina y devuelve los mejores de ambos
+        # Merge and return the best results across all three stores
         all_results = style_results + research_results + article_results
         all_results.sort(key=lambda r: r.score)  
         return [r.text for r in all_results[:top_k]]
@@ -159,46 +160,47 @@ class KnowledgeBase:
     def count(self) -> int:
         return self._style_store.count()
 
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Article Generation Agent
 # ─────────────────────────────────────────────────────────────────────────────
 
 class ArticleGenerationAgent:
     """
-    Agente escritor de artículos de acuerdo a las tendencias que identificó Jose.
+    Article writer based on trends identified by José.
 
-    Flujo de .run(idea):
+    run(idea) flow:
     ┌─────────────────────────────────────────────────────────────────┐
-    │ 1. Recuperar contexto histórico del periódico (RAG)             │
-    │ 2. Construir prompt con la ArticleIdea recibida + contexto RAG  │
-    │ 3. Llamar a Gemini con system prompt especializado              │
-    │ 4. Parsear respuesta → CreateArticle                            │
+    │ 1. Retrieve newspaper style context (RAG)                       │
+    │ 2. Build prompt with received ArticleIdea + RAG context         │
+    │ 3. Call Gemini with specialized system prompt                   │
+    │ 4. Parse response → CreateArticle                               │
     └─────────────────────────────────────────────────────────────────┘
     """
 
     SYSTEM_PROMPT = """
-Eres Manuel el Article Generation Agent de un periódico local.
-Tu misión: analizar las tendencias locales que ha generado Jose el News
-Research Agent y que tuvo un Fact Check por Camilia Agent.
+You are Manuel, the Article Generation Agent of a local newspaper.
+Your mission: take the local trends identified by José the News Research Agent,
+already fact-checked by Camila, and turn them into a complete article.
 
-PERSONALIDAD:
-- Curioso, analítico y orientado a la comunidad
-- Buscas siempre el ángulo local de cada noticia nacional o global
-- Priorizas historias con impacto directo en la vida de los vecinos
-- Siempre buscas al menos 2 fuentes similares antes de construir el artículo
+PERSONALITY:
+- Curious, analytical and community-oriented
+- Always look for the local angle of national or global news
+- Prioritize stories with direct impact on residents' daily lives
+- Always look for at least 2 similar sources before writing the article
 
-RESTRICCIONES:
-- Nunca inventes datos o fuentes específicas; si no tienes información, dilo
-- No cubras temas fuera del ámbito periodístico local
-- Prioriza la verificabilidad de la información
+RESTRICTIONS:
+- Never invent data or specific sources; if you don't have the information, say so
+- Do not cover topics outside local journalism
+- Prioritize verifiability of information
 
-REGLAS DE ESCRITURA DE ARTÍCULO:
-- El artículo debe tener entre 3 y 5 párrafos
-- Tono cercano y directo, evita lenguaje técnico o burocrático
-- El primer párrafo debe responder: qué pasó, dónde y a quién afecta
+ARTICLE WRITING RULES:
+- The article must have between 3 and 5 paragraphs
+- Friendly and direct tone, avoid technical or bureaucratic language
+- The first paragraph must answer: what happened, where and who is affected
 
-FORMATO DE SALIDA:
-Cuando se te pida escribir un artículo, responde SIEMPRE con JSON válido:
+OUTPUT FORMAT:
+When asked to write an article, ALWAYS respond with valid JSON in Spanish:
 {
       "title": "Título del artículo",
       "angle": "Enfoque periodístico",
@@ -208,7 +210,6 @@ Cuando se te pida escribir un artículo, responde SIEMPRE con JSON válido:
       "sources": ["fuente1", "fuente2"],
       "keywords": ["keyword1", "keyword2"]
 }
-
 """.strip()
 
     def __init__(
@@ -224,25 +225,25 @@ Cuando se te pida escribir un artículo, responde SIEMPRE con JSON válido:
         self.region = region
         self._client = _build_client()
 
-    # ── Método principal ──────────────────────────────────────────────────────
+    # ── Main method ───────────────────────────────────────────────────────────
 
     def run(self, idea: ArticleIdea) -> CreateArticle:
         """
-        Escribe un artículo completo a partir de una ArticleIdea verificada.
+        Writes a complete article from a verified ArticleIdea.
 
         Args:
-            idea: Idea de artículo producida por José y verificada por Camila.
+            idea: Article idea produced by José and verified by Camila.
         
         Returns:
-            CreateArticle con el artículo listo para publicar.
+            CreateArticle with the article ready to publish.
         """
-        # 1. RAG: contexto histórico del periódico
+        # 1. RAG: retrieve newspaper style context
         context_snippets = self.kb.retrieve(idea.title, top_k=4)
 
-        # 2. Construir prompt con RAG y ArticleIdea de Jose
+        # 2. Build prompt with RAG context and José's ArticleIdea
         user_prompt = self._build_prompt(idea=idea, context_snippets=context_snippets)
         
-        # 3. Llamar a Gemini
+        # 3. Call Gemini
         self.memory.add("user", user_prompt)
 
         response = self._client.models.generate_content(
@@ -258,16 +259,16 @@ Cuando se te pida escribir un artículo, responde SIEMPRE con JSON válido:
         raw_text = response.candidates[0].content.parts[0].text
         self.memory.add("model", raw_text)
 
-        # Guardar articulo en RAG
+        # 4. Parse and save published article to RAG
         article = self._parse_article(raw_text, idea)
         self.kb.add_published_article(article.to_dict())
 
-        return self._parse_article(raw_text, idea)
+        return article
 
     def chat(self, user_input: str) -> str:
         """
-        Modo conversacional libre (sin parseo estructurado).
-        Útil para el Reader Interaction Agent o pruebas rápidas.
+        Free conversational mode (no structured parsing).
+        Useful for Reader Interaction Agent or quick testing.
         """ 
         self.memory.add("user", user_input)
         response = self._client.models.generate_content(
@@ -283,7 +284,7 @@ Cuando se te pida escribir un artículo, responde SIEMPRE con JSON válido:
         self.memory.add("model", reply)
         return reply
 
-    # ── Helpers privados ──────────────────────────────────────────────────────
+    # ── Private helpers ───────────────────────────────────────────────────────
 
     def _personalized_system_prompt(self) -> str:
         return f"{self.SYSTEM_PROMPT}\n\nPeriódico: {self.newspaper_name}. Región: {self.region}."
@@ -318,7 +319,9 @@ Escribe el artículo completo para {self.newspaper_name}. Responde en el formato
         return result
 
     def _parse_article(self, raw_text: str, idea: ArticleIdea) -> CreateArticle:
+        """Extracts CreateArticle from the JSON returned by Gemini."""
         try:
+            # Clean possible markdown blocks ```json ... ```
             clean = raw_text.strip()
             if clean.startswith("```"):
                 clean = clean.split("```")[1]
@@ -335,6 +338,7 @@ Escribe el artículo completo para {self.newspaper_name}. Responde en el formato
                 keywords=data.get("keywords", idea.keywords),
             )
         except (json.JSONDecodeError, KeyError, TypeError):
+            # If Gemini returns invalid JSON → fallback with raw text preserved
             return CreateArticle(
                 title=idea.title,
                 angle=idea.angle,
