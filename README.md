@@ -10,8 +10,8 @@ An autonomous multi-agent system that helps local newspapers gain visibility, tr
 newspaper_ai/
 ├── agents/
 │   ├── adk_app/
-        ├── __init__.py
-        └── agent.py 
+│   │   ├── __init__.py
+│   │   └── agent.py 
 │   ├── jose_news_research/
 │   │   ├── agent.py       
 │   │   └── run.py          
