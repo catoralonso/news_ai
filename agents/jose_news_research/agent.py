@@ -29,8 +29,8 @@ Local usage (no GCloud):
 """
 
 from __future__ import annotations
-# Uncomment when orchestrator is ready:
-# from config import NEWSPAPER_NAME, PAIS
+# for when the orchestaror is build uncomment
+# from config import NEWSPAPER_NAME, PAIS 
 
 import json
 import os
