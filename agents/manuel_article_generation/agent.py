@@ -211,7 +211,7 @@ When asked to write an article, ALWAYS respond with valid JSON in Spanish:
         knowledge_base: KnowledgeBase,
         memory: Memory | None = None,
         newspaper_name: str = NEWSPAPER_NAME,
-        region: str = REGION,
+        region: str = PAIS,
     ):
         self.kb = knowledge_base
         self.memory = memory or Memory(max_turns=10)
