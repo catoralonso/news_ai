@@ -1,14 +1,14 @@
 """
 agents/jose_news_research/run.py
-───────────────────────────
-Script de demo / desarrollo local del News Research Agent.
+─────────────────────────────────
+Local demo / development script for the News Research Agent.
 
-Uso:
+Usage:
     python agents/jose_news_research/run.py
 
-Variables de entorno (.env o export):
-    GEMINI_API_KEY=AIza...     ← para desarrollo local (AI Studio)
-    GOOGLE_CLOUD_PROJECT=...   ← para Vertex AI (producción)
+Environment variables (.env or export):
+    GEMINI_API_KEY=AIza...       <- local development (AI Studio)
+    GOOGLE_CLOUD_PROJECT=...     <- Vertex AI (production)
     GOOGLE_CLOUD_REGION=us-central1
 """
 
@@ -16,10 +16,10 @@ import json
 import os
 import sys
 
-# Agregar raíz del proyecto al path
+# Add project root to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-# Cargar .env si existe
+# Load .env if it exists
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -31,7 +31,7 @@ from core.memory import Memory
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Datos de ejemplo para poblar el RAG (simula artículos del periódico)
+# Sample articles to populate the RAG (simulates newspaper archive)
 # ─────────────────────────────────────────────────────────────────────────────
 
 SAMPLE_ARTICLES = [
@@ -86,51 +86,51 @@ SAMPLE_ARTICLES = [
 
 def main():
     print("=" * 60)
-    print("  NEWS RESEARCH AGENT — Demo Local")
+    print("  NEWS RESEARCH AGENT — Local Demo")
     print("=" * 60)
 
-    # 1. Inicializar componentes
+    # 1. Initialize components
     kb = KnowledgeBase(persist_dir="data/embeddings")
     memory = Memory(max_turns=10)
 
-    # 2. Cargar artículos de ejemplo en el RAG
-    print(f"\nCargando {len(SAMPLE_ARTICLES)} artículos en ChromaDB...")
+    # 2. Load sample articles into the RAG
+    print(f"\nLoading {len(SAMPLE_ARTICLES)} articles into ChromaDB...")
     kb.add_documents(SAMPLE_ARTICLES)
-    print(f"   → {kb.count()} chunks indexados\n")
+    print(f"   -> {kb.count()} chunks indexed\n")
 
-    # 3. Crear agente
+    # 3. Create agent
     agent = NewsResearchAgent(
         knowledge_base=kb,
         memory=memory,
     )
 
-    # 4. Consulta de investigación
+    # 4. Research query
     query = "¿Qué temas de nutrición deberíamos cubrir esta semana?"
     print(f"Query: {query}\n")
 
     report = agent.run(query)
 
-    # 5. Mostrar resultados
+    # 5. Display results
     print("TRENDING TOPICS:")
     for t in report.trending_topics[:5]:
-        print(f"   • {t}")
+        print(f"   * {t}")
 
-    print(f"\nIDEAS DE ARTÍCULOS ({len(report.article_ideas)}):")
+    print(f"\nARTICLE IDEAS ({len(report.article_ideas)}):")
     for i, idea in enumerate(report.article_ideas, 1):
         print(f"\n  [{i}] {idea.title}")
-        print(f"      Ángulo: {idea.angle}")
-        print(f"      Categoría: {idea.category} | Prioridad: {idea.priority}")
-        print(f"      Relevancia local: {idea.local_relevance_score:.0%}")
+        print(f"      Angle:    {idea.angle}")
+        print(f"      Category: {idea.category} | Priority: {idea.priority}")
+        print(f"      Local relevance: {idea.local_relevance_score:.0%}")
         if idea.keywords:
             print(f"      Keywords: {', '.join(idea.keywords)}")
 
     print("\n" + "=" * 60)
-    print("  Modo conversacional (escribe 'salir' para terminar)")
+    print("  Conversational mode (type 'salir' to exit)")
     print("=" * 60 + "\n")
 
     while True:
         try:
-            user_input = input("Tú: ").strip()
+            user_input = input("You: ").strip()
         except (EOFError, KeyboardInterrupt):
             break
         if not user_input:
