@@ -66,7 +66,7 @@ PAIS            = os.getenv("REGION_NEWS", "ES")
 
 CHAT_MODEL        = os.getenv("CHAT_MODEL", "gemini-2.5-flash")
 MAX_OUTPUT_TOKENS = 4096
-TEMPERATURE       = 0.7   # Higher than other agents — creativity is the point
+TEMPERATURE       = 0.7   
 
 
 def _build_client() -> genai.Client:
@@ -191,10 +191,10 @@ class KnowledgeBase:
         Prioritizes social_media examples to keep Asti's voice consistent.
         """
         social_results    = self._social_store.query(query, top_k=top_k)
-        published_results = self._published_store.query(query, top_k=2)  # less weight
+        published_results = self._published_store.query(query, top_k=2)  
 
         all_results = social_results + published_results
-        all_results.sort(key=lambda r: r.score)  # lower cosine = more similar
+        all_results.sort(key=lambda r: r.score) 
         return [r.text for r in all_results[:top_k]]
 
     def count(self) -> int:
