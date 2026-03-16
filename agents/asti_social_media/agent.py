@@ -305,7 +305,7 @@ ALWAYS respond with valid JSON (no markdown blocks):
         knowledge_base: KnowledgeBase,
         memory: Memory | None = None,
         newspaper_name: str = NEWSPAPER_NAME,
-        region: str = ,
+        region: str = PAIS,
     ):
         self.kb = knowledge_base
         self.memory = memory or Memory(max_turns=10)
