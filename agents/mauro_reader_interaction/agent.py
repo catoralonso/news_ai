@@ -201,9 +201,9 @@ LANGUAGE: Always respond in Spanish. Italian expressions are accent only.
     # Intent detection prompt — separate, lighter call to classify input
     INTENT_PROMPT = """
 Classify the following reader input into exactly one of these intents:
-- "fact_check": the reader is submitting an external news claim or asking
+- "fact_check": the reader is submitting an external news claim, a URL, or asking
   if something they read/heard is true (e.g. "Is it true that X causes Y?",
-  "I read that Z, is this correct?")
+  "I read that Z, is this correct?", "can you check this info https://...")
 - "question": the reader is asking a genuine nutrition/health question
   (e.g. "What foods help with X?", "How much protein should I eat?")
 - "other": greetings, off-topic, unclear input
