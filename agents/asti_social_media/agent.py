@@ -34,7 +34,11 @@ Local usage (without GCloud):
 """
 
 from __future__ import annotations
-from config import NEWSPAPER_NAME, REGION, CHAT_MODEL, GEMINI_API_KEY, VERTEX_PROJECT, VERTEX_REGION
+from config import (
+    NEWSPAPER_NAME, REGION as PAIS,
+    CHAT_MODEL, GEMINI_API_KEY,
+    VERTEX_PROJECT, VERTEX_REGION,
+)
 
 import json
 import os
@@ -301,7 +305,7 @@ ALWAYS respond with valid JSON (no markdown blocks):
         knowledge_base: KnowledgeBase,
         memory: Memory | None = None,
         newspaper_name: str = NEWSPAPER_NAME,
-        region: str = PAIS,
+        region: str = ,
     ):
         self.kb = knowledge_base
         self.memory = memory or Memory(max_turns=10)
