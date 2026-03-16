@@ -318,6 +318,16 @@ When asked to verify a claim, ALWAYS respond with valid JSON:
         Returns:
             VerificationResult with verdict, confidence, reason and sources.
         """
+
+        if input_text.startswith("http"):
+             try:
+                 import requests, re
+                 r = requests.get(input_text, timeout=5)
+                 clean = re.sub(r'<[^>]+>', ' ', r.text)
+                 clean = re.sub(r'\s+', ' ', clean).strip()
+                 input_text = input_text + "\n\nContent: " + r.text[:1000]
+             except Exception:
+                 pass
         # 1. RAG — retrieve fake news patterns similar to this claim
         context_snippets = self.kb.retrieve(input_text, top_k=4)
 
