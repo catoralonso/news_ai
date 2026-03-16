@@ -1,24 +1,24 @@
 """
 agents/manuel_article_generation/run.py
 ────────────────────────────────────────
-Script de demo / desarrollo local del Article Generation Agent.
+Demo / local development script for the Article Generation Agent.
 
-Uso:
+Usage:
     python agents/manuel_article_generation/run.py
 
-Variables de entorno (.env o export):
-    GEMINI_API_KEY=AIza...     ← para desarrollo local (AI Studio)
-    GOOGLE_CLOUD_PROJECT=...   ← para Vertex AI (producción)
+Environment variables (.env or export):
+    GEMINI_API_KEY=AIza...     ← for local development (AI Studio)
+    GOOGLE_CLOUD_PROJECT=...   ← for Vertex AI (production)
     GOOGLE_CLOUD_REGION=us-central1
 """
 
 import os
 import sys
 
-# Agregar raíz del proyecto al path
+# Add project root to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-# Cargar .env si existe
+# Load .env if it exists
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -31,7 +31,7 @@ from core.memory import Memory
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Artículos de ejemplo para poblar el RAG de estilo
+# Sample articles to populate the style RAG
 # ─────────────────────────────────────────────────────────────────────────────
 
 SAMPLE_ARTICLES = [
@@ -81,7 +81,7 @@ SAMPLE_ARTICLES = [
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ArticleIdea mock — simula lo que produciría José
+# Mock ArticleIdea — simulates what José would produce
 # ─────────────────────────────────────────────────────────────────────────────
 
 SAMPLE_IDEA = ArticleIdea(
@@ -101,57 +101,57 @@ SAMPLE_IDEA = ArticleIdea(
 
 def main():
     print("=" * 60)
-    print("  ARTICLE GENERATION AGENT — Demo Local")
+    print("  ARTICLE GENERATION AGENT — Local Demo")
     print("=" * 60)
 
-    # 1. Inicializar componentes
+    # 1. Initialize components
     kb = KnowledgeBase(persist_dir="data/embeddings")
     memory = Memory(max_turns=10)
 
-    # 2. Cargar artículos de estilo en el RAG
-    print(f"\nCargando {len(SAMPLE_ARTICLES)} artículos de estilo en ChromaDB...")
+    # 2. Load style articles into RAG
+    print(f"\nLoading {len(SAMPLE_ARTICLES)} style articles into ChromaDB...")
     kb.add_style_documents(SAMPLE_ARTICLES)
-    print(f"   → {kb.count()} chunks indexados\n")
+    print(f"   → {kb.count()} chunks indexed\n")
 
-    # 3. Crear agente
+    # 3. Create agent
     agent = ArticleGenerationAgent(
         knowledge_base=kb,
         memory=memory,
     )
 
-    # 4. Mostrar la idea que se va a desarrollar
-    print("IDEA RECIBIDA (mock de José):")
-    print(f"   Título:     {SAMPLE_IDEA.title}")
-    print(f"   Ángulo:     {SAMPLE_IDEA.angle}")
-    print(f"   Categoría:  {SAMPLE_IDEA.category}")
-    print(f"   Relevancia: {SAMPLE_IDEA.local_relevance_score:.0%}")
-    print(f"   Prioridad:  {SAMPLE_IDEA.priority}\n")
+    # 4. Display the idea to be developed
+    print("RECEIVED IDEA (mock from José):")
+    print(f"   Title:      {SAMPLE_IDEA.title}")
+    print(f"   Angle:      {SAMPLE_IDEA.angle}")
+    print(f"   Category:   {SAMPLE_IDEA.category}")
+    print(f"   Relevance:  {SAMPLE_IDEA.local_relevance_score:.0%}")
+    print(f"   Priority:   {SAMPLE_IDEA.priority}\n")
 
-    # 5. Generar artículo
-    print("Generando artículo...\n")
+    # 5. Generate article
+    print("Generating article...\n")
     article = agent.run(SAMPLE_IDEA)
 
-    # 6. Mostrar resultado
+    # 6. Display result
     print("=" * 60)
-    print("  ARTÍCULO GENERADO")
+    print("  GENERATED ARTICLE")
     print("=" * 60)
-    print(f"\nTítulo:    {article.title}")
-    print(f"Categoría: {article.category}")
-    print(f"Ángulo:    {article.angle}")
-    print(f"Relevancia local: {article.local_relevance_score:.0%}")
+    print(f"\nTitle:     {article.title}")
+    print(f"Category:  {article.category}")
+    print(f"Angle:     {article.angle}")
+    print(f"Local relevance: {article.local_relevance_score:.0%}")
     if article.keywords:
         print(f"Keywords:  {', '.join(article.keywords)}")
     if article.sources:
-        print(f"Fuentes:   {', '.join(article.sources)}")
+        print(f"Sources:   {', '.join(article.sources)}")
     print(f"\n{article.article_content}")
 
     print("\n" + "=" * 60)
-    print("  Modo conversacional (escribe 'salir' para terminar)")
+    print("  Conversational mode (type 'exit' to quit)")
     print("=" * 60 + "\n")
 
     while True:
         try:
-            user_input = input("Tú: ").strip()
+            user_input = input("You: ").strip()
         except (EOFError, KeyboardInterrupt):
             break
         if not user_input:
