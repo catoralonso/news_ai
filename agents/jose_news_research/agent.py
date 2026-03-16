@@ -105,6 +105,9 @@ class ArticleIdea:
     sources: list[str] = field(default_factory=list)
     keywords: list[str] = field(default_factory=list)
     priority: str = "media"             # alta / media / baja
+    # Populated by Orchestrator after Camila runs — None until then
+    confidence_score: float | None = None
+    verdict: str | None = None          # "truthful" | "doubtful" | "untruthful"
 
     def to_dict(self) -> dict:
         return self.__dict__
