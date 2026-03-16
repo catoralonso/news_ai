@@ -8,6 +8,10 @@ An autonomous multi-agent system that helps local newspapers gain visibility, tr
 
 ```
 newspaper_ai/
+├── app.py                   
+├── requirements.txt
+├── config.py
+├── .env
 ├── agents/
 │   ├── adk_app/
 │   │   ├── __init__.py
@@ -46,10 +50,8 @@ newspaper_ai/
 │       ├── article_published/  ← Manuel: published articles
 │       ├── fact_checking/      ← Camila: fake news patterns, trusted sources
 │       ├── reader_interaction/ ← Mauro: FAQs, reader context
-│       └── social_media/       ← Asti: successful post examples
-├── tests/
-├── requirements.txt
-└── .env.example
+└──     └── social_media/       ← Asti: successful post examples
+
 ```
 
 ---
