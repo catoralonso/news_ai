@@ -1,35 +1,36 @@
 """
-agents/news_research/agent.py
-──────────────────────────────
-News Research Agent
-───────────────────
-Responsabilidad: investigar tendencias, detectar oportunidades de cobertura
-y proponer ideas de artículos con contexto enriquecido por RAG.
+agents/jose_news_research/agent.py
+────────────────────────────────────
+News Research Agent — José
+──────────────────────────
+Responsibility: research trending topics, detect coverage opportunities,
+and propose article ideas enriched with RAG context.
 
-Arquitectura:
-    Usuario / Orchestrator
+Architecture:
+    User / Orchestrator
           │
           ▼
     NewsResearchAgent.run(query)
           │
-          ├─► KnowledgeBase.retrieve()   ← ChromaDB local
-          ├─► web_search()               ← Google CSE o mock
-          ├─► get_trending_topics()      ← pytrends o mock
+          ├─► KnowledgeBase.retrieve()   ← local ChromaDB
+          ├─► web_search()               ← Google CSE or mock
+          ├─► get_trending_topics()      ← pytrends or mock
+          ├─► get_clickstream_insights() ← reader behavior on the site
           └─► Gemini generate_content()  ← google-genai (Vertex AI)
                     │
-                    └─► Respuesta estructurada (ArticleIdea[])
+                    └─► Structured response (ArticleIdea[])
 
-Dependencias:
+Dependencies:
     pip install google-genai chromadb pytrends requests
 
-Uso local (sin GCloud):
-    Configurar GEMINI_API_KEY en .env con una key de AI Studio.
-    Vertex AI se activa automáticamente cuando se detecte PROJECT_ID.
+Local usage (no GCloud):
+    Set GEMINI_API_KEY in .env with an AI Studio key.
+    Vertex AI activates automatically when PROJECT_ID is detected.
 """
 
 from __future__ import annotations
-# cuando este el orchestator
-# from config import NEWSPAPER_NAME, PAIS 
+# Uncomment when orchestrator is ready:
+# from config import NEWSPAPER_NAME, PAIS
 
 import json
 import os
@@ -40,7 +41,7 @@ from typing import Any
 from google import genai
 from google.genai import types
 
-# ── Módulos internos ──────────────────────────────────────────────────────────
+# ── Internal modules ──────────────────────────────────────────────────────────
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -61,22 +62,22 @@ from tools.search_tools import (
 # Config
 # ─────────────────────────────────────────────────────────────────────────────
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")      
-VERTEX_PROJECT  = os.getenv("GOOGLE_CLOUD_PROJECT", "") 
+GEMINI_API_KEY  = os.getenv("GEMINI_API_KEY", "")
+VERTEX_PROJECT  = os.getenv("GOOGLE_CLOUD_PROJECT", "")
 VERTEX_REGION   = os.getenv("GOOGLE_CLOUD_REGION", "us-central1")
-NEWSPAPER_NAME = os.getenv("NEWSPAPER_NAME", "Nutrición AI")
-PAIS           = os.getenv("REGION_NEWS", "ES")
+NEWSPAPER_NAME  = os.getenv("NEWSPAPER_NAME", "Nutrición AI")
+PAIS            = os.getenv("REGION_NEWS", "ES")
 
-CHAT_MODEL      = os.getenv("CHAT_MODEL", "gemini-2.5-flash")
+CHAT_MODEL        = os.getenv("CHAT_MODEL", "gemini-2.5-flash")
 MAX_OUTPUT_TOKENS = 4096
 TEMPERATURE       = 0.4
 
 
 def _build_client() -> genai.Client:
     """
-    Prioridad de autenticación:
-    1. Vertex AI (si hay PROJECT_ID en env) → producción
-    2. GEMINI_API_KEY                        → desarrollo local
+    Authentication priority:
+    1. Vertex AI (if PROJECT_ID is in env) → production
+    2. GEMINI_API_KEY                       → local development
     """
     if VERTEX_PROJECT:
         return genai.Client(
@@ -87,20 +88,20 @@ def _build_client() -> genai.Client:
     if GEMINI_API_KEY:
         return genai.Client(api_key=GEMINI_API_KEY)
     raise EnvironmentError(
-        "Configura GEMINI_API_KEY (local) o GOOGLE_CLOUD_PROJECT (Vertex AI)."
+        "Set GEMINI_API_KEY (local) or GOOGLE_CLOUD_PROJECT (Vertex AI)."
     )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Modelos de datos de salida
+# Output data models
 # ─────────────────────────────────────────────────────────────────────────────
 
 @dataclass
 class ArticleIdea:
     title: str
-    angle: str                         
-    category: str                      
-    local_relevance_score: float        # 0–1
+    angle: str                          # suggested journalistic angle
+    category: str                       # politics, sports, culture...
+    local_relevance_score: float        # 0-1
     sources: list[str] = field(default_factory=list)
     keywords: list[str] = field(default_factory=list)
     priority: str = "media"             # alta / media / baja
@@ -114,7 +115,7 @@ class ResearchReport:
     query: str
     trending_topics: list[str]
     article_ideas: list[ArticleIdea]
-    context_snippets: list[str]         # fragmentos RAG usados
+    context_snippets: list[str]         # RAG fragments used
     raw_web_results: list[dict]
 
     def to_dict(self) -> dict:
@@ -132,8 +133,13 @@ class ResearchReport:
 
 class KnowledgeBase:
     """
-    Indexa documentos del periódico (artículos históricos, estilo, contexto)
-    y los recupera semánticamente para enriquecer las respuestas del agente.
+    Indexes newspaper documents (historical articles, style guides, context)
+    and retrieves them semantically to enrich agent responses.
+
+    Two collections:
+    - news_research     -> historical articles loaded by the team
+    - article_published -> articles already published by Manuel,
+                          so Jose avoids proposing repeated angles
     """
 
     def __init__(self, persist_dir: str = "data/embeddings"):
@@ -160,12 +166,13 @@ class KnowledgeBase:
             self.add_document(doc)
 
     def retrieve(self, query: str, top_k: int = 4) -> list[str]:
-        news_result = self._store.query(query, top_k=top_k)
-        article_result = self._published_store.query(query, top_k=top_k)
-        
-        all_results = news_result + article_result
-        all_results.sort(key=lambda r: r.score) 
-        return [r.text for r in all_results[:top_k]]      
+        # Merge results from both collections, ranked by similarity score
+        news_results      = self._store.query(query, top_k=top_k)
+        published_results = self._published_store.query(query, top_k=top_k)
+
+        all_results = news_results + published_results
+        all_results.sort(key=lambda r: r.score)     # lower cosine = more similar
+        return [r.text for r in all_results[:top_k]]
 
     def count(self) -> int:
         return self._store.count()
@@ -177,56 +184,57 @@ class KnowledgeBase:
 
 class NewsResearchAgent:
     """
-    Agente de investigación de noticias.
+    News research agent -- Jose.
 
-    Flujo de .run(query):
+    run(query) pipeline:
     ┌─────────────────────────────────────────────────────────────┐
-    │ 1. Recuperar contexto histórico del periódico (RAG)         │
-    │ 2. Obtener trending topics locales                          │
-    │ 3. Buscar noticias recientes en la web                      │
-    │ 4. Enviar todo a Gemini con system prompt especializado      │
-    │ 5. Parsear respuesta → ResearchReport                       │
+    │ 1. Retrieve historical newspaper context (RAG)              │
+    │ 2. Fetch local trending topics                              │
+    │ 3. Search recent news on the web                            │
+    │ 4. Read reader behavior from clickstream                    │
+    │ 5. Build enriched prompt and call Gemini                    │
+    │ 6. Parse response -> ResearchReport                         │
     └─────────────────────────────────────────────────────────────┘
     """
 
     SYSTEM_PROMPT = """
-Eres el News Research Agent de un periódico local.
-Tu misión: investigar tendencias, detectar oportunidades de cobertura y
-proponer ideas de artículos periodísticos relevantes para la comunidad local.
- 
-PERSONALIDAD:
-- Curioso, analítico y orientado a la comunidad
-- Buscas siempre el ángulo local de cada noticia nacional o global
-- Priorizas historias con impacto directo en la vida de los vecinos
-- Siempre buscas al menos 2 fuentes antes de proponer una noticia
- 
-RESTRICCIONES:
-- Nunca inventes datos o fuentes específicas; si no tienes información, dilo
-- No cubras temas fuera del ámbito periodístico local
-- Prioriza la verificabilidad de la información
- 
-FORMATO DE SALIDA:
-Cuando se te pida proponer ideas, responde SIEMPRE con JSON válido:
+You are Jose, the News Research Agent of a local newspaper.
+Your mission: research trending topics, detect coverage opportunities, and
+propose article ideas that are relevant to the local community.
+
+PERSONALITY:
+- Curious, analytical, and community-oriented
+- You always look for the local angle in national or global news
+- You prioritize stories with direct impact on residents daily lives
+- You always find at least 2 sources before proposing a story
+
+RESTRICTIONS:
+- Never invent data or specific sources; if you don't have information, say so
+- Do not cover topics outside the scope of local journalism
+- Prioritize verifiability of information
+
+OUTPUT FORMAT:
+When asked to propose ideas, ALWAYS respond with valid JSON in spanish:
 {
   "article_ideas": [
     {
-      "title": "Título sugerido del artículo",
-      "angle": "Enfoque o ángulo periodístico específico",
-      "category": "nutrición|recetas|bienestar|suplementos|dietas|comunidad",
+      "title": "Suggested article title",
+      "angle": "Specific journalistic angle or approach",
+      "category": "nutrition|recipes|wellness|supplements|diets|community",
       "local_relevance_score": 0.0,
-      "sources": ["fuente1", "fuente2"],
+      "sources": ["source1", "source2"],
       "keywords": ["keyword1", "keyword2"],
       "priority": "alta|media|baja"
     }
   ],
-  "summary": "Resumen ejecutivo del panorama informativo actual"
+  "summary": "Executive summary of the current news landscape"
 }
 
-REGLAS para "local_relevance_score":
-número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la comunidad local, donde:
-    - 1.0 = afecta directamente a vecinos del municipio (obras, eventos, política local)
-    - 0.5 = tema nacional con impacto local moderado
-    - 0.0 = tema sin conexión con la comunidad local,
+RULES for local_relevance_score:
+A number between 0.0 and 1.0 indicating how relevant this story is to the local community:
+    - 1.0 = directly affects residents (local works, events, municipal politics)
+    - 0.5 = national topic with moderate local impact
+    - 0.0 = no connection to the local community
 """.strip()
 
     def __init__(
@@ -242,32 +250,32 @@ número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la co
         self.region = region
         self._client = _build_client()
 
-    # ── Método principal ──────────────────────────────────────────────────────
+    # ── Main method ───────────────────────────────────────────────────────────
 
     def run(self, query: str) -> ResearchReport:
         """
-        Ejecuta el ciclo completo de investigación.
+        Runs the full research pipeline.
 
         Args:
-            query: Tema o pregunta de investigación.
-                   Ej: "¿Qué pasa con el transporte público esta semana?"
+            query: Research topic or question.
+                   E.g. "What nutrition topics should we cover this week?"
 
         Returns:
-            ResearchReport con ideas de artículos estructuradas.
+            ResearchReport with structured article ideas.
         """
-        # 1. RAG: contexto histórico del periódico
+        # 1. RAG: historical newspaper context
         context_snippets = self.kb.retrieve(query, top_k=4)
 
         # 2. Trending topics
         trending = get_trending_topics(region=self.region)
 
-        # 3. Búsqueda web
+        # 3. Web search
         web_results = web_search(query, num_results=5)
 
-        # 4. Clickstream — qué están leyendo los lectores esta semana
+        # 4. Clickstream -- what readers are actually reading this week
         clickstream = get_clickstream_insights(days=7)
 
-        # 5. Construir prompt enriquecido
+        # 5. Build enriched prompt
         user_prompt = self._build_prompt(
             query=query,
             context_snippets=context_snippets,
@@ -276,7 +284,7 @@ número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la co
             clickstream=clickstream,
         )
 
-        # 5. Llamar a Gemini
+        # 6. Call Gemini
         self.memory.add("user", user_prompt)
 
         response = self._client.models.generate_content(
@@ -292,7 +300,7 @@ número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la co
         raw_text = response.candidates[0].content.parts[0].text
         self.memory.add("model", raw_text)
 
-        # 6. Parsear respuesta
+        # 7. Parse response
         article_ideas = self._parse_ideas(raw_text)
 
         return ResearchReport(
@@ -305,9 +313,9 @@ número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la co
 
     def chat(self, user_input: str) -> str:
         """
-        Modo conversacional libre (sin parseo estructurado).
-        Útil para el Reader Interaction Agent o pruebas rápidas.
-        """ 
+        Free conversational mode (no structured parsing).
+        Useful for quick tests or direct journalist interaction.
+        """
         self.memory.add("user", user_input)
         response = self._client.models.generate_content(
             model=CHAT_MODEL,
@@ -322,10 +330,10 @@ número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la co
         self.memory.add("model", reply)
         return reply
 
-    # ── Helpers privados ──────────────────────────────────────────────────────
+    # ── Private helpers ───────────────────────────────────────────────────────
 
     def _personalized_system_prompt(self) -> str:
-        return f"{self.SYSTEM_PROMPT}\n\nPeriódico: {self.newspaper_name}. Región: {self.region}."
+        return f"{self.SYSTEM_PROMPT}\n\nNewspaper: {self.newspaper_name}. Region: {self.region}."
 
     def _build_prompt(
         self,
@@ -335,37 +343,36 @@ número entre 0.0 y 1.0 que indica qué tan relevante es esta noticia para la co
         web_results: list[dict],
         clickstream: dict | None = None,
     ) -> str:
-        ctx_block = "\n".join(f"- {s[:300]}" for s in context_snippets) or "Sin contexto previo."
-        trend_block = ", ".join(trending[:5]) or "No disponible."
+        ctx_block = "\n".join(f"- {s[:300]}" for s in context_snippets) or "No prior context."
+        trend_block = ", ".join(trending[:5]) or "Not available."
         web_block = "\n".join(
-            f"• {r['title']} ({r['source']}): {r['snippet'][:200]}"
+            f"* {r['title']} ({r['source']}): {r['snippet'][:200]}"
             for r in web_results
-        ) or "Sin resultados web."
+        ) or "No web results."
 
         click_block = (
             format_insights_for_prompt(clickstream)
             if clickstream
-            else "Sin datos de comportamiento de lectores todavía."
+            else "No reader behavior data available yet."
         )
 
         return f"""
-CONSULTA DE INVESTIGACIÓN: {query}
+RESEARCH QUERY: {query}
 
-CONTEXTO HISTÓRICO DEL PERIÓDICO (RAG):
+HISTORICAL NEWSPAPER CONTEXT (RAG):
 {ctx_block}
 
-TEMAS EN TENDENCIA HOY:
+TODAY'S TRENDING TOPICS:
 {trend_block}
 
-NOTICIAS RECIENTES EN LA WEB:
+RECENT NEWS FROM THE WEB:
 {web_block}
- 
+
 {click_block}
- 
-Con base en toda la información anterior, propón 3 ideas de artículos
-para {self.newspaper_name}. Prioriza los temas que combinan tendencia
-externa con alto engagement histórico de los lectores.
-Responde en el formato JSON indicado.
+
+Based on all the information above, propose 3 article ideas for {self.newspaper_name}.
+Prioritize topics that combine external trends with high historical reader engagement.
+Respond in the specified JSON format.
 """.strip()
 
     def _messages_to_contents(self, messages: list[dict]) -> list[types.Content]:
@@ -381,9 +388,9 @@ Responde en el formato JSON indicado.
         return result
 
     def _parse_ideas(self, raw_text: str) -> list[ArticleIdea]:
-        """Extrae ArticleIdea[] del JSON que devuelve Gemini."""
+        """Extracts ArticleIdea[] from the JSON returned by Gemini."""
         try:
-            # Limpia posibles bloques markdown ```json ... ```
+            # Strip markdown code blocks if present: ```json ... ```
             clean = raw_text.strip()
             if clean.startswith("```"):
                 clean = clean.split("```")[1]
@@ -393,10 +400,10 @@ Responde en el formato JSON indicado.
             ideas_raw = data.get("article_ideas", [])
             return [
                 ArticleIdea(
-                    title=i.get("title", "Sin título"),
+                    title=i.get("title", "Untitled"),
                     angle=i.get("angle", ""),
                     category=i.get("category", "general"),
-                    local_relevance_score=float(i.get("local_relevance_score",0.5)),
+                    local_relevance_score=float(i.get("local_relevance_score", 0.5)),
                     sources=i.get("sources", []),
                     keywords=i.get("keywords", []),
                     priority=i.get("priority", "media"),
@@ -404,10 +411,10 @@ Responde en el formato JSON indicado.
                 for i in ideas_raw
             ]
         except (json.JSONDecodeError, KeyError, TypeError):
-            # Si Gemini no devuelve JSON válido → idea genérica de fallback
+            # Fallback 
             return [
                 ArticleIdea(
-                    title="Investigación pendiente de parseo",
+                    title="Research pending parse",
                     angle=raw_text[:200],
                     category="general",
                     local_relevance_score=0.0,
