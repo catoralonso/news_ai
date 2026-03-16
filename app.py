@@ -263,7 +263,7 @@ with tab_pipeline:
         report = st.session_state["report"]
 
         st.markdown(f"**{len(report.article_ideas)} ideas encontradas**")
-        if report.summary:
+        if getattr(report, "summary", None):
             st.caption(report.summary)
 
         verdict_icon = {"truthful": "✓", "doubtful": "?", "untruthful": "✗"}
