@@ -232,51 +232,147 @@ Managed entirely via Terraform (`infra/main.tf`).
 | **Cloud Logging** | Receives all `logging.*` calls from all agents automatically |
 | **Cloud Trace** | Records timeline of every API request (spans per agent step) |
 
+---
 ### Deploy with Terraform
-
 ```bash
-cd infra/
-terraform init
-terraform apply \
-  -var="project_id=YOUR_PROJECT" \
-  -var="gemini_api_key=YOUR_KEY"
+gcloud auth application-default login
+gcloud auth configure-docker europe-west1-docker.pkg.dev
+cd infra/ && terraform init && terraform apply -var="project_id=X" -var="gemini_api_key=Y"
+docker build -t $(terraform output -raw image_url) . && docker push $(terraform output -raw image_url)
+
+# For updates 
+docker build -t $(terraform output -raw image_url) . && docker push $(terraform output -raw image_url)
+
+# Terraform print
+api_url = "https://newspaper-ai-XXXXX-ew.a.run.app"
+docker_build_command = "docker build -t ..."
+docker_push_command  = "docker push ..."
+
+# Destroy infraestructure
+terraform destroy -var="project_id=..." -var="gemini_api_key=..."
 ```
-
-Outputs the `api_url` to set as `VITE_API_URL` in Lovable.
-
-### Deploy manually
-
+---
+### Deploy with Cloud Run
 ```bash
-# Build and push Docker image
-docker build -t europe-west1-docker.pkg.dev/YOUR_PROJECT/newspaper-ai/newspaper-ai:latest .
-docker push europe-west1-docker.pkg.dev/YOUR_PROJECT/newspaper-ai/newspaper-ai:latest
+# 1. Project Config
+gcloud config set project TU_PROYECTO_ID
+gcloud config set run/region europe-west1
 
-# Deploy to Cloud Run
+# 2. Enable APIs
+gcloud services enable \
+  run.googleapis.com \
+  artifactregistry.googleapis.com \
+  secretmanager.googleapis.com \
+  cloudscheduler.googleapis.com \
+  cloudtrace.googleapis.com \
+  logging.googleapis.com
+
+# 3. Secret API Key
+echo -n "TU_GEMINI_API_KEY" | \
+  gcloud secrets create gemini-api-key \
+    --data-file=- \
+    --replication-policy=automatic
+
+# 4. Create Artifact Registry
+gcloud artifacts repositories create newspaper-ai \
+  --repository-format=docker \
+  --location=europe-west1 \
+  --description="Docker images for newspaper_ai"
+
+# 5. Docker Image
+gcloud auth configure-docker europe-west1-docker.pkg.dev
+docker build -t europe-west1-docker.pkg.dev/TU_PROYECTO/newspaper-ai/newspaper-ai:latest .
+docker push europe-west1-docker.pkg.dev/TU_PROYECTO/newspaper-ai/newspaper-ai:latest
+
+# 6. Deploy Cloud Run
 gcloud run deploy newspaper-ai \
-  --image europe-west1-docker.pkg.dev/YOUR_PROJECT/newspaper-ai/newspaper-ai:latest \
+  --image europe-west1-docker.pkg.dev/TU_PROYECTO/newspaper-ai/newspaper-ai:latest \
   --platform managed \
   --region europe-west1 \
   --allow-unauthenticated \
+  --memory 1Gi \
+  --cpu 1 \
+  --min-instances 0 \
+  --max-instances 3 \
+  --set-env-vars NEWSPAPER_NAME="Savia",REGION_NEWS=ES,CHAT_MODEL=gemini-2.5-flash,GOOGLE_CLOUD_PROJECT=TU_PROYECTO_ID,GOOGLE_CLOUD_REGION=europe-west1 \
   --set-secrets GEMINI_API_KEY=gemini-api-key:latest
+
+# 7. GCloud print URL service
+Service URL: https://newspaper-ai-XXXXX-ew.a.run.app
+
+# 8. Validation and enviroment activation
+curl https://newspaper-ai-XXXXX-ew.a.run.app/health
+# → {"status":"ok","newspaper":"Nutrición AI",...}
+
+curl https://newspaper-ai-XXXXX-ew.a.run.app/docs
+# → Swagger UI con todos los endpoints
+
+# 9. Cloud Logging
+gcloud logging tail "resource.type=cloud_run_revision AND resource.labels.service_name=newspaper-ai"
+# Google Cloud Console → Logging → Logs Explorer
+# Filter: resource.type="cloud_run_revision"
+
+# 10. Cloude Traces and Metrics
+# Google Cloud Console → Trace → Trace List
+# Google Cloud Console → Cloud Run → newspaper-ai → Metrics
+
 ```
 
 ---
-
-## Local Development
-
-```bash
-pip install -r requirements.txt
-cp .env.example .env
-# Edit .env: add GEMINI_API_KEY
-
-# Run the API gateway locally
-uvicorn api.main:app --reload --port 8080
-
-# Or run individual agents
-python agents/jose_news_research/run.py
-python agents/orchestrator/run.py
+### Conect API with Lovable
+Go to **Settings → Environment Variables** y add:
+```
+VITE_API_URL=https://newspaper-ai-XXXXX-ew.a.run.app
 ```
 
+En el código React de Lovable, todas las llamadas a la API deben usar esta variable:
+```javascript
+const API = import.meta.env.VITE_API_URL;
+
+// Ejemplo: obtener artículos
+const res = await fetch(`${API}/api/articles`);
+const { articles } = await res.json();
+
+// Ejemplo: lanzar pipeline
+const res = await fetch(`${API}/api/pipeline/run`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ topic_hint: null, max_articles: 1 })
+});
+const { job_id } = await res.json();
+
+// Ejemplo: polling de estado del pipeline
+const check = await fetch(`${API}/api/pipeline/status/${job_id}`);
+const { status, result } = await check.json();
+
+// Ejemplo: chatbot Mauro con streaming
+const res = await fetch(`${API}/api/chat`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ message: 'Hola Mauro', session_id: 'user_123' })
+});
+
+const reader = res.body.getReader();
+const decoder = new TextDecoder();
+let buffer = '';
+
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  buffer += decoder.decode(value);
+  const lines = buffer.split('\n\n');
+  buffer = lines.pop();
+  for (const line of lines) {
+    if (line.startsWith('data: ')) {
+      const chunk = JSON.parse(line.slice(6));
+      if (!chunk.done) {
+        // añadir chunk.text al estado del mensaje
+        setMessage(prev => prev + chunk.text);
+      }
+    }
+  }
+}
+```
 ---
 
 ## Environment Variables
