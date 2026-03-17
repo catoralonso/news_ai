@@ -26,5 +26,15 @@ numpy>=1.26.0
 # ── Testing ──────────────────────────────────────────────────────────────────
 pytest>=8.0.0
 
-# ── Streamlit UI ───────────────────────────────────────────────────
+# ── Streamlit UI — reemplazada por api/main.py ──────────────────
 # streamlit>=1.35.0
+
+
+#── Production Launch ───────────────────────────────────────────────────
+
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+google-cloud-logging>=3.10.0
+opentelemetry-sdk>=1.24.0
+opentelemetry-exporter-gcp-trace>=1.6.0
+opentelemetry-instrumentation-fastapi>=0.45b0
