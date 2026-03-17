@@ -325,15 +325,15 @@ Go to **Settings → Environment Variables** y add:
 VITE_API_URL=https://newspaper-ai-XXXXX-ew.a.run.app
 ```
 
-En el código React de Lovable, todas las llamadas a la API deben usar esta variable:
+In the React from Lovable all calls to API should use this variable:
 ```javascript
 const API = import.meta.env.VITE_API_URL;
 
-// Ejemplo: obtener artículos
+// Example: get articles
 const res = await fetch(`${API}/api/articles`);
 const { articles } = await res.json();
 
-// Ejemplo: lanzar pipeline
+// Example: launch pipeline
 const res = await fetch(`${API}/api/pipeline/run`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
@@ -341,11 +341,11 @@ const res = await fetch(`${API}/api/pipeline/run`, {
 });
 const { job_id } = await res.json();
 
-// Ejemplo: polling de estado del pipeline
+// Example: polling state pipeline
 const check = await fetch(`${API}/api/pipeline/status/${job_id}`);
 const { status, result } = await check.json();
 
-// Ejemplo: chatbot Mauro con streaming
+// Example: chatbot Mauro with streaming
 const res = await fetch(`${API}/api/chat`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
