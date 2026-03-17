@@ -8,10 +8,19 @@ An autonomous multi-agent system that helps local newspapers gain visibility, tr
 
 ```
 newspaper_ai/
-├── app.py                   
+├── config.py                   
 ├── requirements.txt
-├── config.py
+├── Dockerfile
+├── app.py
 ├── .env
+├── .gitignore
+│ 
+├── core/
+│  ├── __init__.py
+│  └── main.py
+│ 
+├── infra/
+│  └── main.tf
 ├── agents/
 │   ├── adk_app/
 │   │   ├── __init__.py
