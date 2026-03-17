@@ -8,26 +8,27 @@ An autonomous multi-agent system that helps local newspapers gain visibility, tr
 
 ```
 newspaper_ai/
-├── config.py                   
+├── config.py                   ← Central config + Cloud Logging/Trace setup
 ├── requirements.txt
-├── Dockerfile
-├── app.py
+├── Dockerfile                  ← Cloud Run container build
+├── app.py                      ← Streamlit UI (legacy, not used in production)
 ├── .env
 ├── .gitignore
-│ 
-├── core/
-│  ├── __init__.py
-│  └── main.py
-│ 
+│
+├── api/                        ← FastAPI gateway (replaces Streamlit)
+│   ├── __init__.py
+│   └── main.py                 ← HTTP endpoints consumed by Lovable frontend
+│
 ├── infra/
-│  └── main.tf
+│   └── main.tf                 ← Terraform: Cloud Run, Scheduler, Secrets, IAM
+│
 ├── agents/
 │   ├── adk_app/
 │   │   ├── __init__.py
-│   │   └── agent.py 
+│   │   └── agent.py
 │   ├── jose_news_research/
-│   │   ├── agent.py       
-│   │   └── run.py          
+│   │   ├── agent.py
+│   │   └── run.py
 │   ├── camila_fact_checking/
 │   │   ├── agent.py
 │   │   └── run.py
@@ -45,39 +46,90 @@ newspaper_ai/
 │       └── run.py
 │
 ├── core/
-│   ├── vector_store.py     ← ChromaDB wrapper (swappable to Vertex AI)
-│   ├── memory.py           ← Conversation history
-│   └── chunker.py          ← Text splitting for RAG
+│   ├── vector_store.py         ← ChromaDB wrapper (swappable to Vertex AI)
+│   ├── memory.py               ← Conversation history
+│   └── chunker.py              ← Text splitting for RAG
+│
 ├── tools/
-│   └── search_tools.py     ← web_search, trending_topics, local_relevance
-├── data/
-│   ├── raw_news/           ← .txt articles from Content Engineer
-│   └── embeddings/
-│       ├── global_nutrition/   ← shared knowledge base (studies, guides)
-│       ├── news_research/      ← José: topics already covered
-│       ├── article_style/      ← Manuel: writing style examples
-│       ├── article_published/  ← Manuel: published articles
-│       ├── fact_checking/      ← Camila: fake news patterns, trusted sources
-│       ├── reader_interaction/ ← Mauro: FAQs, reader context
-└──     └── social_media/       ← Asti: successful post examples
+│   └── search_tools.py         ← web_search, trending_topics, local_relevance
+│
+└── data/
+    ├── raw_news/               ← .txt articles from Content Engineer
+    ├── articles/               ← Generated articles (JSON)
+    ├── social_media_output/    ← SocialMediaPack per article (JSON)
+    ├── trends/                 ← Google Trends CSV (manual export)
+    ├── clickstream/            ← Reader events (future: logged by web)
+    └── embeddings/
+        ├── global_nutrition/   ← shared knowledge base (studies, guides)
+        ├── news_research/      ← José: topics already covered
+        ├── article_style/      ← Manuel: writing style examples
+        ├── article_published/  ← Manuel: published articles
+        ├── fact_checking/      ← Camila: fake news patterns, trusted sources
+        ├── reader_interaction/ ← Mauro: FAQs, reader context
+        └── social_media/       ← Asti: successful post examples
+```
+
+---
+
+## Architecture
+
+The system runs as a single Cloud Run service. The FastAPI gateway (`api/main.py`) is the only entry point — it receives HTTP requests from the Lovable web frontend and routes them to the appropriate agents.
 
 ```
+Lovable (React · lovable.app)
+        │  HTTPS + CORS
+        ▼
+api/main.py — FastAPI Gateway  (Cloud Run)
+        │
+        ▼
+orchestrator/agent.py
+        │
+        ├── asyncio.gather ──────────────────────┐
+        │                                        │
+        ▼                                        ▼
+jose_news_research              camila_fact_checking
+(trends · RSS · RAG)            (verify · sources)
+        │                                        │
+        └──────────────┬─────────────────────────┘
+                       ▼
+            manuel_article_generation
+               (write · RAG · Gemini)
+                       │
+        ┌──────────────┴──────────────┐
+        ▼                             ▼
+asti_social_media          mauro_reader_interaction
+(tweet · ig · newsletter)  (chatbot · SSE · memory)
+```
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET`  | `/health` | Cloud Run health check |
+| `GET`  | `/api/trends` | Latest trends from José (no full pipeline) |
+| `POST` | `/api/pipeline/run` | Run full pipeline — returns `job_id` immediately |
+| `GET`  | `/api/pipeline/status/{job_id}` | Poll pipeline status |
+| `GET`  | `/api/articles` | List generated articles |
+| `GET`  | `/api/articles/{id}` | Full article content |
+| `GET`  | `/api/social/{article_id}` | SocialMediaPack for an article |
+| `POST` | `/api/chat` | Mauro chatbot — SSE streaming |
+| `GET`  | `/docs` | Swagger UI |
 
 ---
 
 ## RAG Architecture
 
-Each agent has its own ChromaDB collection scoped to its specific task. This avoids loading unnecessary data into memory and keeps each collection clean and purposeful.
+Each agent has its own ChromaDB collection scoped to its specific task.
 
 ### Collections
 
-| Collection | Owner (writes) | Who can read | Purpose |
+| Collection | Owner | Who can read | Purpose |
 |---|---|---|---|
-| `global_nutrition` | Content Engineer (ingestion script) | All agents | Scientific studies, dietary guides, general nutrition knowledge |
-| `news_research` | José | José, Manuel, Camila | Topics and angles already covered — avoids repetition |
+| `global_nutrition` | Content Engineer | All agents | Scientific studies, dietary guides, general nutrition knowledge |
+| `news_research` | José | José, Manuel, Camila | Topics already covered — avoids repetition |
 | `article_style` | Manuel | Manuel | Style examples and newspaper writing guide |
-| `article_published` | Manuel | José, Mauro, Asti | Published articles — José avoids duplicates, Mauro answers readers, Asti creates posts |
-| `fact_checking` | Camila | Camila | Fake news patterns, trusted source index, known misinformation |
+| `article_published` | Manuel | José, Mauro, Asti | Published articles |
+| `fact_checking` | Camila | Camila | Fake news patterns, trusted source index |
 | `reader_interaction` | Mauro | Mauro | Reader FAQs and recurring question patterns |
 | `social_media` | Asti | Asti | High-performing post examples per platform |
 
@@ -85,12 +137,11 @@ Each agent has its own ChromaDB collection scoped to its specific task. This avo
 
 - **Write only to your own collection.** An agent never calls `upsert()` on another agent's collection.
 - **Read across collections freely.** Any agent can query another agent's collection when it adds value.
-- **Each collection loads independently.** ChromaDB only loads the queried collection into memory — agents don't pay the cost of collections they don't need.
 
 ### Cross-collection reads in practice
 
 ```
-José.run(query)
+José.run()
     ├── reads news_research/      ← what has already been covered
     └── reads article_published/  ← what has already been written
 
@@ -101,7 +152,7 @@ Manuel.run(idea)
 
 Mauro.chat(question)
     ├── reads reader_interaction/ ← recurring question patterns
-    └── reads article_published/  ← answer grounded in real articles
+    └── reads article_published/  ← answers grounded in real articles
 
 Asti.run(article)
     ├── reads social_media/       ← successful post formats
@@ -112,26 +163,22 @@ Asti.run(article)
 
 ## Agents
 
-### Jose — News Research
+### José — News Research
 Finds trending topics and generates article ideas for the editorial team.
 
-- **Inputs:** orchestrator prompt or weekly cron trigger
-- **Tools:** pytrends, Google Custom Search (or mock), ChromaDB RAG
+- **Inputs:** orchestrator prompt or daily cron trigger
+- **Tools:** pytrends, RSS (PubMed + Healthline), ChromaDB RAG, clickstream
 - **Output:** `ArticleIdeas[]` — structured ideas ready for the article agent
-
----
 
 ### Camila — Fact Checking
 Verifies claims in two contexts:
 
-1. **Internal flow:** checks facts from Jose's research before articles are written
-2. **External flow:** verifies news that readers submit through Mauro's chatbot
+1. **Internal flow:** checks facts from José's research before articles are written
+2. **External flow:** verifies news submitted by readers through Mauro's chatbot
 
-- **Inputs:** article ideas from Jose, or user-submitted news via Mauro
+- **Inputs:** article ideas from José, or user-submitted news via Mauro
 - **Tools:** web search, trusted source lookup
 - **Output:** verdict: truthful / doubtful / untruthful + reason + sources[]
-
----
 
 ### Manuel — Article Generation
 Writes short, friendly news pieces optimized for visibility and engagement.
@@ -139,21 +186,15 @@ Writes short, friendly news pieces optimized for visibility and engagement.
 > Long-form investigative articles remain the journalists' responsibility. Manuel handles trend-driven, short-format content to keep the newspaper active and visible online.
 
 - **Inputs:** verified ideas from Camila
-- **Tools:** Gemini (`generate_content`)
-- **Output:** publication-ready article (short format, friendly tone)
-
----
+- **Tools:** Gemini `generate_content`, ChromaDB RAG
+- **Output:** `CreateArticle` — publication-ready article
 
 ### Asti — Social Media Distribution
-Publishes content across social platforms.
+Generates platform-ready content from published articles.
 
-- **Platforms:** Twitter/X, LinkedIn, Instagram (caption + hashtags)
-- **Phase 1:** text-only posts — journalists add images manually for Instagram
-- **Phase 2 (future):** AI image generation via Imagen API
-- **Inputs:** article from Manuel or direct prompt from journalist
-- **Output:** published posts per platform
-
----
+- **Platforms:** Twitter/X, Instagram (caption + image prompts), carousel, newsletter snippet
+- **Inputs:** `CreateArticle` from Manuel or direct journalist prompt
+- **Output:** `SocialMediaPack` saved to `data/social_media_output/`
 
 ### Mauro — Reader Interaction
 The public-facing chatbot. Readers interact only with Mauro.
@@ -161,64 +202,78 @@ The public-facing chatbot. Readers interact only with Mauro.
 - **Inputs:** reader questions, submitted news tips
 - **Tools:** ChromaDB RAG (published articles) + Gemini
 - **Camila integration:** if a reader submits an external news claim, Mauro invokes Camila to fact-check it before responding
-- **Output:** informed, grounded responses to readers
-
----
+- **Output:** streaming SSE responses to the Lovable frontend
 
 ### Orchestrator
-Controls the workflow for the editorial team. Not visible to readers.
+Controls the editorial workflow. Not visible to readers.
 
-- **Automatic mode:** runs every Monday via cron — Gemini analyzes last week's context and decides which agents to activate
-- **Manual mode:** journalist provides a prompt and the orchestrator interprets intent and routes to the right agents
+- **Automatic mode:** runs every day at 07:00 CET via Cloud Scheduler
+- **Manual mode:** journalist triggers pipeline via `POST /api/pipeline/run`
 
-**Examples:**
 | Journalist input | Agents activated |
 |---|---|
-| "Show me this week's trends" | Jose + Camila (always paired)
-| "Write an article about X" | Jose → Camila → Manuel |
+| "Show me this week's trends" | José + Camila |
+| "Write an article about X" | José → Camila → Manuel |
 | "Post yesterday's article on social media" | Asti only |
-| *(no input, Monday cron)* | Gemini decides based on context |
+| *(daily cron)* | Full pipeline |
 
 ---
 
-## User Types
+## Infrastructure
 
-| User | Interface | Agents accessible |
-|---|---|---|
-| Reader | Mauro chatbot | Mauro (+ Camila indirectly) |
-| Journalist / Editor | Orchestrator CLI or UI | All agents via orchestrator |
+Managed entirely via Terraform (`infra/main.tf`).
 
----
+| Service | Purpose |
+|---|---|
+| **Cloud Run** | Hosts the FastAPI container — scales to 0 when idle |
+| **Artifact Registry** | Stores Docker images |
+| **Secret Manager** | Stores `GEMINI_API_KEY` securely |
+| **Cloud Scheduler** | Triggers pipeline daily at 07:00 CET |
+| **Cloud Logging** | Receives all `logging.*` calls from all agents automatically |
+| **Cloud Trace** | Records timeline of every API request (spans per agent step) |
 
-## System Flow
+### Deploy with Terraform
 
-```
-READER
-    │
-    ▼
-mauro_reader_interaction
-    ├── RAG: reader_interaction/ + article_published/
-    ├── Gemini         ← enriched responses
-    └── camila         ← invoked if reader submits external news
-
-
-JOURNALIST / CRON (Monday)
-    │
-    ▼
-orchestrator
-    ├── jose_news_research + camila_fact_checking  (always together)
-    ├── manuel_article_generation (optional — if an idea is approved)
-    └── asti_social_media        (optional — if article is ready to publish)
+```bash
+cd infra/
+terraform init
+terraform apply \
+  -var="project_id=YOUR_PROJECT" \
+  -var="gemini_api_key=YOUR_KEY"
 ```
 
+Outputs the `api_url` to set as `VITE_API_URL` in Lovable.
+
+### Deploy manually
+
+```bash
+# Build and push Docker image
+docker build -t europe-west1-docker.pkg.dev/YOUR_PROJECT/newspaper-ai/newspaper-ai:latest .
+docker push europe-west1-docker.pkg.dev/YOUR_PROJECT/newspaper-ai/newspaper-ai:latest
+
+# Deploy to Cloud Run
+gcloud run deploy newspaper-ai \
+  --image europe-west1-docker.pkg.dev/YOUR_PROJECT/newspaper-ai/newspaper-ai:latest \
+  --platform managed \
+  --region europe-west1 \
+  --allow-unauthenticated \
+  --set-secrets GEMINI_API_KEY=gemini-api-key:latest
+```
+
 ---
 
-## Setup
+## Local Development
 
 ```bash
 pip install -r requirements.txt
 cp .env.example .env
-# Edit .env: add your API keys
+# Edit .env: add GEMINI_API_KEY
+
+# Run the API gateway locally
+uvicorn api.main:app --reload --port 8080
+
+# Or run individual agents
+python agents/jose_news_research/run.py
 python agents/orchestrator/run.py
 ```
 
@@ -229,12 +284,22 @@ python agents/orchestrator/run.py
 | Variable | Description | Required |
 |---|---|---|
 | `GEMINI_API_KEY` | AI Studio key (local development) | Yes (local) |
-| `GOOGLE_CLOUD_PROJECT` | GCloud Project ID (production) | Yes (prod) |
-| `GOOGLE_CSE_KEY` | Google Custom Search API key | No (uses mock) |
-| `CHROMA_PERSIST_DIR` | ChromaDB directory | No (default: `data/embeddings`) |
+| `GOOGLE_CLOUD_PROJECT` | GCloud Project ID — activates Vertex AI + observability | Yes (prod) |
+| `GOOGLE_CLOUD_REGION` | GCloud region (default: `europe-west1`) | No |
+| `NEWSPAPER_NAME` | Newspaper display name (default: `Nutrición AI`) | No |
+| `CHAT_MODEL` | Gemini model (default: `gemini-2.0-flash`) | No |
+| `CHROMA_PERSIST_DIR` | ChromaDB directory (default: `data/embeddings`) | No |
 | `TWITTER_BEARER_TOKEN` | Twitter/X API key | Yes (Asti) |
-| `LINKEDIN_ACCESS_TOKEN` | LinkedIn API token | Yes (Asti) |
 | `INSTAGRAM_ACCESS_TOKEN` | Instagram Graph API token | Yes (Asti) |
+
+---
+
+## User Types
+
+| User | Interface | Agents accessible |
+|---|---|---|
+| Reader | Mauro chatbot (Lovable web) | Mauro (+ Camila indirectly) |
+| Journalist / Editor | Lovable web + `/docs` Swagger | All agents via orchestrator |
 
 ---
 
@@ -243,9 +308,15 @@ python agents/orchestrator/run.py
 - [x] Agent skeleton (all 6 agents)
 - [x] ChromaDB RAG core
 - [x] RAG collection architecture (per-agent + global)
-- [ ] Orchestrator task routing with Gemini
-- [ ] Camila external fact-check integration
-- [ ] Asti Phase 1 — text posts (Twitter, LinkedIn, Instagram)
-- [ ] Monday cron automation
+- [x] FastAPI gateway (`api/main.py`) — replaces Streamlit
+- [x] Dockerfile + Cloud Run deployment
+- [x] Terraform infrastructure (`infra/main.tf`)
+- [x] Cloud Logging + Cloud Trace observability
+- [x] Cloud Scheduler — daily pipeline at 07:00 CET
+- [x] Lovable frontend integration (CORS + SSE)
+- [x] Orchestrator task routing with Gemini
+- [x] Camila external fact-check integration
+- [ ] Asti Phase 1 — text posts (Twitter, Instagram)
 - [ ] Asti Phase 2 — AI image generation for Instagram
-- [ ] Deep investigative tools for journalists
+- [ ] Firestore / Cloud Storage for persistent article storage
+- [ ] Vertex AI Vector Search (swap from ChromaDB)
