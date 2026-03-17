@@ -286,7 +286,7 @@ python agents/orchestrator/run.py
 | `GEMINI_API_KEY` | AI Studio key (local development) | Yes (local) |
 | `GOOGLE_CLOUD_PROJECT` | GCloud Project ID — activates Vertex AI + observability | Yes (prod) |
 | `GOOGLE_CLOUD_REGION` | GCloud region (default: `europe-west1`) | No |
-| `NEWSPAPER_NAME` | Newspaper display name (default: `Nutrición AI`) | No |
+| `NEWSPAPER_NAME` | Newspaper display name (default: `Savia`) | No |
 | `CHAT_MODEL` | Gemini model (default: `gemini-2.0-flash`) | No |
 | `CHROMA_PERSIST_DIR` | ChromaDB directory (default: `data/embeddings`) | No |
 | `TWITTER_BEARER_TOKEN` | Twitter/X API key | Yes (Asti) |
