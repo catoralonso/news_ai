@@ -19,13 +19,12 @@ import logging
 import os
 
 # ── Newspaper identity ────────────────────────────────────────────────────────
-NEWSPAPER_NAME = os.getenv("NEWSPAPER_NAME", "Nutrición AI")
+NEWSPAPER_NAME = os.getenv("NEWSPAPER_NAME", "Savia")
 REGION         = os.getenv("REGION_NEWS",    "ES")
 
 # ── Model ─────────────────────────────────────────────────────────────────────
 # Single place to change the model for ALL agents simultaneously.
-# Options: "gemini-2.0-flash" (fast/cheap) | "gemini-2.5-flash" (balanced) | "gemini-2.5-pro" (best)
-CHAT_MODEL = os.getenv("CHAT_MODEL", "gemini-2.0-flash")
+CHAT_MODEL = os.getenv("CHAT_MODEL", "gemini-2.5-flash")
 
 # ── Google / Vertex AI ────────────────────────────────────────────────────────
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY",       "")
@@ -43,8 +42,14 @@ ARTICLES_DIR      = os.getenv("ARTICLES_DIR",            "data/articles")
 # Activar sólo cuando corremos en Google Cloud (GOOGLE_CLOUD_PROJECT detectado).
 # En local usa logging estándar sin ningún cambio en los agentes.
 
-_observability_initialized = False
-
+try:
+    if VERTEX_PROJECT:
+        _setup_gcloud_logging()
+        _setup_gcloud_trace()
+    else:
+        _setup_local_logging()
+except Exception:
+    _setup_local_logging()
 
 def setup_observability() -> None:
     """
