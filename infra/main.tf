@@ -65,6 +65,12 @@ variable "image_tag" {
   default     = "latest"
 }
 
+variable "service_name" {
+  description = "Cloud Run service name"
+  type        = string
+  default     = "savia"
+}
+
 # ── Provider ──────────────────────────────────────────────────────────────────
 
 provider "google" {
@@ -92,7 +98,7 @@ resource "google_project_service" "apis" {
 # ── Artifact Registry ─────────────────────────────────────────────────────────
 
 resource "google_artifact_registry_repository" "newspaper_ai" {
-  repository_id = "newspaper-ai"
+  repository_id = var.service_name
   format        = "DOCKER"
   location      = var.region
   description   = "Docker images for newspaper_ai"
@@ -101,7 +107,7 @@ resource "google_artifact_registry_repository" "newspaper_ai" {
 }
 
 locals {
-  image_url = "${var.region}-docker.pkg.dev/${var.project_id}/newspaper-ai/newspaper-ai:${var.image_tag}"
+  image_url = "${var.region}-docker.pkg.dev/${var.project_id}/${var.service_name}/${var.service_name}:${var.image_tag}"
 }
 
 # ── Secret Manager — GEMINI_API_KEY ───────────────────────────────────────────
@@ -124,8 +130,8 @@ resource "google_secret_manager_secret_version" "gemini_api_key" {
 # ── Service Account para Cloud Run ────────────────────────────────────────────
 
 resource "google_service_account" "newspaper_ai" {
-  account_id   = "newspaper-ai-sa"
-  display_name = "newspaper_ai Cloud Run Service Account"
+  account_id   = "${var.service_name}-sa"
+  display_name = "${var.service_name} Cloud Run Service Account"
 }
 
 # Permissions to read secrets
@@ -159,7 +165,7 @@ resource "google_project_iam_member" "trace_agent" {
 # ── Cloud Run — API Gateway ───────────────────────────────────────────────────
 
 resource "google_cloud_run_v2_service" "newspaper_ai" {
-  name     = "newspaper-ai"
+  name     = var.service_name
   location = var.region
 
   template {
