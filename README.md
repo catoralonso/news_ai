@@ -235,10 +235,23 @@ Managed entirely via Terraform (`infra/main.tf`).
 ---
 ### Deploy with Terraform
 ```bash
+read -s -p "Gemini API Key: " GEMINI_KEY
+
 gcloud auth application-default login
-gcloud auth configure-docker europe-west1-docker.pkg.dev
-cd infra/ && terraform init && terraform apply -var="project_id=X" -var="gemini_api_key=Y"
-docker build -t $(terraform output -raw image_url) . && docker push $(terraform output -raw image_url)
+gcloud auth configure-docker us-central1-docker.pkg.dev
+
+cd infra && terraform init && terraform apply \
+  -var="project_id=$(gcloud config get-value project)" \
+  -var="gemini_api_key=$GEMINI_KEY"
+
+cd ..
+IMAGE_URL=$(cd infra && terraform output -raw image_url)
+docker build -t $IMAGE_URL .
+docker push $IMAGE_URL
+
+cd infra && terraform apply \
+  -var="project_id=$(gcloud config get-value project)" \
+  -var="gemini_api_key=$GEMINI_KEY"
 
 # For updates 
 docker build -t $(terraform output -raw image_url) . && docker push $(terraform output -raw image_url)
