@@ -1,21 +1,20 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # newspaper_ai — Terraform
-# Infraestructura completa en Google Cloud con un solo `terraform apply`
+# Complete infraestructure for Google Cloud using `terraform apply`
 #
-# Recursos que crea:
+# Resources created:
 #   - Artifact Registry (Docker images)
 #   - Secret Manager (GEMINI_API_KEY)
 #   - Cloud Run Service (API Gateway)
-#   - Cloud Scheduler (generación diaria automática de artículos)
 #   - IAM (permisos mínimos)
 #
-# Uso:
+# Use:
 #   cd infra/
 #   terraform init
 #   terraform plan -var="project_id=TU_PROYECTO" -var="gemini_api_key=AIza..."
 #   terraform apply
 #
-# Variables requeridas: project_id, gemini_api_key
+# Variables needed: project_id, gemini_api_key
 # ─────────────────────────────────────────────────────────────────────────────
 
 terraform {
@@ -28,9 +27,9 @@ terraform {
     }
   }
 
-  # Descomenta para guardar el state en GCS (recomendado para trabajo en equipo)
+  # Uncoment to save state on GCS
   # backend "gcs" {
-  #   bucket = "TU_PROYECTO-terraform-state"
+  #   bucket = "YOUR-PROJECT-terraform-state"
   #   prefix = "newspaper-ai"
   # }
 }
@@ -43,25 +42,25 @@ variable "project_id" {
 }
 
 variable "region" {
-  description = "GCloud region para Cloud Run"
+  description = "GCloud region for Cloud Run"
   type        = string
-  default     = "europe-west1"   # Europa — latencia baja desde España
+  default     = "us-central1"
 }
 
 variable "gemini_api_key" {
-  description = "Gemini API key (AI Studio). Se guarda en Secret Manager."
+  description = "Gemini API key (AI Studio). Saved in Secret Manager."
   type        = string
   sensitive   = true
 }
 
 variable "newspaper_name" {
-  description = "Nombre del periódico"
+  description = "Newspaper name"
   type        = string
-  default     = "Nutrición AI"
+  default     = "Savia"
 }
 
 variable "image_tag" {
-  description = "Docker image tag a desplegar"
+  description = "Docker image tag for deploy"
   type        = string
   default     = "latest"
 }
@@ -73,8 +72,7 @@ provider "google" {
   region  = var.region
 }
 
-# ── APIs habilitadas ──────────────────────────────────────────────────────────
-# Habilitar las APIs de GCloud necesarias (sólo la primera vez)
+# ── APIs enabeling ──────────────────────────────────────────────────────────
 
 resource "google_project_service" "apis" {
   for_each = toset([
@@ -92,7 +90,6 @@ resource "google_project_service" "apis" {
 }
 
 # ── Artifact Registry ─────────────────────────────────────────────────────────
-# Donde viven los Docker images del proyecto
 
 resource "google_artifact_registry_repository" "newspaper_ai" {
   repository_id = "newspaper-ai"
@@ -131,28 +128,28 @@ resource "google_service_account" "newspaper_ai" {
   display_name = "newspaper_ai Cloud Run Service Account"
 }
 
-# Permiso para leer secrets
+# Permissions to read secrets
 resource "google_secret_manager_secret_iam_member" "gemini_key_access" {
   secret_id = google_secret_manager_secret.gemini_api_key.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.newspaper_ai.email}"
 }
 
-# Permiso para Vertex AI (cuando se migre de GEMINI_API_KEY a Vertex)
+# Permissions for Vertex AI
 resource "google_project_iam_member" "vertex_user" {
   project = var.project_id
   role    = "roles/aiplatform.user"
   member  = "serviceAccount:${google_service_account.newspaper_ai.email}"
 }
 
-# Permiso para Cloud Logging
+# Permissions for Cloud Logging
 resource "google_project_iam_member" "log_writer" {
   project = var.project_id
   role    = "roles/logging.logWriter"
   member  = "serviceAccount:${google_service_account.newspaper_ai.email}"
 }
 
-# Permiso para Cloud Trace
+# Permissions for Cloud Trace
 resource "google_project_iam_member" "trace_agent" {
   project = var.project_id
   role    = "roles/cloudtrace.agent"
@@ -168,8 +165,7 @@ resource "google_cloud_run_v2_service" "newspaper_ai" {
   template {
     service_account = google_service_account.newspaper_ai.email
 
-    # Recursos: ajustar según presupuesto
-    # 1 CPU + 512MB RAM es suficiente para Gemini Flash
+    # Resources: adjust according to budget
     containers {
       image = local.image_url
 
@@ -178,11 +174,11 @@ resource "google_cloud_run_v2_service" "newspaper_ai" {
           cpu    = "1"
           memory = "1Gi"
         }
-        # CPU sólo activa mientras hay requests (máximo ahorro de costes)
+        # CPU ative only on request
         cpu_idle = false
       }
 
-      # Variables de entorno (no sensibles)
+      # Environment Variables
       env {
         name  = "NEWSPAPER_NAME"
         value = var.newspaper_name
@@ -204,7 +200,7 @@ resource "google_cloud_run_v2_service" "newspaper_ai" {
         value = var.region
       }
 
-      # API key desde Secret Manager (nunca hardcodeada)
+      # API key from Secret Manager
       env {
         name = "GEMINI_API_KEY"
         value_source {
@@ -233,7 +229,7 @@ resource "google_cloud_run_v2_service" "newspaper_ai" {
       }
     }
 
-    # Escala a 0 cuando no hay tráfico (máximo ahorro)
+    # Scaling to 0 when there is no traffic
     scaling {
       min_instance_count = 0
       max_instance_count = 3
@@ -247,7 +243,7 @@ resource "google_cloud_run_v2_service" "newspaper_ai" {
   ]
 }
 
-# Permite acceso público (Lovable llama desde el navegador del usuario)
+# Allows public access
 resource "google_cloud_run_v2_service_iam_member" "public_access" {
   project  = var.project_id
   location = var.region
@@ -256,61 +252,24 @@ resource "google_cloud_run_v2_service_iam_member" "public_access" {
   member   = "allUsers"
 }
 
-# ── Cloud Scheduler — Generación automática diaria ───────────────────────────
-# Lanza el pipeline cada mañana a las 7:00 CET (6:00 UTC)
-# El periódico tiene artículos frescos cada día sin intervención manual
-
-resource "google_cloud_scheduler_job" "daily_pipeline" {
-  name      = "newspaper-ai-daily-pipeline"
-  region    = var.region
-  schedule  = "0 6 * * *"   # 06:00 UTC = 07:00 CET / 08:00 CEST
-  time_zone = "Europe/Madrid"
-
-  http_target {
-    uri         = "${google_cloud_run_v2_service.newspaper_ai.uri}/api/pipeline/run"
-    http_method = "POST"
-
-    body = base64encode(jsonencode({
-      topic_hint   = null
-      max_articles = 1
-    }))
-
-    headers = {
-      "Content-Type" = "application/json"
-    }
-
-    # Autenticación: el scheduler se autentica como la SA del proyecto
-    oidc_token {
-      service_account_email = google_service_account.newspaper_ai.email
-      audience              = google_cloud_run_v2_service.newspaper_ai.uri
-    }
-  }
-
-  retry_config {
-    retry_count = 3
-  }
-
-  depends_on = [google_cloud_run_v2_service.newspaper_ai]
-}
-
 # ── Outputs ───────────────────────────────────────────────────────────────────
 
 output "api_url" {
-  description = "URL pública de la API — pégala en Lovable como VITE_API_URL"
+  description = "Public URL from API - for Lovable (VITE_API_URL)"
   value       = google_cloud_run_v2_service.newspaper_ai.uri
 }
 
 output "image_url" {
-  description = "URL del Docker image en Artifact Registry"
+  description = "URL of the Docker image on the Artifact Registry"
   value       = local.image_url
 }
 
 output "docker_push_command" {
-  description = "Comando para subir el Docker image"
+  description = "To upload the Docker image"
   value       = "docker push ${local.image_url}"
 }
 
 output "docker_build_command" {
-  description = "Comando para construir y etiquetar el Docker image"
+  description = "To build and tag Docker image"
   value       = "docker build -t ${local.image_url} ."
 }
