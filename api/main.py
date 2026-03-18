@@ -55,13 +55,9 @@ from pydantic import BaseModel
 from config import (
     NEWSPAPER_NAME, REGION,
     VERTEX_PROJECT,
-    setup_observability,   # añadido en config.py actualizado
 )
 
 logger = logging.getLogger("newspaper_ai.api")
-
-# Activa Cloud Logging / Trace si estamos en GCloud
-setup_observability()
 
 # ── Agentes ───────────────────────────────────────────────────────────────────
 # Importaciones lazy para no bloquear el arranque si un agente falla
