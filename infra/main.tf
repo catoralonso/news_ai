@@ -4,17 +4,15 @@
 #
 # Resources created:
 #   - Artifact Registry (Docker images)
-#   - Secret Manager (GEMINI_API_KEY)
 #   - Cloud Run Service (API Gateway)
 #   - IAM (permisos mínimos)
 #
 # Use:
 #   cd infra/
 #   terraform init
-#   terraform plan -var="project_id=TU_PROYECTO" -var="gemini_api_key=AIza..."
 #   terraform apply
 #
-# Variables needed: project_id, gemini_api_key
+# Variables needed: project_id
 # ─────────────────────────────────────────────────────────────────────────────
 
 terraform {
@@ -45,12 +43,6 @@ variable "region" {
   description = "GCloud region for Cloud Run"
   type        = string
   default     = "us-central1"
-}
-
-variable "gemini_api_key" {
-  description = "Gemini API key (AI Studio). Saved in Secret Manager."
-  type        = string
-  sensitive   = true
 }
 
 variable "newspaper_name" {
@@ -84,8 +76,6 @@ resource "google_project_service" "apis" {
   for_each = toset([
     "run.googleapis.com",
     "artifactregistry.googleapis.com",
-    "secretmanager.googleapis.com",
-    "cloudscheduler.googleapis.com",
     "cloudtrace.googleapis.com",
     "logging.googleapis.com",
     "aiplatform.googleapis.com",
@@ -110,35 +100,11 @@ locals {
   image_url = "${var.region}-docker.pkg.dev/${var.project_id}/${var.service_name}/${var.service_name}:${var.image_tag}"
 }
 
-# ── Secret Manager — GEMINI_API_KEY ───────────────────────────────────────────
-
-resource "google_secret_manager_secret" "gemini_api_key" {
-  secret_id = "gemini-api-key"
-
-  replication {
-    auto {}
-  }
-
-  depends_on = [google_project_service.apis]
-}
-
-resource "google_secret_manager_secret_version" "gemini_api_key" {
-  secret      = google_secret_manager_secret.gemini_api_key.id
-  secret_data = var.gemini_api_key
-}
-
 # ── Service Account para Cloud Run ────────────────────────────────────────────
 
 resource "google_service_account" "newspaper_ai" {
   account_id   = "${var.service_name}-sa"
   display_name = "${var.service_name} Cloud Run Service Account"
-}
-
-# Permissions to read secrets
-resource "google_secret_manager_secret_iam_member" "gemini_key_access" {
-  secret_id = google_secret_manager_secret.gemini_api_key.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.newspaper_ai.email}"
 }
 
 # Permissions for Vertex AI
@@ -195,7 +161,7 @@ resource "google_cloud_run_v2_service" "newspaper_ai" {
       }
       env {
         name  = "CHAT_MODEL"
-        value = "gemini-2.0-flash"
+        value = "gemini-2.5-flash"
       }
       env {
         name  = "GOOGLE_CLOUD_PROJECT"
@@ -204,17 +170,6 @@ resource "google_cloud_run_v2_service" "newspaper_ai" {
       env {
         name  = "GOOGLE_CLOUD_REGION"
         value = var.region
-      }
-
-      # API key from Secret Manager
-      env {
-        name = "GEMINI_API_KEY"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.gemini_api_key.secret_id
-            version = "latest"
-          }
-        }
       }
 
       # Health check endpoint
@@ -245,7 +200,6 @@ resource "google_cloud_run_v2_service" "newspaper_ai" {
   depends_on = [
     google_project_service.apis,
     google_artifact_registry_repository.newspaper_ai,
-    google_secret_manager_secret_version.gemini_api_key,
   ]
 }
 
