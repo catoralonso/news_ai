@@ -186,7 +186,7 @@ async def get_trends(topic: str = "nutrición tendencias salud"):
         if hasattr(agent, "get_trends"):
             trends = await asyncio.to_thread(agent.get_trends)
         else:
-            result = await asyncio.to_thread(agent.run)
+            result = await asyncio.to_thread(agent.run, topic)
             trends = [
                 {
                     "topic": idea.topic if hasattr(idea, "topic") else str(idea),
