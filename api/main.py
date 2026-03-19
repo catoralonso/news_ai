@@ -372,6 +372,7 @@ async def chat(request: ChatRequest):
 
             # Reutilizamos la instancia de Mauro por sesión para mantener memoria
             if session_id not in _chat_sessions:
+                from agents.camila_fact_checking.agent import FactCheckingAgent, KnowledgeBase as CamilaKB
                 # Camila
                 camila_kb = CamilaKB()
                 camila = FactCheckingAgent(knowledge_base=camila_kb)
