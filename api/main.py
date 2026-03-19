@@ -188,10 +188,9 @@ async def get_trends(topic: str = "nutrición tendencias salud"):
         else:
             result = await asyncio.to_thread(agent.run, topic)
             trends = [
-                {
-                    "topic": idea.topic if hasattr(idea, "topic") else str(idea),
-                    "relevance": getattr(idea, "local_relevance_score", 0.0),
-                }
+                {"topic": t, "relevance": 1.0}
+                for t in (result.trending_topics if hasattr(result, "trending_topics") else [str(result)])
+            ]
                 for idea in (result.ideas if hasattr(result, "ideas") else [result])
             ]
 
