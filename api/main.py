@@ -191,8 +191,6 @@ async def get_trends(topic: str = "nutrición tendencias salud"):
                 {"topic": t, "relevance": 1.0}
                 for t in (result.trending_topics if hasattr(result, "trending_topics") else [str(result)])
             ]
-                for idea in (result.ideas if hasattr(result, "ideas") else [result])
-            ]
 
         logger.info("Trends fetched: %d items", len(trends))
         return {"trends": trends, "fetched_at": time.time()}
@@ -237,10 +235,8 @@ async def _run_pipeline_task(job_id: str, request: PipelineRequest):
         orchestrator = Orchestrator()
 
         # El orquestador ya maneja asyncio.gather internamente (José+Camila en paralelo)
-        result = await asyncio.to_thread(
-            orchestrator.run,
-            topic_hint=request.topic_hint,
-        )
+        query = request.topic_hint or "nutrición tendencias salud"
+        result = await orchestrator.run_pipeline_async(query)
 
         # Guardar artículo generado en disco para que GET /api/articles lo encuentre
         article = result.article if hasattr(result, "article") else result
@@ -376,10 +372,16 @@ async def chat(request: ChatRequest):
 
             # Reutilizamos la instancia de Mauro por sesión para mantener memoria
             if session_id not in _chat_sessions:
+                # Camila
+                camila_kb = CamilaKB()
+                camila = FactCheckingAgent(knowledge_base=camila_kb)
+
+                # Mauro con Camila inyectada
                 kb = MauroKB()
                 memory = Memory(max_turns=20)
                 _chat_sessions[session_id] = ReaderInteractionAgent(
                     knowledge_base=kb,
+                    camila=camila,
                     memory=memory,
                 )
 
