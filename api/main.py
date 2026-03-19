@@ -388,12 +388,16 @@ async def chat(request: ChatRequest):
 
             mauro = _chat_sessions[session_id]
 
-            # Mauro.chat() es síncrono — lo corremos en thread para no bloquear el event loop
+           # Mauro.chat() es síncrono — lo corremos en thread para no bloquear el event loop
             response = await asyncio.to_thread(mauro.chat, request.message)
+            if hasattr(response, "answer"):
+                text = response.answer
+            elif hasattr(response, "text"):
+                text = response.text
+            else:
+                text = str(response)
+            words = text.split(" ")
 
-            # Streaming simulado: enviamos la respuesta en chunks de ~5 palabras
-            # Si Mauro implementa streaming nativo, adaptar aquí
-            words = response.split(" ")
             chunk_size = 5
             for i in range(0, len(words), chunk_size):
                 chunk = " ".join(words[i:i + chunk_size])
