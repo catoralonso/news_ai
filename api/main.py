@@ -166,7 +166,7 @@ async def health():
 # ─────────────────────────────────────────────────────────────────────────────
 
 @app.get("/api/trends", tags=["content"])
-async def get_trends():
+async def get_trends(topic: str = "nutrición tendencias salud"):
     """
     Devuelve las últimas tendencias de nutrición detectadas por José.
     Llama directamente a José sin pasar por el pipeline completo.
