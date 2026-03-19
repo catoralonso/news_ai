@@ -25,11 +25,10 @@ terraform {
     }
   }
 
-  # Uncoment to save state on GCS
-  # backend "gcs" {
-  #   bucket = "YOUR-PROJECT-terraform-state"
-  #   prefix = "newspaper-ai"
-  # }
+  backend "gcs" {
+    bucket = "savia-490716-terraform-state"
+    prefix = "savia"
+   }
 }
 
 # ── Variables ─────────────────────────────────────────────────────────────────
