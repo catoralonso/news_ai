@@ -95,6 +95,7 @@ app.add_middleware(
     allow_origins=[
         "https://*.lovable.app",
         "https://lovable.app",
+        "https://lovable.dev",
         "https://*.lovableproject.com",
         "https://9e934412-07e7-4045-b394-4c9e6fe7b75d.lovableproject.com",
         "http://localhost:5173",   # Vite dev server
