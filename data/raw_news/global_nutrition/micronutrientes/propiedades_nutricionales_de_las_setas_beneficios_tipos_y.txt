@@ -1,0 +1,85 @@
+--- 
+fuente: https://www.bezzia.com/propiedades-nutricionales-de-las-setas-beneficios-tipos-y-como-disfrutarlas/
+---
+
+```markdown
+# Ficha Técnica: Propiedades Nutricionales y Beneficios para la Salud de las Setas
+
+## 1. Descripción General
+
+Las setas son la parte visible de los hongos (reino Fungi), no vegetales. Se caracterizan por carecer de clorofila y poseer paredes celulares con quitina. Son un alimento ligero, rico en micronutrientes y compuestos bioactivos, con una textura carnosa que las hace un excelente sustituto de la carne en dietas vegetarianas y veganas. Solo una parte de las miles de especies de hongos es comestible y segura.
+
+**Ejemplos de Setas Comestibles Mencionadas:**
+*   Champiñón
+*   Boletus
+*   Seta de ostra
+*   Níscalo (Robellón)
+*   Seta de cardo
+*   Rebozuelo
+*   Portobello
+*   Shiitake
+*   Maitake
+*   Reishi
+
+## 2. Composición Nutricional (por 100g de setas frescas, media orientativa)
+
+*   **Agua:** Aproximadamente 90%
+*   **Valor Energético:** ~25 kilocalorías
+*   **Proteínas:** ~1.8 g (puede alcanzar hasta el 9% en seco en algunas variedades)
+*   **Hidratos de Carbono:** ~4 g
+*   **Fibra:** ~2.5 g (incluye fibra soluble e insoluble como quitina y beta-glucanos)
+*   **Grasas:** Muy poca cantidad
+*   **Colesterol:** 0 mg
+
+## 3. Vitaminas Destacadas
+
+Las setas concentran una amplia gama de vitaminas, variando la cantidad según la especie y el cultivo.
+
+*   **Vitaminas del Grupo B:** B1 (Tiamina), B2 (Riboflavina), B3 (Niacina), B6 (Piridoxina). Implicadas en el metabolismo energético y el funcionamiento del sistema nervioso.
+*   **Vitamina A:** En forma de precursores.
+*   **Vitamina C:** Cantidades apreciables.
+*   **Vitamina D:** Poco habitual en alimentos de origen no animal. Presente en algunas setas (ej. shiitake expuestas a la luz). Favorece la absorción de calcio, la salud ósea y el sistema inmunitario.
+
+## 4. Minerales Destacados
+
+Son una fuente interesante de diversos minerales esenciales.
+
+*   **Potasio:** Ayuda a regular la presión arterial y el equilibrio de líquidos.
+*   **Fósforo:** Asociado a la salud de huesos y dientes.
+*   **Magnesio:** Contribuye a diversas funciones corporales.
+*   **Hierro:** Participa en la formación de glóbulos rojos.
+*   **Zinc:** Ligado al buen funcionamiento de las defensas y la protección antioxidante.
+*   **Yodo:** Importante para la función tiroidea.
+*   **Calcio:** Asociado a la salud de huesos y dientes.
+*   **Selenio:** Ligado al buen funcionamiento de las defensas y la protección antioxidante.
+
+## 5. Compuestos Bioactivos Clave
+
+Además de vitaminas y minerales, las setas aportan sustancias con un claro efecto protector.
+
+*   **Ergotioneína:** Aminoácido con potente poder antioxidante. Ayuda a frenar el daño oxidativo, proteger las células y reducir el riesgo de enfermedades crónicas relacionadas con la edad.
+*   **Beta-glucanos y otros polisacáridos:** Actividad antioxidante e inmunomoduladora. Estudiados por su papel en la prevención del envejecimiento celular y el deterioro cognitivo.
+*   **Fitonutrientes:** Sustancias específicas.
+*   **Eritadenina (en shiitake):** Contribuye a reducir el colesterol.
+*   **Moléculas antiinflamatorias:** Ayudan a modular la respuesta del organismo frente a procesos inflamatorios de bajo grado.
+
+## 6. Beneficios para la Salud
+
+La integración habitual de setas en la dieta puede apoyar diversos aspectos de la salud.
+
+*   **Control de Peso:** Bajas en calorías, alto contenido de agua y fibra, lo que las hace muy saciantes y útiles en dietas hipocalóricas.
+*   **Apoyo al Sistema Inmunitario:** Especies como shiitake, reishi, maitake o champiñón del sol contienen beta-glucanos y polisacáridos que estimulan células defensivas (macrófagos, linfocitos T), reforzando la capacidad del organismo frente a infecciones.
+*   **Acción Antioxidante y Antiinflamatoria:** La combinación de ergotioneína, selenio, vitamina C, polifenoles y beta-glucanos neutraliza radicales libres, protege contra el envejecimiento prematuro y modula la inflamación crónica.
+*   **Salud Cardiovascular:**
+    *   La fibra soluble y los beta-glucanos ayudan a manejar el colesterol, favoreciendo su eliminación y reduciendo su absorción.
+    *   Ausencia total de colesterol.
+    *   Ciertas variedades (ej. seta de ostra) contienen sustancias que mejoran factores de riesgo cardiovascular y la circulación sanguínea.
+*   **Salud Digestiva y Microbiota:**
+    *   La combinación de fibra soluble e insoluble (quitina, beta-glucanos) regula el tránsito intestinal, siendo útil para el estreñimiento.
+    *   Poseen un potencial efecto prebiótico, favoreciendo el crecimiento de bacterias beneficiosas en el intestino y contribuyendo a una microbiota equilibrada.
+
+## 7. Consideraciones Adicionales
+
+*   **Recomendaciones:** Ideales para dietas hipocalóricas, vegetarianas y veganas. Aliadas en situaciones de cansancio, estrés o aumento de necesidades nutricionales.
+*   **Vitamina D:** Pueden ser un complemento útil para personas con baja exposición solar, pero no sustituyen un tratamiento pautado en casos de déficit marcado.
+```

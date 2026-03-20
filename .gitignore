@@ -21,3 +21,5 @@ build/
 # IDEs
 .vscode/
 .idea/
+!data/raw_news/
+!data/raw_news/**

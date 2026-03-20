@@ -1,0 +1,71 @@
+--- 
+fuente: https://adelgaceenlinea.com/beneficios-nutricionales-de-los-lacteos/
+---
+
+```markdown
+# Ficha Técnica: Beneficios Nutricionales de los Lácteos
+
+*   **Título del Contenido:** Beneficios nutricionales de los lácteos
+*   **Fuente Original (mencionada):** AdelgaceEnlinea.com
+*   **Tipo de Contenido:** Información Nutricional y de Salud
+
+---
+
+## Resumen General
+
+El texto analiza los beneficios nutricionales y para la salud del consumo de lácteos, incluyendo leche, yogur y queso. Destaca su riqueza en nutrientes esenciales y su papel en la prevención de diversas enfermedades, así como su importancia en diferentes etapas de la vida, especialmente la infancia.
+
+---
+
+## Componentes Nutricionales Clave de los Lácteos
+
+*   **Calcio:** Fundamental para la salud ósea.
+*   **Carbohidratos:**
+    *   **Lactosa:** Azúcar natural de la leche, compuesto por glucosa y galactosa. Requiere la enzima lactasa para su digestión.
+*   **Grasas:** Presentes en diferentes porcentajes según el tipo de leche, esenciales para el crecimiento y la salud.
+*   **Proteínas:** Fuentes importantes para el desarrollo y mantenimiento del cuerpo.
+*   **Vitaminas:**
+    *   **Vitamina A:** Presente en lácteos.
+    *   **Vitaminas del Complejo B:** Especialmente en quesos y yogur.
+    *   **Vitamina D:** A menudo añadida a la leche envasada.
+*   **Minerales:**
+    *   **Fósforo:** Junto con el calcio, importante para la salud ósea.
+    *   **Sodio:** Los lácteos son pobres en sodio, lo cual es beneficioso para la salud.
+
+---
+
+## Beneficios para la Salud Atribuidos a los Lácteos
+
+*   **Prevención de Enfermedades:**
+    *   Obesidad
+    *   Diabetes tipo II
+    *   Colesterol elevado
+    *   Presión arterial alta
+*   **Desarrollo y Crecimiento:**
+    *   Permiten un buen desarrollo del cuerpo (especialmente la leche).
+    *   Necesarios para el crecimiento y la salud general.
+*   **Beneficios Específicos en la Infancia:**
+    *   Protegen y fortalecen los huesos.
+    *   Aumentan los niveles energéticos.
+    *   Contribuyen a aumentar la masa muscular.
+    *   Ayudan a controlar el peso.
+    *   Disminuyen el riesgo de padecer problemas cardiovasculares.
+    *   Proporcionan equilibrio nutricional.
+
+---
+
+## Consideraciones Especiales
+
+*   **Intolerancia a la Lactosa:** Algunas personas carecen de suficiente lactasa, la enzima necesaria para digerir la lactosa, lo que provoca intolerancia.
+*   **Importancia en la Dieta:** Los lácteos representan uno de los grupos nutricionales más importantes en todas las etapas de la vida, siendo alimentos completos y equilibrados, cruciales en la infancia.
+
+---
+
+## Productos Lácteos Mencionados
+
+*   Leche
+*   Yogur
+*   Queso
+
+---
+```

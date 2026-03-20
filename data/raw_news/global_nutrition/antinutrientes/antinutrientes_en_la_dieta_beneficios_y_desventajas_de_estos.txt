@@ -1,0 +1,44 @@
+# Antinutrientes En La Dieta: Beneficios Y Desventajas De Estos ...
+
+**Fuente:** https://fisioterapiaalia.com/antinutrientes-en-la-dieta-beneficios-y-desventajas-de-estos-compuestos-en-los-alimentos-vegetales/
+**Fecha:** 19/03/2026
+**Categoría:** Antinutrientes
+
+========================================
+
+A medida que la importancia de una dieta rica en alimentos de origen vegetal se hace cada vez más evidente, es esencial abordar los factores que pueden influir en la biodisponibilidad de nutrientes esenciales.
+Los antinutrientes, son compuestos presentes en muchos alimentos vegetales. Algunos de ellos, son los fitatos, tánicos, oxalatos y lectinas, han sido objeto de considerable investigación debido a su capacidad para interferir con la absorción de minerales y otros nutrientes. Sin embargo, estos compuestos también pueden desempeñar efectos beneficios potenciales para la salud humana (Duarte et al., 2022).
+TIPOS MÁS FRECUENTES DE ANTINUTRIENTES: DENEFICIOS Y DESVENTAJAS
+-
+FITATOS
+El fitato, también conocido como ácido fítico o hexafosfato de mioinositol (IP6), puede reducir la biodisponibilidad de minerales esenciales como el calcio, hierro y zinc debido a su capacidad quelante. Se encuentran principalmente en cereales, nueces, semillas y legumbres.
+Métodos culinarios de procesamiento como el remojo, fermentación, germinación y cocción pueden reducir significativamente su contenido (Petroski et al., 2020).
+Estudios sugieren que puede ayudar a prevenir enfermedades crónicas como la diabetes tipo 2 y enfermedades cardiovasculares al reducir los productos finales de glicación avanzada y actuar como un regulador natural del hierro (Sanchis et al., 2018; Petroski et al., 2020). Además, los fitatos actúan como un potente antioxidante (Dilworth et al., 2023).
+-
+OXALATOS
+Los oxalatos, son compuestos que se forman cuando el ácido oxálico se une a minerales como sodio, potasio, y calcio, entre otros. Se encuentran en legumbres, semillas, nueces, y en menor medida, en frutas y verduras (Siener, 2021). Sin embargo, al igual que los fitatos, hay que tener en cuenta que la formación de cálculos renales de oxalato de calcio, su contenido y actividad puede reducirse significativamente mediante métodos de procesamiento alimentario como el remojo y la cocción (Petroski et al., 2020; Shi et al., 2018).
+Sin embargo, patrones dietéticos que incluyen alimentos ricos en oxalato, como dietas ricas en los vegetales y que incluyan cereales integrales, han mostrado tener efectos protectores y beneficiosos para la salud debido a la presencia de otros compuestos bioactivos como los polifenoles, por lo que estos efectos negativos pueden ser mitigados mediante una dieta equilibrada y un adecuado procesamiento de alimentos (Siener, 2021).
+-
+TANINOS
+Los taninos son compuestos polifenólicos presentes en muchos alimentos vegetales como frutas, té, vino, nueces, semillas y legumbres. Estos compuestos son responsables del sabor astringente de muchos alimentos y bebidas.
+Los taninos pueden formar complejos con proteínas y minerales, lo que puede reducir la absorción de minerales esenciales como el hierro, el cobre y el zinc. (Petroski et al., 2020). Sin embargo, al igual que los oxalatos y los taninos, el remojo, la fermentación y la cocción, pueden reducir su contenido. Además, el consumo de vitamina C junto con alimentos ricos en taninos también puede contrarrestar sus efectos inhibidores sobre la absorción de hierro (Petroski et al., 2020).
+A pesar de sus efectos antinutricionales, los taninos también tienen numerosos beneficios para la salud. Actúan como potentes antioxidantes, ayudando a eliminar los radicales libres y proporcionando efectos protectores contra el cáncer, enfermedades cardiovasculares y otras condiciones crónicas (Dilworth et al., 2023). Además, estudios sugieren que los taninos pueden mejorar la función inmunológica y tener propiedades antiinflamatorias y cardioprotectoras (Sanchis et al., 2018).
+-
+LECTINAS
+Las lectinas son proteínas de unión a carbohidratos que se encuentran en legumbres, semillas, nueces, y en menor medida, en frutas y verduras.
+Pueden ser tóxicas si se consumen sin procesar adecuadamente. Sin embargo, su contenido y actividad pueden reducirse significativamente mediante métodos de procesamiento alimentario como el remojo y la cocción (Petroski et al., 2020; Shi et al., 2018).
+A pesar de su potencial efecto tóxico, las lectinas en pequeñas cantidades y correctamente procesadas, podrían tener efectos beneficiosos para la salud. Diversos estudios, han estudiado sus posibles propiedades anticancerígenas
+(Bhutia et al., 2019; Huldani et al., 2022) y antibacterianas (Fonseca et al., 2022). Además, parece ser que las lectinas podrían tener un papel en el control metabólico, específicamente en la moderación de la absorción de glucosa, lo cual podría ser beneficioso para la gestión de la diabetes.
+CONCLUSIONES
+Por todo ello, aunque los antinutrientes pueden presentar desafíos nutricionales, con el conocimiento y las técnicas de procesamiento adecuadas, sus efectos negativos pueden ser significativamente mitigados, permitiendo que sus beneficios para la salud sean aprovechados al máximo. Además, hay que tener en cuenta que estos alimentos son mucho más que la simple suma de sus componentes. Los nutrientes interactúan entre sí y con su matriz de maneras complejas, creando sinergias beneficiosas.
+Para la mayoría de las personas sin problemas específicos de salud, no es necesario preocuparse por los antinutrientes presentes en los alimentos. Sin embargo, aquellas personas que presenten anemia o presenten riesgo de deficiencias minerales podrían beneficiarse al limitar la ingesta de estos denominados “antinutrientes”.
+BILIOGRAFÍA
+Bhutia, S. K., Panda, P. K., Sinha, N., Praharaj, P. P., Bhol, C. S., Panigrahi, D. P., Mahapatra, K. K., Saha, S., Patra, S., Mishra, S. R., Behera, B. P., Patil, S., & Maiti, T. K. (2019). Plant lectins in cancer therapeutics: Targeting apoptosis and autophagy-dependent cell death. Pharmacological research, 144, 8–18. https://doi.org/10.1016/j.phrs.2019.04.001
+Dilworth, L., Stennett, D., & Omoruyi, F. (2023). Cellular and Molecular Activities of IP6 in Disease Prevention and Therapy. Biomolecules, 13(6), 972. https://doi.org/10.3390/biom13060972
+Duarte, C. M., Mota, J., Assunção, R., Martins, C., Ribeiro, A. C., Lima, A., Raymundo, A., Nunes, M. C., Ferreira, R. B., & Sousa, I. (2022). New Alternatives to Milk From Pulses: Chickpea and Lupin Beverages With Improved Digestibility and Potential Bioactivities for Human Health. Frontiers in nutrition, 9, 852907. https://doi.org/10.3389/fnut.2022.852907
+Fonseca, V. J. A., Braga, A. L., Filho, J. R., Teixeira, C. S., da Hora, G. C. A., & Morais-Braga, M. F. B. (2022). A review on the antimicrobial properties of lectins. International journal of biological macromolecules, 195, 163–178. https://doi.org/10.1016/j.ijbiomac.2021.11.209
+Huldani, H., Rashid, A. I., Turaev, K. N., Opulencia, M. J. C., Abdelbasset, W. K., Bokov, D. O., Mustafa, Y. F., Al-Gazally, M. E., Hammid, A. T., Kadhim, M. M., & Ahmadi, S. H. (2022). Concanavalin A as a promising lectin-based anti-cancer agent: the molecular mechanisms and therapeutic potential. Cell communication and signaling : CCS, 20(1), 167. https://doi.org/10.1186/s12964-022-00972-7
+Petroski, W., & Minich, D. M. (2020). Is There Such a Thing as «Anti-Nutrients»? A Narrative Review of Perceived Problematic Plant Compounds. Nutrients, 12(10), 2929. https://doi.org/10.3390/nu12102929
+Sanchís, P., Rivera, R., Berga, F., Fortuny, R., Adrover, M., Costa-Bauzá, A., Grasas, F., & Masmiquel, L. (2018). Phytate reduces the formation of advanced glycation end-products in patients with type II diabetes: A randomized cross-over trial. Scientific Reports, 8, 9619. https://doi.org/10.1038/s41598-018-27927-7
+Shi, L., Arntfield, S. D., & Nickerson, M. (2018). Changes in levels of phytic acid, lectins and oxalates during soaking and cooking of Canadian pulses. Food research international (Ottawa, Ont.), 107, 660–668. https://doi.org/10.1016/j.foodres.2018.02.056
+Siener R. (2021). Nutrition and Kidney Stone Disease. Nutrients, 13(6), 1917. https://doi.org/10.3390/nu13061917

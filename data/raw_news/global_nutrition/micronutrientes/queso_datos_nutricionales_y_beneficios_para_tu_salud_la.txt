@@ -1,0 +1,95 @@
+--- 
+fuente: https://laguiadelasvitaminas.com/queso/
+---
+
+```markdown
+# Ficha Técnica: Queso (Micronutrientes y Nutrición)
+
+## 1. Descripción General del Producto
+El queso es un producto lácteo elaborado a partir de la leche, cuyas características (forma, textura, sabor, color, olor, nutrimentos) varían según la técnica de elaboración. Es un alimento altamente nutritivo, rico en vitaminas y minerales, y ha sido una parte fundamental de la dieta humana a lo largo de la historia.
+
+## 2. Información Nutricional (por 100 gramos de Queso Cheddar)
+*   **Energía:** 406 calorías
+*   **Agua:** 37%
+
+### 2.1. Macronutrimentos
+*   **Proteínas:** 24 gramos
+    *   *Nota:* Principalmente caseínas, de alto valor biológico y ricas en aminoácidos esenciales.
+*   **Carbohidratos:** 1.3 gramos
+    *   **Azúcar:** 0.3 gramos (principalmente lactosa, cuya concentración varía con la maduración)
+    *   **Fibra:** 0 gramos
+*   **Grasas:** 33.8 gramos
+    *   **Saturadas:** 19.37 gramos (aprox. 70% del total de grasas)
+    *   **Monoinsaturadas:** 8.43 gramos
+    *   **Poliinsaturadas:** 1.43 gramos
+        *   Omega 3: 0.14 gramos
+        *   Omega 6: 0.82 gramos
+    *   **Grasas Trans:** 1.18 gramos (incluye grasas trans de rumiantes como ácido vacénico y CLA, con posibles beneficios en cantidades moderadas).
+
+### 2.2. Micronutrimentos
+#### Vitaminas
+*   **Retinol (Vitamina A):** 263 µg (29% IDR)
+*   **Ácido Ascórbico (Vitamina C):** 0 mg
+*   **Calciferol (Vitamina D):** 0.6 µg (12% IDR)
+*   **Tocoferol (Vitamina E):** 0.78 mg (5% IDR)
+*   **Fitomenadiona (Vitamina K):** 2.9 µg (2% IDR) - Específicamente Vitamina K2 (menaquinona).
+*   **Tiamina (Vitamina B1):** 0.03 mg (2% IDR)
+*   **Riboflavina (Vitamina B2):** 0.43 mg (33% IDR)
+*   **Niacina (Vitamina B3):** 0.04 mg (0% IDR)
+*   **Ácido Pantoténico (Vitamina B5):** 0.48 mg (10% IDR)
+*   **Piridoxina (Vitamina B6):** 0.05 mg (4% IDR)
+*   **Colina (Vitamina B7):** 16.5 mg (3% IDR)
+*   **Ácido Fólico (Vitamina B9):** 26 µg (7% IDR)
+*   **Cobalamina (Vitamina B12):** 0.88 µg (37% IDR)
+
+#### Minerales
+*   **Calcio:** 675 mg (68% IDR)
+*   **Hierro:** 0.16 mg (2% IDR)
+*   **Magnesio:** 27 mg (7% IDR)
+*   **Fósforo:** 473 mg (68% IDR)
+*   **Potasio:** 76 mg (2% IDR)
+*   **Sodio:** 644 mg (43% IDR)
+*   **Cinc:** 3.43 mg (31% IDR)
+*   **Cobre:** 0.06 mg (6% IDR)
+*   **Manganeso:** 0.03 mg (1% IDR)
+*   **Selenio:** 28.3 µg (51% IDR)
+
+## 3. Componentes Clave y sus Funciones
+*   **Proteínas (Caseínas):**
+    *   Alto valor biológico, ricas en aminoácidos esenciales.
+    *   Pueden favorecer la disminución de la presión arterial y mejorar la absorción de minerales.
+*   **Grasas Trans de Rumiantes (Ácido Vacénico, CLA):**
+    *   A diferencia de las grasas trans industriales, estas pueden aportar beneficios en cantidades moderadas.
+    *   El CLA se ha asociado con la pérdida de peso y la prevención de enfermedades, aunque el exceso de suplementos puede ser dañino.
+*   **Lactosa:**
+    *   Carbohidrato principal, su concentración es menor en quesos maduros (ej. cheddar) y mayor en quesos frescos (ej. cottage, crema).
+*   **Calcio:**
+    *   Esencial para la salud ósea y dental, ayuda a prevenir la osteoporosis.
+*   **Cobalamina (Vitamina B12):**
+    *   Participa activamente en las funciones del sistema nervioso.
+*   **Sodio:**
+    *   Añadido para mejorar el sabor y aumentar la vida útil; también presente naturalmente.
+*   **Fósforo:**
+    *   Mineral esencial para la salud de huesos y dientes.
+*   **Selenio:**
+    *   Importante para la función enzimática, producción de hormonas tiroideas y protección contra radicales libres.
+*   **Cinc:**
+    *   Involucrado en la función enzimática, regulación del sistema inmune, metabolismo de macronutrientes, reparación y regeneración celular.
+*   **Riboflavina (Vitamina B2):**
+    *   Parte del complejo B, el queso es una fuente principal en la dieta occidental.
+*   **Retinol (Vitamina A):**
+    *   Abundante en la grasa de la leche, esencial para la salud ocular, crecimiento, reproducción y mantenimiento de tejidos (piel).
+*   **Fitomenadiona (Vitamina K2):**
+    *   Ayuda en el mantenimiento y cuidado de la salud ósea y cardiovascular.
+
+## 4. Beneficios para la Salud del Consumo Moderado de Queso
+*   **Salud Ósea:**
+    *   Su alto contenido de calcio contribuye a la densidad ósea y ayuda a prevenir la osteoporosis, especialmente en adultos mayores y mujeres.
+*   **Salud Cardiovascular:**
+    *   El consumo de lácteos se ha asociado con beneficios para el corazón y una reducción del riesgo de hipertensión.
+    *   La combinación de calcio, potasio, magnesio y los péptidos derivados de las caseínas contribuyen a estos efectos.
+
+## 5. Preocupaciones Individuales
+*   **Intolerancia a la Lactosa:**
+    *   Personas con deficiencia de lactasa pueden experimentar problemas digestivos. Los quesos maduros suelen ser mejor tolerados debido a su menor contenido de lactosa.
+```

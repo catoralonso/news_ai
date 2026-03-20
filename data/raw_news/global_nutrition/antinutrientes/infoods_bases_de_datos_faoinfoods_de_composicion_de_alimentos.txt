@@ -1,0 +1,25 @@
+---
+tipo: investigacion
+fuente: https://www.fao.org/infoods/infoods/tablas-y-bases-de-datos/bases-de-datos-faoinfoods-de-composicion-de-alimentos/es/
+categoria: Antinutrientes
+fecha_scraped: 2024-05-20
+---
+
+Como Investigador de Nutrición Clínica, he analizado el texto proporcionado para extraer información relevante sobre antinutrientes.
+
+---
+
+1.  **Resumen Técnico**:
+    El fitato es un antinutriente identificado principalmente en legumbres y cereales. Su importancia radica en su capacidad para interferir con la absorción de minerales esenciales, especialmente el hierro y el zinc, en el cuerpo humano. La base de datos global FAO/INFOODS/IZiNCG sobre la composición de alimentos para fitato (PhyFoodComp1.0) es un repositorio crucial de datos analíticos sobre el fitato en sus diversas formas, así como de hierro, zinc, calcio y las relaciones molares fitato:mineral. Esta base de datos tiene como objetivo mejorar la comprensión de los contenidos de fitato, sus factores influyentes y las mejores maneras de reducirlo en alimentos y recetas, con el fin de diseñar dietas más adecuadas para prevenir deficiencias minerales y desarrollar intervenciones nutricionales efectivas.
+
+2.  **Ficha de Datos**:
+    No aplica. El texto describe una base de datos de composición de alimentos y no proporciona valores específicos de mg, kcal o dosis de fitato o minerales. Su propósito es ser una fuente de datos analíticos para investigadores y compiladores.
+
+3.  **Mecanismo de Acción**:
+    El fitato actúa como un antinutriente al unirse a minerales como el hierro y el zinc en el tracto gastrointestinal, formando complejos insolubles (quelatos). Esta unión reduce significativamente la biodisponibilidad de estos minerales, impidiendo su absorción por el cuerpo y, consecuentemente, pudiendo contribuir a deficiencias nutricionales.
+
+4.  **Nivel de Evidencia**:
+    **A: Sólida**. La información proviene de una base de datos global de composición de alimentos desarrollada por organizaciones científicas reconocidas (FAO/INFOODS/IZiNCG), que se basa en datos analíticos de alta calidad. El papel del fitato como antinutriente y su interferencia con la absorción de minerales es un concepto bien establecido y ampliamente reconocido en la ciencia de la nutrición, utilizado para informar la investigación, el diseño de dietas y las políticas de salud pública.
+
+5.  **Interacciones/Riesgos**:
+    El principal riesgo asociado con el consumo de fitato es la **reducción de la biodisponibilidad y absorción de minerales**, particularmente el hierro y el zinc. Esto puede llevar a un mayor riesgo de desarrollar **deficiencias de hierro y zinc**, especialmente en poblaciones que dependen en gran medida de dietas ricas en cereales y legumbres sin un procesamiento adecuado para reducir el contenido de fitato. La base de datos PhyFoodComp1.0 busca precisamente abordar este riesgo al proporcionar herramientas para comprender y mitigar el impacto del fitato en la nutrición.

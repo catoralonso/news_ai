@@ -1,0 +1,122 @@
+# Intervención nutricional, mediante dieta DASH, para mejorar ... - SciELO
+
+**Fuente:** http://scielo.sld.cu/scielo.php?script=sci_arttext&pid=S1817-59962023000200005
+**Fecha:** 19/03/2026
+**Categoría:** Nutricion_Clinica
+
+========================================
+
+Introducción
+La hipertensión arterial (HTA) es conceptualizada como una enfermedad crónica no transmisible (ECNT) caracterizada por el un aumento de la presión en el interior de los vasos sanguíneos. Este aumento de la presión lesiona el endotelio vascular y a partir de esto se generan complicaciones que pueden llegar a poner en peligro la vida del paciente.1
+Se describe que la HTA incrementa el riesgo de sufrir cardiopatías, encefalopatías, nefropatías y otras enfermedades. Como enfermedad tiene una alta prevalencia y su distribución es mundial. La prevalencia aumenta con la edad, se describe que el 50% de las personas mayores de 50 años sufren de hipertensión. Se estima que en el mundo hay 1130 millones de personas con diagnóstico confirmado de HTA, la mayoría de ellas (cerca de dos tercios) vive en países de ingresos bajos y medianos.2
+Un estudio publicado en el año 2015 reportó que alrededor del 20 % de las féminas y 25 % de los hombres mayores de 15 años, a nivel mundial, sufren de HTA. Apenas 1 de cada 5 personas hipertensas tiene controlado el problema, la enfermedad es considerada como una de las principales causas de muerte prematura.2
+La HTA constituye un problema de salud mundial, es importante destacar que más allá de las cifras mencionadas anteriormente existe un elevado número de personas que sufren la enfermedad y aún no lo saben ya que no se ha realizado el diagnóstico definitivo. Esta situación genera mayor riesgo para el paciente, ya que el no control de las cifras de tensión arterial (TA) es un factor desencadenante de complicaciones.
+En Ecuador, las cifras de incidencia y prevalencia de la enfermedad están en relación con los reportes internacionales, sin embargo, lo más preocupante es subregistro esta enfermedad. En este sentido la OMS expone que “la mayoría de las personas hipertensas ignoran que lo son, la enfermedad no siempre va acompañada de síntomas o signos de alerta, por lo que se dice que mata silenciosamente”.3
+Múltiples son los factores de riesgo que han sido asociados a la HTA. Entre ellos destacan el sedentarismo, el consumo de alcohol y tabaco, dieta rica en grasas saturadas, circunferencia de cintura sobre los rangos recomendados, antecedentes familiares de HTA, sexo femenino, edad superior a los 50 años, presencia de otras ECNT como diabetes y los trastornos nutricionales por exceso (sobrepeso y obesidad). En el Ecuador la prevalencia del sobrepeso alcanza al 38,5% de la población adulta y el 13,4 % sufre de obesidad; siendo considerados como problemas de salud que influyen no solo en la prevalencia de la HTA sino también de otras enfermedades como diabetes mellitus, trastornos cardiovasculares y renales entre otros.3
+El tratamiento de la HTA se basa en la combinación entre medidas farmacológicas y no farmacológicas; dentro de estas últimas la identificación y control de factores de riesgo, la práctica de actividades físicas sistemáticas y un adecuado régimen nutricional constituyen sus pilares.4
+Se describen distintos esquemas dietéticos orientados al control del peso corporal y de las cifras de TA. Dentro de ellas destaca la dieta denominada como Enfoques Dietéticos para Detener la Hipertensión (DASH). Esta dieta es baja en grasas (saturadas, totales y colesterol) y contiene altos niveles de frutas, verduras, legumbres y lácteos semidescremados. También incluye el consumo de cereales integrales, carnes magras, frutos secos, ácidos grasos mono y poliinsaturados y una reducción considerable del consumo de sodio.5
+La implementación de la dieta DASH ha sido reportada como útil no solo para la reducción del peso corporal y la corrección del estado nutricional. Sus ventajas también abarcan la reducción de las cifras de TA tanto en pacientes hipertensos como no hipertensos. El uso de la dieta por al menos 3 meses logra disminuir la media de PA en 4,2 mmHg. Este nivel de reducción hace que se minimice el riesgo de aparición de HTA en pacientes sanas y en aquellas que tienen diagnóstico de la enfermedad mejoran el control de la PA y disminuye la tasa de uso de antihipertensivos.2),(5
+En Ecuador, a pesar de conocerse las ventajas que ofrece la dieta DASH en la corrección de las alteraciones nutricionales por exceso, son muy escasas las investigaciones realizadas en este sentido. En la provincia Chimborazo no existen estudios que validen las ventajas de esta dieta ni en pacientes hipertensos ni no hipertensos, lo que motivó realizar la presente investigación.
+Es por eso, que teniendo en cuenta la elevada prevalencia de la HTA, el sobrepeso y la obesidad a nivel mundial y en Ecuador, las complicaciones que sobre la salud humana generan estas afecciones y las ventajas que se han descritas asociadas al uso de la dieta DASH; se decide realizar esta investigación con el objetivo de aplicar una intervención nutricional, basado en la implementación de la dieta DASH, para mejorar el estado nutricional y controlar las cifras de tensión arterial.
+Métodos
+Se realizó una investigación aplicada, que incluyó un diseño cuasiexperimental, descriptivo y correlacional; el enfoque del estudio fue mixto al incluir elementos cuantitativos y cualitativos. La investigación se realizó en el periodo comprendido entre octubre 2021 y julio del año 2022, en el cantón Riobamba, perteneciente a la provincia Chimborazo, Ecuador.
+El universo estuvo constituido por un total de 54 pacientes que asistieron consulta de nutrición con la finalidad de perder peso corporal. Para determinar el tamaño de la muestra se utilizó la siguiente fórmula de cálculo muestral para poblaciones conocidas:
+La nomenclatura que se utilizó se describe a continuación:
+N |
+= población |
+n |
+= muestra |
+Z |
+= nivel de confianza |
+e |
+= límite aceptable de error muestral del 5% |
+p |
+= Probabilidad en contra (0.50) y a favor (0.50) |
+Después de realizar los cálculos matemáticos de determinó el tamaño de la muestra en 48 personas; se utilizó el método de muestreo aleatorio simple para su confección. Cada una de personas que formaron parte de la muestra cumplieron los siguientes criterios de inclusión.
+Criterios de Inclusión
+1.- Personas que asistieron voluntariamente a consulta de nutrición con la finalidad de perder peso corporal sin estar recibiendo tratamiento farmacológico para ello.
+2.- Personas que expresaron, mediante la firma del consentimiento informado, su deseo de participar en la investigación, incluyendo la aceptación de la recomendación dietética sugerida.
+Se definieron cuatro variables de investigación. La primera de ellas se denominó características generales e incluyó subvariables cuantitativas como la edad y cualitativas como el sexo, la procedencia y los antecedentes familiares de obesidad. Las restantes variables de investigación fueron de tipo cualitativas y se denominaron como índice de masa corporal, presión arterial y perímetro abdominal. La entrevista y la revisión documental fueron las técnicas de investigación utilizadas.
+A pesar de que la investigación se realizó en un periodo de 10 meses, la intervención en cada paciente fue de 4 meses; esta diferencia en tiempos estuvo dada en que la inclusión de todos los pacientes a la muestra de estudio no se realizó al unísono. La intervención incluyó actividades teóricas y prácticas.
+Las actividades teóricas consistieron en charlas educativas sobre temas relacionados con la nutrición saludable, efectos terapéuticos de la nutrición, hábitos y estilos de vida saludables, ventajas de la actividad física, complicaciones de la HTA y efectos del sobrepeso y la obesidad en la salud humana. Las actividades prácticas consistieron en demostraciones sobre la forma correcta de realizar los ejercicios físicos, de seleccionar los alimentos en base a requerimientos nutricionales y de la forma de confeccionar la dieta. Estas actividades, tanto teóricas como prácticas, se realizaron como parte del seguimiento que tuvo cada paciente que tuvo una frecuencia quincenal, alternando visitas a consulta médica y visitas domiciliarias.
+Después de oficializar la incorporación del paciente a la investigación se procedió a realizar la consulta nutricional inicial. En ella se procedió a identificar los antecedentes de obesidad del paciente, se realizó la valoración antropométrica basada en el cálculo del IMC, determinación de la circunferencia de la cintura y toma de pliegues cutáneos.
+Para determinar el IMC se procedió a pesar y tallar a cada persona con la menor cantidad de ropa posible (respetando su pudor) y utilizando una balanza con tallímetro, marca Health o meter, certificada por el departamento de metrología de la Dirección Distrital de Salud 3. Los valores se obtuvieron al dividir el peso corporal (expresado en kilogramos) sobre la talla de la persona, expresada en centímetros cuadrados. Lo valores de referencia utilizados fueron los propuestos por la OMS que determina:6
+Bajo peso: IMC inferior a 18,5
+Normo peso: IMC entre 18,5 y 24,9
+Sobrepeso: IMC entre 25,0 y 29,9
+Obesidad: IMC igual o superior a 30 puntos
+Obesidad I: IMC entre 30 y 34,9
+Obesidad II: IMC entre 35 y 39,9
+Obesidad III: IMC igual o superior a 40
+Para determinar la circunferencia de la cintura se utilizó una cinta métrica y los valores de referencia fueron:6
+Mujeres: Bajo Riesgo: < 80 cm.
+Riesgo elevado entre 80-88 cm.
+Riesgo muy elevado >88 cm.
+Hombres: Bajo Riesgo: < 94 cm.
+Riesgo elevado entre 94-102 cm.
+Riesgo muy elevado >102 cm.
+Para medir los pliegues se utilizó un plicómetro marca AccuMeasure.
+También se realizaron acciones relacionadas con la anamnesis alimentaria que incluyó el recordatorio de alimentos consumidos en las últimas 24 horas, frecuencia, preferencias e intolerancias alimentarias. Por último, se procedió a tomar las TA a las personas; para esto se utilizó estetoscopio y esfigmomanómetro marca Riester y se establecieron como referencia:
+Óptima: cifras inferiores 120/80 mmHg
+Normal: inferior a 130/85 mmHg
+Normal alta: entre 130-139/85-89 mmHg
+HTA grado 1 (ligera): entre 140-159/90-99 mmHg
+HTA grado 2 (moderada): entre 160-179/100-109 mmHg
+HTA grado 3 (severa): 180/110 entre 140-159/90-99 mmHg
+Todos los elementos anteriormente mencionados fueron determinados en la consulta inicial y de forma mensual en consulta de seguimiento.
+El elemento central de la intervención fue la aplicación de la dieta DASH. A cada paciente incluido en el estudio se le realizó el cálculo individualizado de los requerimientos nutricionales. Se determinaron restricciones que fueron aplicada en cada uno de los cuatro meses que duro la intervención. La primera y segunda restricción correspondió a establecer dietas de 1883 kilocalorías por día (Kcal), la tercera restricción dieta de 1742 Kcal y la cuarta y última restricción una dieta de 1642Kcal
+Los elementos constitutivos de la dieta DASH utilizados se listan a continuación:
+Frutas: 4 a 5 porciones/día (1 porción = 1 fruta mediana)
+Verduras: 4 a 5 porciones/día (1 porción = 1 taza verduras crudas; ½ taza verduras cocidas)
+Lácteos bajos en grasa: 2 a 3 porciones/día (1 porción = taza de leche; 1 vaso de yogurt o 1 tajada de queso)
+Cereales integrales: 6 a 8 porciones/día (1 porción = 1 rebanada de pan integral; 1 taza de cereal integral; ½ taza de arroz integral, quinua, fideo integral)
+Carnes magras, aves o pescado: ≤ 2 porciones/día (1 porción = 1 onza de carne magra cocida, aves, pescado; 1 huevo mediano)
+Semillas, nueces o leguminosas: 4 a 5 porciones/semana (1 porción = ½ taza de semillas, ½ taza de nueces; ½ taza de leguminosas cocidas ejemplo frejol)
+Aceites y grasas: 2 a 3 porciones/día (1 porción = 1 cucharada de aceite o grasa)
+Dulces y azúcar: ≤ 5 porciones/semana (1 porción = 1 cucharada de azúcar; 1 cucharada de mermelada)
+Toda la información recopilada fue procesada de forma automatizada mediante el programa estadístico Statistical Package for the Social Sciences (SPSS) en su versión 26 para Windows. Se determinaron medidas de tendencia central (media) y de dispersión (desviación estándar) para las subvariables cuantitativas y frecuencias absolutas y porcentajes para las variables y subvariables cualitativas. Se utilizó la prueba de McNemar para identificar cambios en las variables comparando los resultados al inicio (pretest) y final de la intervención (postest). La prueba de ANOVA se utilizó para medidas no paramétricas en variables repetidas. El nivel de confianza se definió en el 95% con un margen de error del 5 % y una significación estadística dada por un valor de p menos o igual a 0,05. La
+Para el desarrollo del estudio se cumplieron principios éticos de la investigación que incluyeron brindar información a los participantes sobre los objetivos y métodos de investigación. La incorporación se realizó voluntariamente y posterior a la firma del consentimiento informado. La información recopilada se usó solo fines investigativos y no se utilizaron datos de identificación personal. La base de datos, con toda la información recopilada, fue eliminada después de terminar el informe final de la investigación. La dieta DASH es un recurso terapéutico aprobado por la Organización Mundial de Salud para el tratamiento de la obesidad y otras alteraciones nutricionales por exceso, por esta situación no fue necesario solicitar aprobación de algún Comité de Ética de Investigación en Seres Humanos (CEISH).
+Resultados
+Después de realizar el procesamiento de la información recopilada se identificó, al analizar las características generales que existió un promedio de edad de 41,56 años con desviación estándar de 22,44 años. El 50 % de las personas que participaron en la investigación fueron del sexo femenino y el 83,33 % refirió antecedentes familiares de sobrepeso y obesidad. Un total de 36 pacientes (75,00 %) procedían de área urbana.
+La tabla 1 muestra el análisis de las variables comparando resultados al inicio y final de la intervención y los resultados de la prueba de McNemar. Se observa mejoría en las tres variables al finalizar la intervención; el valor Z de la prueba de McNemar muestra que la intervención nutricional aplicada generó cambios positivos en las cifras de TA, en el IMC y en la circunferencia de la cintura. El valor de p (0,01) muestra que los resultados obtenidos fueron estadísticamente significativos.
+| Variable | ||||
+|---|---|---|---|---|
+| Valor Z | *p | |||
+| Óptima | 0 (0,00) | 32 (66,67) | -3,76 | 0,01 |
+| Normal | 20 (41,67) | 12 (25,00) | ||
+| Normal alta | 24 (50,00) | 4 (8,33) | ||
+| HTA grado 1 | 4 (8,33) | 0 (0,00) | ||
+| Normal | 0 (0,00) | 4 (8,33) | -3,21 | 0,01 |
+| Sobrepeso | 20 (41,67) | 28 (58,33) | ||
+| Obesidad I | 12 (25,00) | 8 (16,67) | ||
+| Obesidad II | 12 (25,00) | 4 (8,33) | ||
+| Obesidad III | 4 (8,33) | 4 (8,33) | ||
+| Bajo riesgo | 0 (0,00) | 16 (33,33) | -3,47 | 0,01 |
+| Riesgo elevado | 16 (33,33) | 8 (16,67) | ||
+| Riesgo muy elevado | 32 (66,67) | 24 (50,00) |
+Fuente: cuestionario de investigación *p ≤ 0,05
+Los resultados de la prueba de ANOVA se exponen en la tabla 2. Se observa que en todas las variables existió mejoría de los parámetros medidos; se observa disminución, al finalizar la intervención de 28,1 cm (media) de pliegues cutáneos; la media de PA diastólica disminuyó en 5,3 mmHg y la sistólica en 14 mmHg. La media de circunferencia de la cintura disminuyó en 9,2 cm y el IMC en 2,7 Kg/m2; la media del peso corporal también disminuyó en 7 kg. Los resultados de la significación estadística, (p=0,01) muestran que los cambios obtenidos han finalizar la investigación son estadísticamente significativos.
+| Media según mes de intervención | *p | ||||
+|---|---|---|---|---|---|
+| Restricción dieta (kcal) | 1883 | 1883 | 1742 | 1642 | 0,01 |
+| Pliegues cutáneos (mm) | 107,4 | 97,7 | 87,8 | 79,3 | |
+| PA diastólica (mmHg) | 82,5 | 80,8 | 79,5 | 77,2 | |
+| PA sistólica (mmHg) | 132 | 128 | 123 | 118 | |
+| Circunferencia cintura (cm) | 103,9 | 100,5 | 97,6 | 94,7 | |
+| Índice masa corporal (Kg/m2) | 32,4 | 31,3 | 30,5 | 29,7 | |
+| Peso (kg) | 84,1 | 81,2 | 79,0 | 77,1 |
+Fuente: cuestionario de investigación *p ≤ 0,05
+Discusión
+El tratamiento no farmacológico ha sido señalado como uno de los pilares terapéuticos de la HTA, de hecho se plantea que se debe implementar este tipo de esquema terapéutico antes de comenzar tratamiento farmacológico, al no ser que se presenten complicaciones de la HTA.4 Como se ha descrito anteriormente, los hábitos y estilos de vida saludables constituyen una prioridad para el control de las cifras de TA. Dentro de ellos, mantener un estado nutricional adecuado resulta fundamental para disminuir las cifras de TA y prevenir la aparición de la HTA o lograr el control de la misma. Para lograrlo es necesario mantener un adecuado régimen dietético, para lo cual se aplicó una intervención nutricional basado en la implementación de la dieta DASH.
+La intervención se aplicó para mejorar el estado nutricional, sin embargo, en la evaluación inicial se detectó que la mayoría de los pacientes presentaban cifras de TA no óptimas; situación que era desconocida por ellos hasta el momento de realizar esta investigación.
+El análisis de las características generales mostró un promedio de edad inferior a lo reportado en la literatura como pico de incidencia de la HTA. Se describe que la prevalencia de la enfermedad aumenta conforme lo hace la edad y que el pico se obtiene por encima de los 50 años; también ha sido descrito un cierto predominio de afectación en el sexo femenino,7 lo cual no coincide con los resultados de este estudio donde existió el mismo número de hombres y mujeres afectados.
+El predominio de pacientes con antecedentes familiares de sobrepeso y obesidad muestra el componente genético de estos trastornos nutricionales; el predominio de personas residentes en área rural muestra que los hábitos nutricionales en zona rural son más saludables que los del área urbana. Una posible explicación está dada por la propia dinámica citadina y el acceso a comida no saludable.
+La aplicación de la dieta DASH mejoró los parámetros antropométricos investigados (peso, IMC, pliegues cutáneos y circunferencia de cintura) y las cifras de TA sistólicas y diastólicas; esto posibilitó que mejorara el estado nutricional y que se revirtiera la situación de HTA leve y normal óptima en casi la totalidad de personas afectadas. Los valores de p obtenidos tanto en la prueba de McNemar como en el estudio ANOVA evidencian que los resultados obtenidos no son al azar, sino que son el resultado de la intervención aplicada; los valores obtenidos permiten afirmar que existe suficiente evidencia para plantear que la intervención aplicada, basada en la dieta DASH mejoró el estado nutricional y las cifras de TA de los pacientes que participaron en el estudio.
+Si bien es cierto que históricamente se han generado distintas dietas para controlar los trastornos nutricionales por exceso (sobrepeso y obesidad), basadas en la disminución de la ingesta de sodio, las ventajas reportadas con la implementación de la dieta DASH se centran no solo en la disminución de la disminución del consumo de sal, sino también en el aumento de consumo de alimentos saludables como frutas, verduras, legumbres y otros que tienen una mayor repercusión en el control del estado nutricional y en la disminución de las cifras de TA.
+Uno de los primeros reportes que avalaron las ventajas de la dieta DASH fue el publicado por Sacks y otros,8 en el cual reportan disminución de la TA independientemente de la cantidad de sodio ingerida. La restricción de la ingesta de sodio ha sido señalada como un elemento que reduce la morbimortalidad por HTA.9 Sin embargo, los estudios actuales resaltan la importancia de acompañar la restricción de sodio con restricción de grasas saturadas, grasas totales, colesterol y aumentar el consumo de frutas, verduras, legumbres y productos semidesnatados.8 Gay y otros,10 realizó un metaanálisis de 24 estudios donde participaron en total alrededor de 23 858 individuos con diagnóstico definido de HTA y concluyó que la dieta DASH logró disminuir las cifras de TA sistólica y diastólica.
+Existen otras investigaciones que reportan beneficios con la utilización de la dieta DASH; los cuales no solo involucran la disminución del peso corporal, sino que también reportan ventajas en torno a la disminución de las cifras de TA, control de la TA y disminución del riesgo de aparición de insuficiencia cardiaca.11),(12
+La HTA se relaciona directamente con la circunferencia de la cintura; la cual se ve favorecida por la presencia de sobrepeso u obesidad. La reducción del peso corporal y de la circunferencia de la cintura inciden directamente en el mejoramiento del estado nutricional y en el control de las cifras de TA. La disminución de un 1 kg de peso corporal disminuye entre 0,3 y 2 mmHg las cifras de TA,13 lo cual guarda relación con los resultados de este estudio.
+Es importante señalar que para potenciar los resultados de cualquier intervención nutricional es necesario fomentar la práctica de actividades físicas sistemáticas; el equilibrio entre ingesta y pérdidas calóricas es la base del estado nutricional; los desequilibrios entes binomio son los responsables de que existe un adecuado estado nutricional o trastornos por exceso o defecto.14
+Las limitaciones estuvieron dadas por el número reducido de pacientes y dificultades con sus preferencias alimentarias. La relevancia del estudio se basa en mostrar como la implementación de la dieta DASH mejora el estado nutricional y las cifras de TA; resultado que abre el camino hacia la generalización de los resultados de este estudio y el diseño de planes nutricionales basado en los elementos básicos de la dieta DASH.
+Conclusiones
+La intervención nutricional aplicada, basada en la implementación de la dieta DASH contribuyó al mejoramiento del estado nutricional y al control de las cifras de TA; pudiendo ser considerada una alternativa no farmacológica para aquellos pacientes diagnosticados con HTA previo al tratamiento farmacológico.

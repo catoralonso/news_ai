@@ -1,0 +1,64 @@
+# Los nutrientes y la epigenética - Bioquímica
+
+**Fuente:** https://actualfruveg.com/2022/12/09/nutrientes-epigenetica-salud/
+**Fecha:** 19/03/2026
+**Categoría:** Nutrigenomica
+
+========================================
+
+Los nutrientes tienen la capacidad de desencadenar cambios epigenéticos y modificar la salud de las personas
+Beatriz Riverón,
+Bioquímico farmacéutica
+INFORMACIÓN
+La dieta es uno de los principales influenciadores de los cambios epigenéticos; los nutrientes y los componentes orgánicos o inorgánicos presentes en algunos alimentos pueden dar forma al genoma humano.
+Los estudios epidemiológicos y clínicos respaldan la asociación entre la nutrición y el desarrollo o progresión de diferentes enfermedades malignas.
+Debido al cambio en el estilo de vida y los hábitos alimentarios, las personas corren un mayor riesgo de padecer enfermedades crónicas y hasta desarrollar formas de cáncer relacionados con la alimentación. También se ha establecido que las modificaciones dietéticas y en el estilo de vida, reducen significativamente el riesgo de estas dolencias.
+La epigenética estudia los cambios en el fenotipo que no son causados por alteraciones en la secuencia del ADN. Comprende un conjunto de mecanismos que promueven la regulación de la expresión génica.
+¿Cómo funciona la epigenética?
+Los mecanismos implicados en la epigenética incluyen modificaciones moleculares del ADN, como la metilación (introducción de grupos metila -CH3) y la acetilación de histonas (proteínas encargadas de interaccionar con el ADN para mantener la organización de la doble cadena).
+Los nutrientes tienen la capacidad de desencadenar cambios epigenéticos y modificar la susceptibilidad a las enfermedades. El hecho de que los cambios epigenéticos sean reversibles, a diferencia de las mutaciones genéticas, lo convierte en un área muy atractiva para las intervenciones en el campo de la nutrición.
+Las modificaciones epigenéticas que también son capaces de revertir la activación o el silenciamiento de genes anormales, pueden desempeñar un papel importante en el desarrollo de ciertas patologías.
+La metilación del ADN y la remodelación de la cromatina son los mecanismos epigenéticos más comunes.
+La mejor conocida de estas modificaciones es la metilación de los residuos de citosina en el ADN. Ahora se reconoce que el patrón de citosinas metiladas a lo largo de nuestros genomas (el ‘metiloma’) puede cambiar durante el desarrollo y en respuesta a señales ambientales, a menudo con efectos profundos en la expresión génica.
+Interacción nutrientes y genes
+Los ácidos grasos omega 3 son el mejor ejemplo de interacción entre nutrientes y genes que evitan la metilación perjudicial del ADN, mientras que otros compuestos alimentarios bioactivos tienen un papel comprobado en la prevención del cáncer a través de un mecanismo epigenético.
+Por ejemplo, los polifenoles de la dieta participan sustancialmente en la prevención de distintos tipos de cáncer. Además, los minerales y las vitaminas implican procesos de regulación génica.
+El zinc, el selenio y el folato involucrados en el proceso de reparación del ADN tienen propiedades anticancerígenas.
+El consumo de multivitaminas previene la metilación indeseada del ADN.
+Dieta y salud
+La dieta es uno de los principales influenciadores de los cambios epigenéticos; los nutrientes y los componentes orgánicos o inorgánicos presentes en algunos alimentos pueden dar forma al genoma humano. Muchos componentes de la dieta pueden influir indirectamente en las vías genómicas que metilan el ADN, y existe evidencia de vínculos bioquímicos entre la calidad nutricional y la salud mental.
+La dieta mediterránea muestra asociaciones inversas con enfermedades metabólicas, patologías cardiovasculares y diversos tipos de cáncer. Muchos de sus nutrientes bioactivos se han identificado como factores protectores frente a este tipo de patologías.
+El epigenoma se ha identificado como el objetivo principal de las modulaciones en la expresión génica relacionada con este tipo de nutrientes. De hecho, pueden modificar el epigenoma y pueden incorporarse a la “dieta epigenética”, lo que se traduce en un régimen dietético que puede usarse terapéuticamente para la salud o con fines preventivos.
+Terapia epigenética, una nueva área de desarrollo
+La terapia epigenética es una nueva área para el desarrollo de nutracéuticos cuya ausencia de toxicidad puede representar un activo válido en las estrategias de prevención del cáncer.
+Los avances recientes en la comprensión de los mecanismos de la nutrigenómica, la nutrigenética y los nutracéuticos han llevado a la identificación de superalimentos capaces de condicionar favorablemente la expresión génica. Los nutracéuticos presentes en la dieta mediterránea son de gran importancia como modificadores epigenéticos tanto de los mecanismos de aparición de tumores como agentes protectores.
+Se ha documentado que los polifenoles como ácido cafeico, acido clorogénico y resveratrol presentes en muchas frutas rojas, así como la genisteína (isoflavona de la soya), y los isotiocianatos y glucosinolatos presentes en las crucíferas, inducen cambios epigenéticos positivos.
+La S-adenosilmetionina es un producto del metabolismo de la colina, la metionina, el ácido fólico, las vitaminas B2, B6 y B12. Produce la metilación del ADN mediante la participación de la enzima ADN metiltransferasa S-adenosilmetionina. La deficiencia de estos nutrientes provoca la hipometilación de una determinada región del ADN que está involucrada en la génesis de varios tipos de cáncer.
+La dieta influye en la microbiota intestinal
+Diversas evidencias sugieren que la microbiota intestinal está involucrada en el desarrollo de la obesidad y las comorbilidades asociadas. Difiere en sujetos obesos y delgados, lo que indica que la disbiosis de la microbiota puede contribuir a los cambios en el peso corporal. Puede ser modulada positiva o negativamente por diferentes estilos de vida y factores dietéticos.
+Además, los metabolitos microbianos pueden inducir modificaciones epigenéticas (cambios en la metilación del ADN y también en la expresión de micro-ARN), con implicaciones potenciales para el estado de salud y la susceptibilidad a la obesidad.
+Más recientemente, los avances en metodologías epigenéticas han llevado a una rápida expansión de los estudios en poblaciones humanas que informan diferencias epigenéticas entre adultos obesos con diabetes tipo 2 y controles sanos, y cambios epigenéticos en asociación con intervenciones nutricionales, de pérdida de peso y de ejercicio.
+Mucho por conocer
+El área de la epigenética y la salud metabólica ha experimentado un rápido desarrollo en un corto espacio de tiempo. Si bien los resultados hasta la fecha son prometedores, los estudios están en curso y las próximas décadas prometen muchas investigaciones productivas sobre las complejas interacciones entre el genoma, el epigenoma y el medio ambiente en relación con las enfermedades metabólicas.
+Fuentes
+Samyr Coradini Lopes, Nutrigenética e Nutrigenômica, UFJF, https://www.ufjf.br/naorigen/files/2015/07/Nutrigenetica.pdf
+Nasir , A.; Bullo , M. M. H.; Ahmed , Z.; Imtiaz , A.; Yaqoob , E.; Jadoon , M.; Ahmed , H.; Afreen , A.; Yaqoob, S. (2020).
+Nutrigenomics: Epigenetics and cancer prevention: A comprehensive review.
+Crit Rev Food Sci Nutr, 60(8):1375-1387.
+Divella , R.; Daniele , A.; Savino , E.; Paradiso, A. (2020).
+Anticancer Effects of Nutraceuticals in the Mediterranean Diet: An Epigenetic Diet Model.
+Cancer Genomics Proteomics,17(4):335-350.
+Hardy , T. M.; Tollefsbol, T. O. (2011).
+Epigenetic diet: impact on the epigenome and câncer.
+Epigenomics, 3(4):503-18.
+Cuevas-Sierra , A.; Ramos-Lopez , O.; Riezu-Boj , J. I.; Milagro , J. I.; Martinez, A. (2019).
+Diet, Gut Microbiota, and Obesity: Links with Host Genetics and Epigenetics and Potential Applications.
+Adv Nutr, 10(suppl_1):S17-S30.
+Stevens , A. J.; Rucklidge , J. J.; Kennedy, M. A. (2018).
+Epigenetics, nutrition and mental health. Is there a relationship?
+Nutr Neurosci, 21(9):602-613.
+van Dijk , S. J.; Tellam , R. L.; Morrison , J. L.; Muhlhausler , B. S.; Molloy, P. L. ( 2015).
+Recent developments on the role of epigenetics in obesity and metabolic disease.
+Clin Epigenetics, 7:66.
+Imagen
+El aderezo – Verdades y mitos sobre las frutas y las hortalizas

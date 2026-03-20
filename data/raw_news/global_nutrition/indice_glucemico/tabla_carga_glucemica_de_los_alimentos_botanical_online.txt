@@ -1,0 +1,88 @@
+# Tabla carga glucémica de los alimentos - Botanical-online
+
+**Fuente:** https://www.botanical-online.com/alimentos/carga-glucemica-tablas
+**Fecha:** 19/03/2026
+**Categoría:** Indice_Glucemico
+
+========================================
+
+Clasificación de los alimentos según su índice glucémico y carga glucémica
+¿Para qué sirven las tablas de carga glucémica?
+La carga glucémica (CG) nos indica el efecto sobre la glucemia que tiene un alimento, teniendo en cuenta su índice glucémico (IG) y su contenido en carbohidratos asimilables por ración. Es decir, la carga glucémica permite comparar los alimentos ricos en carbohidratos de forma cualitativa y cuantitativa.
+Esto es de gran utilidad para el manejo dietético de la diabetes, de la obesidad y para deportistas, en los que se necesita controlar los niveles de glucemia.
+¿Por qué no se utilizan las tablas de índice glucémico?
+Muchas personas han oído hablar del índice glucémico de los alimentos, entendiéndose como una escala que mide la rapidez con el que un hidrato de carbono es absorbido, pero se trata de una interpretación errónea de este concepto.
+A la práctica, el índice glucémico no compara los alimentos por ración, sino solamente cualitativamente, dando información sobre si contienen azúcares o almidones, o sobre el grado de refinamiento del alimento, pero no tiene en cuenta las raciones o cantidades alimentarias normales que se consumen de ese alimento.
+Alimentos con un mismo índice glucémico pueden tener cargas glucémicas altas, medias o bajas, ya que depende de la ración. Para más información léanse las diferencias entre índice y carga glucémica.
+Tal como quedó estipulado en el último documento oficial de consenso científico que de hizo al respecto*, para comparar el impacto glucémico de los alimentos solamente se puede utilizar el concepto de carga glucémica (que incluye el concepto de índice glucémico por la ración). En ese sentido, las tablas de carga glucémica serán de gran utilidad. * Véase el documento de consenso: Glycemic index, glycemic load and glycemic response: An International Scientific Consensus Summit from the International Carbohydrate Quality Consortium (ICQC). PMID: 26160327.
+Limitaciones de las tablas de índice y carga glucémica
+A continuación se presentan las tablas de IG y CG de los alimentos ricos en carbohidratos. Es conveniente conocer y tener en cuenta las limitaciones de las tablas de índice y carga glucémica, que son las siguientes:
+- Los valores pueden variar en función de la variedad de planta (p.ej. arroz redondo, largo,…)
+- Diferencias en la composición de los productos elaborados como el pan, productos de panadería, mermeladas, bizcochos,…
+- Variación de la respuesta glucémica entre individuos (diferencias interindividuales)
+- Diferente respuesta glucémica según condición física (atletas, personas convalecientes, mujeres embarazadas,…)
+- Procesado y técnicas culinarias que se aplican a los alimentos (pasta al dente, patata frita o hervida,…)
+- Combinación de varios alimentos en una misma comida o receta (modifica el índice glucémico de los alimentos)
+Tabla de carga glucémica de los alimentos
+Las tablas de carga glucémica (CG) deben incluir el valor de índice glucémico y la ración para la que se calcula la CG. En la siguiente tabla se ordenan los alimentos de mayor a menor carga glucémica.
+Véase que alimentos con un mismo índice glucémico pueden tener cargas glucémicas distintas, altas, medias o bajas. Solamente la CG sirve para comparar alimentos ya que es la medida más aproximada a la respuesta glucémica de ese alimento por ración:
+| Alimentos | IG | Ración (g) | CG/ración |
+| Arroz blanco hervido | 72 | 150 | 30 |
+| Pasas sultanas | 57 | 60 | 25 |
+| Pasta, espaguetis hervidos 10min | 48 | 180 | 23 |
+| Cereales copos de maíz sin azúcar | 80 | 26 | 21 |
+| Arroz integral hervido | 66 | 150 | 21 |
+| Pan de leche | 63 | 32 | 20 |
+| Dátiles | 42 | 60 | 18 |
+| Cereales desayuno con fibra | 74 | 23 | 17 |
+| Plátano | 60 | 120 | 14 |
+| Yogur de soja azucarado | 50 | 250 | 13 |
+| Patata hervida | 72 | 150 | 13 |
+| Muesli de avena | 64 | 30 | 12 |
+| Zumo naranja | 50 | 250 | 12 |
+| Porridge de avena | 49 | 250 | 11 |
+| Garbanzos | 36 | 150 | 11 |
+| Uvas negras | 59 | 120 | 11 |
+| Zumo manzana | 41 | 250 | 11 |
+| Pan blanco | 75 | 30 | 11 |
+| Pan integral | 73 | 30 | 9 |
+| Albaricoque | 34 | 120 | 8 |
+| Mango | 51 | 120 | 8 |
+| Bebida soja | 32 | 250 | 7 |
+| Kiwi | 58 | 120 | 7 |
+| Orejones | 31 | 60 | 7 |
+| Manzana | 39 | 120 | 6 |
+| Piña o ananás | 66 | 120 | 6 |
+| Guisantes hervidos | 35 | 150 | 5 |
+| Lentejas hervidas | 29 | 150 | 5 |
+| Arándanos | 53 | 100 | 5 |
+| Papaya | 56 | 120 | 5 |
+| Sandía | 80 | 120 | 5 |
+| Remolacha | 64 | 80 | 5 |
+| Melón | 67 | 120 | 4 |
+| Leche desnatada | 32 | 250 | 4 |
+| Naranja | 36 | 120 | 4 |
+| Yogur entero | 36 | 200 | 3 |
+| Leche entera | 27 | 250 | 3 |
+| Zanahoria | 47 | 80 | 3 |
+| Calabaza | 45 | 80 | 3 |
+| Fresas | 40 | 120 | 1 |
+| Xilitol | 7 | 10 | 1 |
+* Tablas según la escala de glucosa y con IG probados en personas sanas (sin diabetes).
+Leyenda: = Alto, = Medio, = Bajo.
+Alimentos que no salen en la lista
+Hay alimentos que no tienen hidratos de carbono asimilables y que por lo tanto no tienen índice glucémico ni carga glucémica, como son las carnes, pescado, mariscos, huevos, frutos secos (nueces, almendras, sésamo y otras semillas).
+Tablas oficiales de índice glucémico
+La fuente de la tabla anterior son las International Tables of Glycemic Index and Glycemic Load Values publicadas en la revista científica Diabetes Care en 2008, de los autores FS. Atkinson, K. Foster-Powell y JC. Brand-Miller.
+Se trata de unas listas que ocupan cerca de 60 páginas, con información sobre diferentes alimentos y productos comerciales, por lo que es imposible resumir todos los alimentos en una tabla. Por este motivo, a continuación se amplía la tabla por grupos de alimentos, comentada para su mejor comprensión:
+- Índice glucémico cereales, pan, legumbres y tubérculos
+- Índice glucémico de las harinas y distintos tipos de panes
+- Índice y carga glucémica de las frutas
+- Índice y carga glucémica de las verduras
+- Índice y carga glucémica de los edulcorantes
+Menús semanales para la diabetes
+*Información relacionada:
+– Significado y clasificación del índice glucémico
+– Tablas oficiales de índice glucémico
+Más información sobre el índice glucémico y la carga glucémica.
+12 abril, 2021

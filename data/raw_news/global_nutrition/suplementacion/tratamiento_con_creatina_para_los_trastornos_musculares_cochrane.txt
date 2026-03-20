@@ -1,0 +1,26 @@
+---
+tipo: investigacion
+fuente: https://www.cochrane.org/es/CD004760/NEUROMUSC_tratamiento-con-creatina-para-los-trastornos-musculares
+categoria: Suplementacion
+fecha_scraped: 2024-05-20
+---
+
+Como Investigador de Nutrición Clínica, he analizado el texto proporcionado para extraer la información relevante para su Base de Conocimiento.
+
+---
+
+1.  **Resumen Técnico**:
+    La suplementación con creatina a corto y medio plazo ha demostrado ser eficaz para aumentar la fuerza muscular en pacientes con distrofias musculares. Además, mejora el estado funcional en individuos con distrofia muscular y miopatías inflamatorias idiopáticas. En general, la creatina fue bien tolerada en estas poblaciones. Sin embargo, no se observaron mejoras significativas en la fuerza muscular en pacientes con miopatías metabólicas. Es crucial destacar que el tratamiento con dosis altas de creatina perjudicó las actividades cotidianas y aumentó el dolor muscular en pacientes con la enfermedad de McArdle (enfermedad por almacenamiento de glucógeno tipo V).
+
+2.  **Ficha de Datos**:
+    El texto no especifica dosis en mg o kcal. Se menciona "altas dosis de creatina" en el contexto de efectos adversos en la enfermedad de McArdle, pero sin cuantificación.
+
+3.  **Mecanismo de Acción**:
+    El texto no detalla el mecanismo de acción de la creatina en el cuerpo humano, más allá de mencionar que "mejora el rendimiento muscular en los individuos sanos".
+
+4.  **Nivel de Evidencia**:
+    A: Sólida (Basado en metanálisis de ensayos controlados aleatorizados de alta calidad).
+
+5.  **Interacciones/Riesgos**:
+    *   **Riesgo Específico**: En pacientes con **enfermedad de McArdle (enfermedad por almacenamiento de glucógeno tipo V)**, la suplementación con creatina, especialmente a dosis altas, puede provocar un aumento de los episodios de dolor muscular y un deterioro de las actividades cotidianas.
+    *   **Tolerancia**: Fue bien tolerada en pacientes con distrofias musculares y miopatías inflamatorias idiopáticas, sin eventos adversos clínicamente relevantes reportados en estas poblaciones.

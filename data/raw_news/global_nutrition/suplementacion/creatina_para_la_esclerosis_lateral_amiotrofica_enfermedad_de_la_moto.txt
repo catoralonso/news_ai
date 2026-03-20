@@ -1,0 +1,30 @@
+---
+tipo: investigacion
+fuente: https://www.cochrane.org/es/evidence/CD005225_creatine-amyotrophic-lateral-sclerosismotor-neuron-disease
+categoria: Suplementacion
+fecha_scraped: 2024-05-20
+---
+
+Como Investigador de Nutrición Clínica, he analizado el texto proporcionado para extraer la información relevante:
+
+---
+
+1.  **Resumen Técnico**:
+    Una revisión sistemática de Cochrane, actualizada en 2012, que incluyó tres ensayos clínicos bien diseñados con 386 participantes, investigó la eficacia de la creatina (en dosis de 5 g a 10 g por día) en pacientes con Esclerosis Lateral Amiotrófica (ELA). Los resultados indicaron que la creatina no mejoró significativamente la supervivencia relacionada con la ELA ni enlenteció su progresión (medida por ALSFRS-R). Aunque fue bien tolerada y no se asoció con efectos secundarios graves ni insuficiencia renal, hubo una tendencia no estadísticamente significativa a un ligero empeoramiento de la capacidad respiratoria (CVF) en el grupo de creatina, lo cual los autores atribuyeron a posible variabilidad estadística.
+
+2.  **Ficha de Datos**:
+
+| Componente | Dosis | Frecuencia |
+| :--------- | :---- | :--------- |
+| Creatina   | 5 g a 10 g | Por día    |
+
+3.  **Mecanismo de Acción**:
+    La creatina es un ácido orgánico nitrogenado de formación natural que está involucrado en la producción de trifosfato de adenosina (ATP), la principal fuente de energía celular. En modelos de ELA en ratones, se había demostrado que la creatina aumentaba la supervivencia, sugiriendo un posible papel en la mejora energética o neuroprotección. Sin embargo, este efecto no se replicó en los ensayos clínicos en humanos para la ELA.
+
+4.  **Nivel de Evidencia**:
+    A: Sólida (La evidencia de esta revisión sistemática de ensayos clínicos bien diseñados es sólida para concluir que la creatina no es efectiva para los objetivos estudiados en pacientes con ELA).
+
+5.  **Interacciones/Riesgos**:
+    *   **Tolerabilidad**: La creatina fue bien tolerada en las dosis estudiadas (5-10 g/día).
+    *   **Efectos Secundarios Graves**: No se encontraron efectos secundarios graves atribuibles específicamente a la creatina, ni pruebas de insuficiencia renal.
+    *   **Riesgo Potencial**: Hubo una tendencia (no estadísticamente significativa, p=0.054) a un ligero empeoramiento de la capacidad vital forzada (CVF) o capacidad respiratoria en el grupo de creatina, aunque los autores sugieren que esto podría deberse a variabilidad estadística.

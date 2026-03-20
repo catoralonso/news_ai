@@ -1,0 +1,82 @@
+# La política de Diet Doctor para evaluar laevidenciacientífica
+
+**Fuente:** https://www.dietdoctor.com/es/acerca-de/politica-para-evaluar-evidencia-cientifica
+**Fecha:** 19/03/2026
+**Categoría:** Nutricion_Clinica
+
+========================================
+
+La política de Diet Doctor para evaluar la evidencia científica
+- Revisiones sistemáticas de múltiples estudios aleatorios de alta calidad y con control:3 Evidencia sólida.
+- Ensayos controlados aleatorizados (ECA): Evidencia moderada. Si se tienen resultados reiterados, muy claros y consistentes en múltiples ensayos: Evidencia sólida.
+Ensayos controlados no aleatorios: Evidencia débil. Si bien los estudios no aleatorios son débiles para determinar la mejor intervención, pueden proporcionar otros conocimientos únicos.4 - Los datos observacionales/ epidemiológicos sólo se consideran seriamente si el cociente de riesgo (CR) es superior a 2.5
+Con un CR menor a 2, la evidencia muestra que la correlación es a menudo aleatoria y falsa,6 y, por lo tanto, es más propensa a confundir que a informar: Evidencia muy débil.
+Con un CR > 2 en estudios prospectivos de cohorte de alta calidad: Evidencia débil.
+Con un CR > 2 en estudios observacionales de calidad inferior: Evidencia muy débil.
+En circunstancias excepcionales y raras con CR sistemáticamente > 5 en varios estudios observacionales de alta calidad, con plausibilidad biológica, sin otra explicación obvia y, en general, si se siguen los criterios clásicos de Bradford Hill:7 Evidencia moderada (por ejemplo, fumar y cáncer de pulmón). - También se considera la experiencia clínica consistente aportada por varios profesionales experimentados, siempre que no haya ciencia de alta calidad (es decir, estudios de intervención aleatorios) que la contradiga: Evidencia débil.8
+- Los informes de casos y las anécdotas se evalúan con cautela y no se usan como evidencia a menos que haya una falta de evidencia disponible de mayor calidad: Evidencia muy débil.
+- Los estudios en animales no se consideran en campos donde ya existen estudios en humanos. Si es la única evidencia disponible: Evidencia muy débil.
+- Los estudios mecanísticos y estudios de células son considerados evidencias muy débiles, más débiles incluso que los estudios en animales. Estos estudios pueden ser experimentales o examinar mecanismos conocidos, pero aplicándolos a explicaciones novedosas de una enfermedad o una intervención. A menudo se desconoce si tales mecanismos pueden ser aplicados en humanos de la forma en la que se abordan, incluso si el mecanismo en sí está bien establecido. Si existen datos clínicos sobre el tema, normalmente evitamos citar estudios mecanísticos. Solo lo hacemos si es la única evidencia disponible: Evidencia muy débil.
+- Opiniones de expertos líderes en el mundo: No hay evidencia. Las opiniones no son evidencia, no importa de quién sea la opinión. Para basarse en la evidencia, todos tienen que apoyar sus opiniones y teorías en datos creíbles, es decir, evidencia científica.
+Revisiones no sistemáticas
+Los artículos de revisión no sistemática suelen ser una recopilación de unos cuantos, o algunas decenas de estudios individuales con diferentes niveles de evidencia. A menos que se haga de manera sistemática para responder a una pregunta específica (ver núm. 1 arriba), generalmente es difícil o inapropiado asignar un nivel específico de evidencia. Estos artículos se marcan entonces así: Revisión no sistemática.
+Para asignar un nivel específico de evidencia, debemos señalar los estudios específicos que lo respaldan.
+Otros artículos sin calificación
+Algunos artículos de las revistas de nutrición y médicas no forman parte de ninguna de las categorías anteriores. Estos son algunos de los demás tipos de artículos que puedes ver citados en las guías de Diet Doctor.
+Artículos de revisión: Estos artículos resumen un tema y pueden o no incluir una revisión equilibrada de la literatura médica. Pueden estar muy influenciados por sesgos, sin tener mucho control sobre la calidad de las evidencias. Por ese motivo no tienen calificación. Se indica de la siguiente forma: Artículo de revisión.
+Artículos técnicos: Estos artículos normalmente describen una nueva técnica, procedimiento o intervención biomédica, o la modificación de una ya existente. Estos artículos son de carácter descriptivo y no de investigación, y por eso no son calificados. Se indica de la siguiente forma: Artículo técnico.
+Historias de éxito
+Como se mencionó anteriormente en “los informes de casos y anécdotas”, las historias de éxito se consideran una evidencia muy débil cuando se trata de determinar si un cambio de estilo de vida en particular es beneficioso. Esto se da por muchas razones, quizás principalmente porque estas historias provienen de una población concreta de personas que tuvieron éxito. No sabemos cuántas personas habrían intentado el mismo cambio de estilo de vida sin quedar contentos con los resultados, o si solo tuvieron un éxito más moderado.
+Sin embargo, estas historias pueden aportar algo valioso cuando se trata de comprender más profundamente la experiencia subjetiva y los sentimientos de un grupo dado. Esto puede agregar otro nivel de conocimiento e inspiración, que los números y las estadísticas no pueden proporcionar por sí solos.9
+Sesgo económico
+La evidencia de estudios con alto riesgo de sesgo económico, por ejemplo, el estudio sobre un medicamento financiado y realizado por la compañía que vende el medicamento, desciende un nivel. Los estudios sugieren que este sesgo financiero puede influir fuertemente en el resultado informado.10
+Los estudios nutricionales financiados por compañías con un interés económico en el resultado también descienden.11
+Consideraciones evolutivas
+La consistencia con lo que es evolutivamente probable puede fortalecer la evidencia y la inconsistencia puede debilitarla.
+Por ejemplo, los humanos y sus ancestros han estado comiendo grasas saturadas naturales durante millones de años.12 Desde una perspectiva evolutiva, es poco probable que consumirlas en cantidades similares a las que se consumía antiguamente sea la causa de una epidemia nueva de enfermedades crónicas.
+Por otro lado, el consumo de azúcar refinada pura en grandes cantidades es un fenómeno de los últimos 150 años. Es posible, desde una perspectiva evolutiva, que pueda tener consecuencias negativas para la salud, ya que los humanos pueden no estar completamente adaptados a ella.
+Si bien estos ejemplos no prueban la causa y el efecto, aportan un contexto a la evidencia científica y, por lo tanto, pueden ayudar de alguna manera a elevar o disminuir el nivel de evidencia.
+Esta forma de razonamiento también podría aplicarse a tratamientos a largo plazo con medicamentos que reducen la función de una enzima o de un receptor en el cuerpo. Si hubiese sido una buena idea, teniendo en cuenta todo, podría haber sido relativamente fácil para la evolución eliminar o reducir esa función (o nunca desarrollarla desde un principio). Esto significa que el efecto positivo del medicamento podría ser superado por sus efectos secundarios para la mayoría de las personas y en la mayoría de las circunstancias. Por lo tanto, el tratamiento a largo plazo con un medicamento podría ser una buena idea, si es que es una buena idea, principalmente en circunstancias específicas y/o para personas con enfermedades específicas.13
+Desde este punto de vista, también se puede argumentar que las intervenciones que se basan en comer ciertos alimentos naturales, o evitar otros durante un breve período de tiempo (por ejemplo, por un día), son cosas a las que el cuerpo humano puede adaptarse, en gran medida, evolutivamente. Por lo tanto, estas intervenciones pueden ser significativamente más seguras, en comparación con nuevos fármacos o intervenciones quirúrgicas.
+Una perspectiva evolutiva, como forma de fortalecer o debilitar la evidencia, debe usarse con una gran dosis de precaución, ya que no siempre es evidente a qué factores ambientales estuvieron expuestos nuestros antepasados, y muchos de estos factores han variado ampliamente con el tiempo y la geografía.
+Referencias principales
+Advances in Nutrition 2018: Limitar la dependencia en los estudios no aleatorizados y mejorar los ensayos aleatorios en la investigación en nutrición humana: por qué y cómo (artículo en inglés)
+JAMA 2018: El desafío de reformar la investigación epidemiológica nutricional (artículo en inglés)
+PLoS Medicine 2005: ¿Por qué la mayoría de los hallazgos de investigación publicados son falsos? (artículo en inglés)
+The Lancet 2019: Estudios de la vida real no son sustitutos de los ECA para establecer eficacia (artículo en inglés)
+Más
+Política de Diet Doctor para las guías basadas en evidencias
+La ciencia de la dieta baja en carbos y cetogénica
+Guía: Estudios observacionales vs. estudios experimentales
+¡Haz una prueba gratis por 7 días!
+Obtén acceso completo a menús semanales, recetas, el programa Adelgaza de por vida, videos exclusivos y más. Verás que comer sano también puede ser delicioso.
+¡Da el primer paso hacia una vida más saludable ahora!
+Empieza tu prueba gratuitaComentarios
+¿Tienes comentarios, objeciones o sugerencias de cambios o novedades para nuestras guías? Contáctanos a través de esta página.
+Por ejemplo, nuestra política de Diet Doctor es similar al documento Oxford Centre for Evidence-based Medicine – Levels of Evidence (Centro Oxford para la medicina basada en evidencia – Niveles de evidencia). ↩
+Considera estas directrices como una escenario de “referencia” y que incluye estudios bien hechos sin grandes sesgos. En caso de que un estudio presente fallos en el diseño o ejecución, especialmente si incluye un sesgo económico, se le rebajará la calificación. ↩
+La debilidad está relacionada principalmente con el inicio injusto: es muy difícil saber cuál de las intervenciones evaluadas fue la mejor sin un ensayo aleatorio.Sin embargo, si una intervención tiene un tamaño de efecto que es mucho más grande de lo que normalmente se espera, sigue siendo una buena indicación de qué resultados se pueden esperar para una población del mundo real auto-seleccionada.
+Un estudio de intervención no aleatorizado puede agregar datos complementarios sobre el tamaño del efecto esperado que no se pueden encontrar en los ECA de participantes no autoseleccionados, especialmente cuando el ECA usa el análisis del tipo intención de tratar. El ECA probablemente proporcionará números significativamente más bajos para el tamaño del efecto promedio, en comparación con lo que se puede esperar de un paciente motivado que logra seguir una intervención de estilo de vida estipulada.
+Un ensayo no aleatorio puede dar la mejor estimación del tamaño del efecto promedio para alguien que está logrando seguir un tratamiento de estilo de vida específico. ↩
+Un HR> 2 significa que un factor (estilo de vida) está asociado con al menos el doble del riesgo de algo.Wikipedia: Estudio observacional
+Guía: Estudios observacionales vs. estudios experimentales ↩
+Advances in Nutrition 2018: Limitando la dependencia de estudios no aleatorizados y mejorando los ensayos aleatorizados en la investigación nutricional: por qué y cómo (artículo en inglés)
+JAMA 2018: El reto de reformar la investigación epidemiológica nutricional (artículo en inglés)
+PLoS Medicine 2005: Por qué la mayoría de los hallazgos de investigación publicados son falsos (artículo en inglés)
+The Lancet 2019: Estudios de la vida real no son sustitutos de los ECA para establecer eficacia (artículo en inglés)
+Frontiers in Nutrition 2018: La incapacidad para medir el consumo alimentario suscitó un debate ficticio sobre la relación de la alimentación con las enfermedades (artículo en inglés) ↩
+Wikipedia: Criterios de Bradford Hill
+Proceedings of the Royal Society of Medicine 1965: TEl medio ambiente y la enfermedad: ¿asociación o causalidad? Por Sir Austin Bradford Hill (artículo en inglés) ↩
+Nuestro objetivo es confirmar o cuestionar si algo es una experiencia clínica consistente con ayuda de nuestro comité de expertos de alimentación baja en carbos. ↩
+Además, ocasionalmente hay un elemento de “cisne negro” en estas historias. Por ejemplo, si una afección generalmente se considera crónica y progresiva, como la diabetes tipo 2, y cientos de personas comparten historias sobre la reversión de la enfermedad usando nada más que una intervención en el estilo de vida; esto plantea una pregunta legítima: ¿Es cierto el punto de vista común, a veces no es cierto, o simplemente es falso?
+Esta pregunta deberá responderse usando evidencia científica de mayor calidad, tales como estudios de intervención controlada. ↩
+BMJ 2017: Los vínculos financieros de los principales investigadores y los resultados de los ensayos controlados aleatorios: estudio transversal (artículo en inglés)
+BMJ 2003: Patrocinio de la industria farmacéutica y resultados y calidad de la investigación: revisión sistemática (artículo en inglés) ↩
+Además, hay otras fuentes de sesgo en los estudios nutricionales, que pueden o no revelarse, y que pueden influir. Un ejemplo de tal sesgo pueden ser las preferencias dietéticas fuertemente afianzadas:
+JAMA 2018: Informaciones sobre investigación nutricional. Por qué es diferente
+Hasta cierto punto, este posible sesgo debe tenerse en cuenta al interpretar la solidez de la evidencia de un estudio, aunque puede ser más difícil de cuantificar que el sesgo financiero.
+Nosotros exigimos a los autores y revisores de nuestras guías basadas en evidencia que revelen cualquier posible fuente clara de sesgo, no solo sesgo financiero. ↩
+Nature Education Knowledge:
+Evidencia de que los seres humanos primitivos comían carne (artículo en inglés) ↩El argumento contrario a esto es que nuestro entorno puede haber cambiado tanto que lo que fue evolutivamente beneficioso hace miles de años (o más) podría ser, ocasionalmente, neutral o incluso dañino en la actualidad. Por ejemplo, una adaptación genética que protege contra infecciones pero que tiene otros efectos secundarios podría ser negativa hoy, en una era de antibióticos.
+A veces, nuestro entorno puede haber cambiado tanto que el tratamiento a largo plazo con un medicamento que reduce una función natural podría ser una buena idea.
+Sin embargo, frecuentemente el curso de acción más seguro podría ser tratar primero de emular más estrechamente el ambiente que era común antes, al menos cuando se trata de cosas seguras como comer alimentos naturales a la antigua, hacer ejercicio, obtener la luz solar adecuada, dormir lo suficiente, etc. Por ejemplo, esto podría reducir la necesidad de un tratamiento a largo plazo con medicamentos para los componentes del síndrome metabólico, como la diabetes tipo 2. ↩

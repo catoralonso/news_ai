@@ -1,0 +1,203 @@
+# Tabla del índice glucémico de los alimentos. Nutrición. CUN
+
+**Fuente:** https://www.cun.es/chequeos-salud/vida-sana/nutricion/tabla-alimentos-indice-glucemico
+**Fecha:** 19/03/2026
+**Categoría:** Indice_Glucemico
+
+========================================
+
+Tabla con el índice glucémico de los alimentos
+El índice glucémico (IG) mide la velocidad con la que los carbohidratos de los alimentos incrementan los niveles de glucosa en sangre.
+Conocer estos valores es fundamental para mantener una alimentación equilibrada, controlar la diabetes, prevenir la obesidad y mejorar el rendimiento deportivo.
+A continuación, presentamos tablas actualizadas con los valores IG organizados por categorías alimentarias.
+| Alimento | IG |
+|---|---|
+| Zanahoria cocida | 85 |
+| Calabaza cocida | 75 |
+| Sandía | 72 |
+| Batata | 70 |
+| Melón | 65 |
+| Piña fresca | 59 |
+| Plátano maduro | 60 |
+| Uvas | 59 |
+| Mango | 55 |
+| Remolacha cocida | 64 |
+| Chirimoya | 54 |
+| Kiwi | 50 |
+| Naranja | 40 |
+| Pera | 38 |
+| Zanahoria cruda | 35 |
+| Manzana | 35 |
+| Yuca cocida | 34 |
+| Higos | 33 |
+| Fresas | 32 |
+| Tomate | 30 |
+| Ciruelas | 29 |
+| Cerezas | 22 |
+| Brócoli | 15 |
+| Espinacas | 15 |
+| Pimiento | 15 |
+| Coliflor | 15 |
+| Lechuga | 10 |
+| Aguacate | 10 |
+| Champiñones | 10 |
+| Rúcula | 10 |
+| Alimento | IG |
+|---|---|
+| Harina de arroz | 95 |
+| Harina de trigo refinada | 85 |
+| Arroz instantáneo | 85 |
+| Copos de maíz (corn flakes) | 81 |
+| Pan de molde blanco | 80 |
+| Pan blanco | 75 |
+| Galletas saladas | 74 |
+| Arroz blanco cocido | 73 |
+| Pan de baguette | 72 |
+| Panecillos de hamburguesa | 70 |
+| Harina de maíz | 69 |
+| Pan integral comercial | 68 |
+| Arroz basmati | 67 |
+| Pan pita blanco | 66 |
+| Pasta blanca cocida (pasada) | 65 |
+| Cuscús | 65 |
+| Harina de avena instantánea | 63 |
+| Pan integral de centeno | 62 |
+| Copos de avena rápidos | 61 |
+| Arroz integral | 68 |
+| Pasta integral cocida | 55 |
+| Trigo bulgur | 48 |
+| Copos de avena tradicionales | 45 |
+| Pan de centeno 100% | 41 |
+| Pan germinado (Ezequiel) | 36 |
+| Quinoa cocida | 35 |
+| Amaranto cocido | 34 |
+| Trigo sarraceno cocido | 34 |
+| Cebada cocida | 28 |
+| Avena integral sin cocer | 25 |
+| Alimento | IG |
+|---|---|
+| Bebida vegetal de arroz | 85 |
+| Helado de crema industrial | 70 |
+| Batido lácteo azucarado | 68 |
+| Leche condensada azucarada | 61 |
+| Yogur líquido con azúcar | 57 |
+| Yogur con frutas y azúcar | 55 |
+| Helado casero con fruta natural | 50 |
+| Queso crema con azúcar (untable) | 50 |
+| Leche evaporada | 49 |
+| Queso fresco batido azucarado | 47 |
+| Yogur griego con miel | 45 |
+| Yogur natural azucarado | 43 |
+| Queso tipo ricotta | 38 |
+| Leche desnatada | 37 |
+| Leche semidesnatada | 34 |
+| Leche entera | 32 |
+| Queso fresco de vaca | 30 |
+| Yogur natural sin azúcar | 30 |
+| Requesón | 30 |
+| Bebida vegetal de avena sin azúcar | 30 |
+| Kéfir natural sin azúcar | 29 |
+| Queso de cabra semicurado | 27 |
+| Queso mozzarella | 27 |
+| Queso brie | 27 |
+| Bebida vegetal de soja sin azúcar | 25 |
+| Queso manchego curado | 25 |
+| Queso feta | 25 |
+| Queso azul | 22 |
+| Queso parmesano | 22 |
+| Yogur de soja natural sin azúcar | 20 |
+| Alimento | IG |
+|---|---|
+| Harina de garbanzo | 65 |
+| Harina de lenteja | 60 |
+| Castañas cocidas | 54 |
+| Guisantes partidos cocidos | 50 |
+| Hummus (comercial) | 45 |
+| Soja cocida | 42 |
+| Guisantes verdes cocidos | 39 |
+| Judías pintas cocidas | 38 |
+| Judías blancas cocidas | 35 |
+| Semillas de girasol | 35 |
+| Crema de cacahuete natural | 33 |
+| Garbanzos cocidos | 33 |
+| Lentejas rojas cocidas | 32 |
+| Crema de almendra natural | 30 |
+| Lentejas pardinas cocidas | 30 |
+| Alubias negras cocidas | 29 |
+| Frijoles cocidos | 28 |
+| Edamame | 28 |
+| Semillas de calabaza | 25 |
+| Semillas de sésamo | 25 |
+| Anacardos | 25 |
+| Semillas de lino | 20 |
+| Pistachos | 23 |
+| Nueces | 15 |
+| Almendras | 15 |
+| Avellanas | 15 |
+| Tofu | 15 |
+| Tempeh | 15 |
+| Cacahuetes | 14 |
+| Nueces de macadamia | 10 |
+| Alimento | IG |
+|---|---|
+| Nuggets de pollo industrial | 50 |
+| Salchichas tipo Frankfurt | 45 |
+| Hamburguesa vegetal (comercial) | 35 |
+| Albóndigas vegetales | 34 |
+| Filete empanado precocinado | 33 |
+| Embutido vegetal tipo mortadela | 30 |
+| Fiambre de pavo con almidones | 28 |
+| Mortadela industrial | 27 |
+| Salchichón | 25 |
+| Chorizo | 25 |
+| Jamón cocido industrial | 20 |
+| Jamón serrano | 15 |
+| Lomo embuchado | 15 |
+| Bacon curado | 15 |
+| Carne de hamburguesa casera | 10 |
+| Pechuga de pollo a la plancha | 0 |
+| Muslo de pollo al horno | 0 |
+| Ternera a la plancha | 0 |
+| Carne de cerdo asada | 0 |
+| Solomillo de cerdo | 0 |
+| Codorniz al horno | 0 |
+| Pato a la plancha | 0 |
+| Merluza cocida | 0 |
+| Bacalao al vapor | 0 |
+| Salmón a la plancha | 0 |
+| Atún al natural | 0 |
+| Sardinas en conserva al natural | 0 |
+| Sepia a la plancha | 0 |
+| Calamares hervidos | 0 |
+| Alimento o bebida | IG |
+|---|---|
+| Glucosa (referencia) | 100 |
+| Pan blanco industrial tipo molde | 95 |
+| Cereales de desayuno azucarados | 90 |
+| Harina refinada (bizcochos, bollería) | 85 |
+| Bebida energética comercial | 85 |
+| Galletas tipo María | 82 |
+| Refrescos azucarados | 70 |
+| Zumo comercial de naranja | 68 |
+| Pastel industrial (magdalena, donut) | 75 |
+| Barrita energética azucarada | 72 |
+| Palomitas industriales (microondas) | 72 |
+| Pizza congelada precocinada | 70 |
+| Patatas fritas de bolsa | 70 |
+| Pan de hamburguesa comercial | 69 |
+| Helado de crema con azúcar | 68 |
+| Barquillos o obleas dulces | 67 |
+| Yogur líquido azucarado | 65 |
+| Ketchup comercial | 65 |
+| Salsa barbacoa azucarada | 64 |
+| Bebida vegetal de arroz | 85 |
+| Snacks tipo crackers | 63 |
+| Batido lácteo con azúcar | 62 |
+| Chocolate con leche | 45 |
+| Chocolate negro 85% | 25 |
+| Zumo de tomate comercial | 38 |
+| Cerveza rubia | 66 |
+| Vino tinto | 40 |
+| Agua con gas saborizada (sin azúcar) | 0 |
+| Té o café sin azúcar | 0 |
+| Agua mineral | 0 |

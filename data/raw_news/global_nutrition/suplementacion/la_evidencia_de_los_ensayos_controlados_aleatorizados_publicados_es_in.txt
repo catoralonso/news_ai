@@ -1,0 +1,29 @@
+---
+tipo: investigacion
+fuente: https://www.cochrane.org/es/evidence/CD002276_evidence-published-randomised-controlled-trials-inadequate-establish-effectiveness-any-drug-treating
+categoria: Suplementacion
+fecha_scraped: 2024-05-20
+---
+
+Aquí tienes el análisis del texto como Investigador de Nutrición Clínica:
+
+---
+
+1.  **Resumen Técnico**:
+    La revisión Cochrane analizó la evidencia de ensayos controlados aleatorizados (ECA) para tratamientos farmacológicos en la distrofia muscular facioescapulohumeral (FSHD), una enfermedad muscular progresiva sin tratamiento acordado. Solo se identificaron dos ECA publicados que cumplieron los criterios de selección: uno sobre la suplementación con creatina y otro sobre albuterol (salbutamol). El ensayo de creatina mostró una diferencia no significativa a favor de la creatina. El ensayo de albuterol no encontró diferencias significativas en la fuerza muscular al año, aunque sí se observaron mejoras en medidas secundarias como la masa corporal magra y la fuerza de prensión. La conclusión principal es que la evidencia actual de los ECA publicados es inadecuada para establecer la efectividad de cualquier tratamiento farmacológico para la FSHD, y se necesitan más estudios de investigación.
+
+2.  **Ficha de Datos**:
+    *   **Creatina**: El texto menciona "suplementación con creatina" pero no especifica dosis (mg) ni frecuencia.
+    *   **Albuterol (Salbutamol)**: El texto menciona "dosis altas y bajas de albuterol" pero no especifica las cantidades (mg) ni la frecuencia.
+    *   No se proporcionan datos de kcal.
+
+3.  **Mecanismo de Acción**:
+    *   **Albuterol (Salbutamol)**: Es un agonista adrenérgico beta 2 conocido por sus efectos anabólicos, los cuales podrían ser beneficiosos en la distrofia muscular.
+    *   **Creatina**: Se utiliza como un potenciador del rendimiento muscular, lo que podría ser útil en las distrofias musculares.
+
+4.  **Nivel de Evidencia**:
+    **B: Emergente**
+    *   Aunque se realizaron ECA, la evidencia es limitada ("solo se han publicado dos ensayos controlados aleatorizados") e "inadecuada" para establecer la efectividad. Los resultados fueron "no significativos" para los objetivos primarios, aunque hubo mejoras en medidas secundarias para el albuterol. Esto sugiere que hay investigación en curso y posibles indicios, pero no conclusiones sólidas.
+
+5.  **Interacciones/Riesgos**:
+    El texto no proporciona información específica sobre interacciones farmacológicas, contraindicaciones o riesgos asociados con la suplementación de creatina o el uso de albuterol en pacientes con distrofia muscular facioescapulohumeral.

@@ -1,0 +1,103 @@
+# Estudio de microbiota intestinal porcina – Técnicas y
+
+**Fuente:** https://porcinews.com/estudio-de-la-microbiota-intestinal-porcina-tecnicas-y-aplicaciones/
+**Fecha:** 19/03/2026
+**Categoría:** Microbiota
+
+========================================
+
+El estudio de la microbiota intestinal permite conocer cómo se modula en función de factores externos y estrategias nutricionales.
+| La microbiota desempeña un papel indispensable en el mantenimiento de la salud intestinal y, en definitiva, sobre la salud global de los animales. |
+En el intestino de los mamíferos habitan un gran número de microorganismos en simbiosis con el animal, lo que se conoce como microbiota, compuesta en su mayoría por bacterias, pero también arqueas, virus, protozoos y hongos.
+La microbiota no es homogénea en todo el tracto gastrointestinal, sino que existen marcadas diferencias tanto entre tramos, incluyendo las heces, como entre el lumen y la mucosa intestinal.
+La microbiota intestinal no es estática, sino que existen múltiples factores internos (edad, sexo o genética) y externos (dieta, tratamientos antimicrobianos, estación del año o manejo) que afectan a su estructura y composición. De hecho, a lo largo de la vida del cerdo, la microbiota evoluciona mediante un fenómeno conocido como sucesión microbiana.
+| Así, por ejemplo, en los primeros días de vida, las familias microbianas que predominan son aquellas capaces de metabolizar los monosacáridos y oligosacáridos presentes en la leche materna mientras que, durante el destete, se produce un gran cambio en la microbiota, principalmente debido al estrés y al cambio brusco de dieta. |
+Nutrición
+Los microorganismos que componen la microbiota intestinal juegan un papel clave en:
+La digestión de nutrientes, esencial para el aprovechamiento de componentes no digeribles por el propio animal.
+La síntesis de vitaminas o ácidos grasos de cadena corta, como butirato o acetato.
+Protección frente a patógenos
+Una microbiota sana puede contribuir a la resistencia frente a determinados patógenos intestinales, como Escherichia coli o Salmonella enterica, al proporcionar unas condiciones que dificulten su desarrollo e implantación en el tracto gastrointestinal, por ejemplo, creando un ambiente con pH más ácido o produciendo péptidos con actividad antimicrobiana.
+Desarrollo inmunitario
+La microbiota intestinal interactúa con la mucosa de la pared intestinal contribuyendo al desarrollo de inmunidad local, muy importante para la salud global del animal.
+Esta estimulación se produce vía presentación de patógenos y otros antígenos a las células inmunitarias, induciendo la producción y liberación de inmunoglobulinas A (IgA) a la luz intestinal y la maduración de linfocitos T, lo que contribuye a su vez a la modulación de la microbiota (Figura 1).
+La microbiota también se relaciona con el mantenimiento de la integridad intestinal y con un correcto desarrollo y maduración del tracto gastrointestinal, ya que se ha visto que animales sin microbiota presentan alteraciones en la proliferación celular y la morfología intestinal.
+|
+Figura 1. Esquema de la regulación de la inmunidad intestinal y su interacción con la microbiota. La pared intestinal está compuesta en su mayoría por enterocitos, responsables de mantener su integridad. Las células de Paneth secretan sustancias antibacterianas, como defensinas, regulando las poblaciones microbianas. Las células caliciformes producen mucina, responsable de mantener la capa mucosa intestinal. Las células dendríticas actúan como células presentadoras de antígenos a los linfocitos presentes en la lámina propia, contribuyendo a la respuesta inmunitaria y a la diferenciación de linfocitos B para la producción de IgA. (Adaptado de Peng J. y col., 2021 y creado con BioRender.com). |
+Históricamente, el estudio de la microbiota ha tenido una gran complejidad, habiéndose centrado principalmente en la identificación y caracterización de las bacterias.
+Las técnicas empleadas van desde el cultivo microbiológico hasta la secuenciación de ADN, aunque con la llegada de la secuenciación masiva algunas de ellas han caído en desuso. Con cada técnica podemos obtener diferentes tipos de información, lo que nos permite determinar:
+Qué bacterias están presentes (taxones bacterianos).
+En qué cantidad está cada población microbiana (cuantificación).
+Cómo es la estructura global del ecosistema (diversidad).
+Por otro lado, algunas técnicas requieren un conocimiento previo del microorganismo a detectar, mientras que otras permiten identificar nuevas especies no encontradas hasta la fecha.
+En la Tabla 1 se recogen parte de las metodologías empleadas, el tipo de información que proporcionan y los posibles inconvenientes.
+| Tabla 1. Relación de las principales técnicas empleadas para el estudio de la microbiota. |
+Secuenciación masiva del gen ribosómico 16S
+Actualmente, la técnica más empleada es la secuenciación masiva gen ribosómico 16S.
+Tras la extracción del ADN de las heces o tramos del intestino, se amplifican por PCR unas regiones hipervariables de este gen (denominadas V3 y V4) que permiten diferenciar entre bacterias.
+Con esta tecnología se obtienen millones de secuencias (algunas iguales entre sí y otras diferentes) y de esta forma, podemos:
+Detectar bacterias no cultivables y aquellas de las que no se conocen previamente las secuencias de sus genomas.
+Conocer la concentración relativa de cada una, la distribución y la diversidad de la microbiota.
+La principal información que se deriva de un estudio de microbiota es la composición taxonómica de la población microbiana, variando esta información en función de la técnica empleada.
+En el caso de los estudios de secuenciación masiva, además, podemos obtener información adicional, como la diversidad microbiana observada dentro del mismo individuo (alfa-diversidad) y entre individuos (beta-diversidad). Toda esta información puede representarse de forma gráfica, lo que permite obtener una visualización rápida y fácilmente interpretable de los resultados (Figura 2).
+Alfa-diversidad
+Las medidas de alfa-diversidad, además de cuantificar las especies diferentes, pueden considerar otros aspectos, como las relaciones filogenéticas entre ellas o la cantidad relativa de cada una para valorar posibles situaciones de disbiosis.
+Beta-diversidad
+La beta-diversidad permite evaluar la similitud o diferencia de las poblaciones microbianas entre muestras o grupos experimentales.
+Se usan matrices de distancias y, de nuevo, se puede tener en cuenta únicamente información cualitativa, cuantitativa o filogenética entre las distintas especies.
+| Las matrices de distancias pueden visualizarse en gráficas en las que cada muestra está representada con un punto, estando más próximos aquellos con mayores similitudes en cuanto a su composición microbiana. |
+|
+Figura 2. Esquema de la información obtenida en un estudio de microbiota por secuenciación masiva 16S: A. Taxones presentes en cada muestra y su abundancia relativa. B. Representación esquemática del concepto de alfa-diversidad en dos muestras. C. Representación gráfica de las medidas de beta-diversidad. |
+Dada la multitud de aplicaciones prácticas que puede tener el estudio de la microbiota intestinal, a continuación se resumen algunas descritas en producción porcina.
+Estudio del efecto de aditivos
+Los estudios de microbiota permiten conocer de qué forma productos como probióticos, prebióticos, simbióticos, postbióticos u otro tipo de aditivos actúan a nivel intestinal modulando la microbiota.
+En los últimos años, como consecuencia de las restricciones al uso de antibióticos y la retirada del óxido de zinc (ZnO), estos estudios se han acelerado con el objetivo de encontrar aditivos que puedan ser una alternativa.
+|
+Por ejemplo, Yu y colaboradores (2017) estudiaron el efecto del suplemento de quitosano en cerdos destetados, comparando con un grupo suplementado con ZnO y antibióticos y un grupo control. La microbiota de los diferentes grupos fue distinta, pero en los grupos del aditivo y de ZnO-antibióticos, a pesar de que alteraban la proporción de diferentes taxones, mostraban una tendencia similar en la modulación de la microbiota. Estudios como este, combinados con la valoración de índices productivos e incidencias de enfermedades infecciosas, pueden contribuir a la búsqueda de alternativas. |
+Microbiota intestinal, crecimiento y eficiencia alimentaria
+Dado el papel crucial que tiene la microbiota en el procesamiento de nutrientes y en la utilización de la energía, su modulación puede ser una herramienta útil para mejorar la productividad.
+Existen numerosos estudios de asociación de taxones bacterianos con la productividad y el crecimiento en porcino.
+La revisión de Gardiner y colaboradores (2020) destaca la complejidad de encontrar un microbioma “sano o ideal”, ya que son muchos los factores que influyen en su composición. Sin embargo, entre los diferentes estudios, encontraron géneros bacterianos asociados con un mejor crecimiento y eficiencia, como Treponema y Methanobrevibacter en intestino delgado y grueso, y Lactobacillus en intestino grueso. Otros géneros productores de butirato, como Roseburia y Ruminococcus, también podrían tener un importante papel en una mejor eficiencia.
+Con estos datos, estos taxones podrían considerarse como probióticos o como dianas en estrategias nutricionales.
+Búsqueda de biomarcadores de salud intestinal
+El estudio de la composición de la microbiota previa a la aparición de la enfermedad intestinal puede ser útil para relacionar los cambios en la misma con la predisposición a una infección o con la evolución tras el periodo de enfermedad.
+Muchos de los estudios se han focalizado en la búsqueda de grupos bacterianos que puedan actuar como marcadores de salud o enfermedad en el tracto gastrointestinal, destacando el papel de la familia Enterobacteriaceae o del género Lactobacillus. Por ejemplo, se ha observado una susceptibilidad diferente a la diarrea postdestete en función de la diversidad y la riqueza de la microbiota en los lechones durante el periodo de lactancia con variaciones en las proporciones de diversas familias bacterianas (Lachnospiraceae, Ruminococcaceae, Prevotellaceae y Lactobacillaceae).
+Por otro lado, una mayor alfa-diversidad y proporción de las familias Methanobacteriaceae, Ruminococcaceae y Streptococcaceae se ha relacionado con una mejor tasa de crecimiento en cerdos tras la coinfección de PRRSV y PCV2.
+| En general, en lo que respecta a las aplicaciones del estudio de la microbiota, la literatura científica es extensa y en diversas revisiones destacan la gran variabilidad de resultados y los diferentes factores que la originan, llegando incluso a encontrar resultados opuestos. Por ello, sería necesario ir un poco más allá y abordar el estudio de este ecosistema desde una perspectiva más global, haciendo uso de las nuevas técnicas denominadas “técnicas ómicas”. |
+La microbiota es considerada como un órgano más en los mamíferos, dada las importantes funciones en las que está implicada. Los estudios referidos en este artículo investigan únicamente una parte de este ecosistema y, en concreto, se centran en la composición taxonómica de las bacterias ahí presentes.
+Sin embargo, gracias al desarrollo de nuevas tecnologías y herramientas, englobadas dentro del concepto de “técnicas ómicas”, podríamos conocer con más detalle qué está ocurriendo en el tracto gastrointestinal. En la Tabla 2 vienen resumidas algunas de las principales técnicas ómicas.
+Todavía queda recorrido, particularmente en los métodos de análisis, interpretación y abaratamiento de costes, pero todo apunta a la necesidad de usar este análisis global de moléculas y las interacciones entre ellas para caracterizar un ecosistema.
+| Tabla 2. Principales técnicas ómicas empleadas para el estudio de la microbiota intestinal |
+| La microbiota intestinal desempeña un papel indispensable en el mantenimiento de la salud intestinal y la aplicación de técnicas de secuenciación para su estudio nos permite conocer cómo se modula en función de factores externos y estrategias nutricionales. Todo ello orientado, en definitiva, a garantizar una salud y un rendimiento productivo óptimos. |
+Arnold, J. W., Roach, J., &Azcarate-Peril, M. A. (2016). Emerging technologies for gut microbiome research. Trends in microbiology, 24(11), 887-901.
+Chen, L., Y. Xu, X. Chen, C. Fang, L. Zhao and F. Chen (2017). The Maturing Development of Gut Microbiota in Commercial Piglets during the Weaning Transition. Frontiers in microbiology 8: 1688.
+Crespo-Piazuelo, D., Migura-García, L., Estellé, J., Criado-Mesas, L., Revilla, M., Castelló, A., Muñoz, M., García-Casco, J.M., Fernández, A.I., Ballester, M., Folch, J.M. (2019). Association between the pig genome and its gut microbiota composition.Scientific Reports, 9(1), 8791.
+Dou, S., P. Gadonna-Widehem, V. Rome, D. Hamoudi, L. Rhazi, L. Lakhal, T. Larcher, N. Bahi-Jaber, A. Pinon-Quintana and A. Guyonvarch (2017). Characterisation of earlylife fecal microbiota in susceptible and healthy pigs to post-weaning diarrhoea.PloS one 12(1): e0169851. Fouhse, J. M., R. T. Zijlstra and B. P. Willing (2016). The role of gut microbiota in the health and disease of pigs. Animal Frontiers 6(3): 30-36.
+Gardiner, G. E., Metzler-Zebeli, B. U., & Lawlor, P. G. (2020). Impact of intestinal microbiota on growth and feed efficiency in pigs: A review. Microorganisms, 8(12), 1886.
+Kim, H. B., K. Borewicz, B. A. White, R. S. Singer, S. Sreevatsan, Z. J. Tu and R. E. Isaacson (2012). Microbial shifts in the swine distal gut in response to the treatment with antimicrobial growth promoter, tylosin. Proceedings of the National Academy of Sciences 109(38): 15485-15490.
+Looft, T., H. K. Allen, B. L. Cantarel, U. Y. Levine, D. O. Bayles, D. P. Alt, B. Henrissat and T. B. Stanton (2014a). Bacteria, phages and pigs: the effects of in-feed antibiotics on the microbiome at different gut locations. The ISME journal 8(8): 1566.
+Marchesi, J. R. (2010). Prokaryotic and eukaryotic diversity of the human gut. Advances in applied microbiology 72: 43-62.
+Ober RA, Thissen JB, Jaing CJ, Cino-Ozuna AG, Rowland RRR, Niederwerder MC. Increased microbiome diversity at the time of infection is associated with improved growth rates of pigs after co-infection with porcine reproductive and respiratory syndrome virus (PRRSV) and porcine circovirus type 2 (PCV2). Vet Microbiol. 2017 Sep;208:203-211.
+Peng, J., Tang, Y., Huang, Y. (2021). Gut health: The results of microbial and mucosal inmune interactions in pigs. Animal Nutrition, 7, 282-294.
+Willing, B. and A. Van Kessel (2010). Host pathways for recognition: establishing gastrointestinal microbiota as relevant in animal health and nutrition. Livestock Science 133(1): 82-91.
+Yu, T., Y. Wang, S. Chen, M. Hu, Z. Wang, G. Wu, X. Ma, Z. Chen, and C. Zheng (2017). Low-molecular- weight chitosan supplementation increases the population of Prevotella in the cecal contents of weanling pigs. Frontiers in microbiology 8.
+Zhang, L., W. Wu, Y. K. Lee, J. Xie, and H. Zhang (2018). Spatial heterogeneity and co-occurrence of mucosal and luminal microbiome across swine intestinal tract. Frontiers in microbiology 9: 48.
+Zhao, W., Y. Wang, S. Liu, J. Huang, Z. Zhai, C. He, J. Ding, J. Wang, H. Wang and W. Fan (2015). The dynamic distribution of porcine microbiota across different ages and gastrointestinal tract segments. PloSone 10(2): e0117441.
+Suscribete ahora a la revista técnica porcina
+AUTORES
+Cómo cuidar la salud respiratoria de los cerdos: medidas clave
+Alejandro Cid González Ana I. Pastor Calonge César B. Gutiérrez Martín Mario Delgado García Óscar Mencía-Ares Sonia Martínez Martínez2026: consolidar fortalezas para avanzar con firmeza
+Respuesta de emergencia en accidentes con transporte porcino: la experiencia danesa
+Cecilie Kobek-Kjeldager Kirstin Dahl-Pedersen Mette S. HerskinMicrobiota intestinal en el cerdo: de la taxonomía a la función en producción porcina
+Eduard de la Torre CandánEnergía neta y crecimiento porcino: claves para una mejor predicción
+Gabriela MartínezLa apuesta ganadora de Porgaor, Grupo LANKA: el sistema de alimentación individualizada en maternidades, Materneo de Asserva
+El arte de alimentar a cerdas reproductoras: inteligencia artificial al servicio de la nutrición y productividad
+Gustavo Márquez Esteban Pablo Fuentes Pardo Sara Crespo VicenteLechones más fuertes y numerosos al destete
+Estrategia nutricional active feeding en lechones destetados PRRS positivos
+Alberto Morillo AlujasMASTERFLY® BAIT: control eficaz y duradero de moscas
+El destete como punto clave de la productividad: puntos críticos a tener en cuenta
+Anabel Fernández Bravo Andrea Martínez Martínez Elena Goyena Salgado Emilio José Ruiz Fernández Francisco Frances Diaz José Manuel Pinto Carrasco Manuel Toledo Castillo Simón García LegazMedidas para el control de la cepa Rosalía de PRRS
+Gestionar la incertidumbre cuando el miedo entra en la granja
+Laura Pérez SalaBioseguridad y control: estrategias para afrontar el PRRS y PPA en un escenario de riesgo
+Bioseguridad aplicada frente a Peste Porcina Africana: protocolos clave en granja, logística y control externo
+David García Páez

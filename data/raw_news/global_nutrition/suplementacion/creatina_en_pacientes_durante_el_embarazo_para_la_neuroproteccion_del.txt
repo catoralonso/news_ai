@@ -1,0 +1,23 @@
+---
+tipo: investigacion
+fuente: https://www.cochrane.org/es/evidence/CD010846_creatine-women-pregnancy-neuroprotection-fetus
+categoria: Suplementacion
+fecha_scraped: 2024-05-20
+---
+
+Como Investigador de Nutrición Clínica, he analizado el texto proporcionado:
+
+1.  **Resumen Técnico**:
+    Esta revisión Cochrane no encontró ensayos controlados aleatorios (ECA) que evaluaran la administración de creatina a madres embarazadas para la neuroprotección del feto. Aunque estudios en animales han sugerido un potencial neuroprotector de la creatina en el cerebro fetal en desarrollo, y estudios en humanos fuera del embarazo han mostrado resultados prometedores para la neuroprotección sin efectos perjudiciales detectados, actualmente no existe evidencia clínica en humanos que respalde su uso para este propósito específico durante el embarazo. Se enfatiza la necesidad urgente de realizar ECA de alta calidad para establecer la eficacia y seguridad de la creatina en esta población.
+
+2.  **Ficha de Datos**:
+    No se encontraron ensayos controlados aleatorios que evaluaran la creatina en mujeres embarazadas para la neuroprotección fetal, por lo que no hay datos de dosificación (mg, kcal, etc.) disponibles en el texto para esta aplicación específica.
+
+3.  **Mecanismo de Acción**:
+    La creatina es un derivado aminoácido crucial en la producción y almacenamiento de energía celular. Su función principal es regenerar el trifosfato de adenosina (ATP) a partir del difosfato de adenosina (ADP) en tejidos con altas y fluctuantes demandas energéticas, mediante la reacción de la creatinquinasa cuando está fosforilada (fosfocreatina). Las células obtienen creatina de la dieta (pescado, carne, leche) y de la síntesis endógena a partir de los aminoácidos arginina, glicina y metionina.
+
+4.  **Nivel de Evidencia**: **B: Emergente**
+    *   **Justificación**: Aunque no existen ensayos controlados aleatorios en humanos que evalúen la creatina para la neuroprotección fetal durante el embarazo, estudios en animales han mostrado resultados prometedores en la protección del cerebro fetal. Además, estudios en humanos fuera del embarazo (como en lesión cerebral traumática o afecciones neurodegenerativas) han sido alentadores y no han detectado efectos perjudiciales, sugiriendo un potencial neuroprotector. Sin embargo, la evidencia directa en mujeres embarazadas es inexistente y se requieren ensayos clínicos rigurosos para establecer su eficacia y seguridad en este contexto.
+
+5.  **Interacciones/Riesgos**:
+    No se detallan interacciones o riesgos específicos para la administración de creatina durante el embarazo en el texto, debido a la ausencia de ensayos clínicos en esta población. El texto subraya la necesidad de establecer la seguridad de la creatina para la madre y el feto antes de cualquier investigación sobre su eficacia. Estudios en humanos fuera del embarazo no han detectado efectos perjudiciales, pero esto no se extrapola directamente al embarazo, por lo que la seguridad en el embarazo aún no está establecida.

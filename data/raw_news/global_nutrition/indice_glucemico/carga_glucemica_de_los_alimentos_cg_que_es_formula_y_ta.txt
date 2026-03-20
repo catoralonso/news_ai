@@ -1,0 +1,101 @@
+# Carga glucémica de los alimentos [CG] - ¿Qué es? Fórmula y tabla
+
+**Fuente:** https://nutricion360.es/salud/diabetes/carga-glucemica
+**Fecha:** 19/03/2026
+**Categoría:** Indice_Glucemico
+
+========================================
+
+La carga glucémica de los alimentos (CG) es uno de los parámetros más útiles en nutrición. Incluso es más importante que el índice glucémico o insulínico.
+La carga glucémica sirve para elaborar un plan de alimentación para personas con diabetes, prediabetes o resistencia a la insulina.
+Para entender mejor cómo funciona este parámetro a continuación se describe la fórmula de la carga glucémica así como se brinda una tabla completa de alimentos.
+La carga glucémica (CG) es el indicador que mide de forma cuantitativa el aumento de glucosa en sangre que ocurre tras comer un alimento.
+A diferencia del índice glucémico (IG), la carga glucémica tiene en cuenta no sólo la calidad de los carbohidratos en los alimentos; sino también su cantidad.
+Por ejemplo, el jugo de zanahoria tiene un índice glucémico IG alto, pero sólo contiene unos pocos gramos de carbohidratos por porción. El resultado: una carga glucémica baja.
+La carga glucémica tiene en cuenta la cantidad de carbohidratos totales de los alimentos y además la velocidad a la que se absorben.
+Según las últimas investigaciones, no sólo son los productos con alto índice glucémico, sino los que tienen alta carga glucémica los que deben ser moderados para los diabéticos o personas con resistencia a la insulina. (1,2,3)
+Sigue leyendo para ver una tabla con las diferencias entre CG e IG.
+Las tablas de carga glucémica de los alimentos presentados al final de este artículo fueron obtenidas mediante un cálculo matemático en base la siguiente fórmula:
+CG = IG * (número de gramos de carbohidratos por porción) / tamaño de la porción
+Las fórmulas no sólo sirven para calcular la carga glucémica de alimentos individuales, sino también la CG que se necesita en total por día.
+Lo ideal en una persona sana es no exceder un valor de CG de 100 unidades. En una dieta para diabéticos tipo 2 al aplicar la fórmula de carga glucémica no debe ser superior a las 60-80 unidades por día.
+De acuerdo a los valores individuales de la carga glucémica de los alimentos, estos se pueden dividir en tres categorías:
+Para que calcular la carga glucémica total de la dieta de una persona se utilizan los siguientes rangos:
+A continuación se describe una tabla de carga glucémica de los alimentos:
+| Alimento | IG | Porción | Carga glucémica |
+| Panes y derivados | |||
+| Pan de banana | 47 | 60 g | 14 |
+| Torta de vainilla | 42 | 60 g | 12 |
+| Pan blanco | 72 | 70 g | 25 |
+| Galletas saladas | 58 | 30 g | 12 |
+| Pan de pita | 68 | 30 g | 10 |
+| Tortilla de maíz | 52 | 50 g | 12 |
+| Pan integral | 34 | 30 g | 7 |
+| Bebidas y refrescos | |||
+| Coca Cola | 63 | 250 mL | 16 |
+| Fanta | 68 | 250 mL | 12 |
+| Jugo de manzana | 44 | 250 mL | 30 |
+| Gatorade | 78 | 250 mL | 24 |
+| Jugo de naranja | 50 | 250 mL | 12 |
+| Jugo de tomate | 38 | 250 mL | 12 |
+| Cereales y derivados | |||
+| Cereales azucarados | 93 | 30 g | 23 |
+| Muesli | 66 | 30 g | 16 |
+| Avena | 40 | 250 g | 13 |
+| Quinoa | 53 | 150 g | 13 |
+| Arroz blanco | 83 | 150 g | 43 |
+| Arroz integral | 50 | 150 g | 16 |
+| Bulgur | 48 | 150 g | 12 |
+| Lácteos y derivados | |||
+| Helado común | 57 | 50 | 6 |
+| Leche entera | 41 | 250 mL | 5 |
+| Leche desnatada | 32 | 250 mL | 4 |
+| Yogurt desnatado con frutas | 33 | 200 mL | 11 |
+| Frutas | |||
+| Manzana | 39 | 120 | 6 |
+| Plátano – banana | 62 | 120 | 16 |
+| Uvas | 59 | 120 | 11 |
+| Pomelo | 25 | 120 | 3 |
+| Naranjas | 40 | 120 | 4 |
+| Durazno – melocotón | 42 | 120 | 5 |
+| Peras | 38 | 120 | 4 |
+| Sandía | 72 | 120 | 4 |
+| Legumbres y frutos secos | |||
+| Porotos blancos | 40 | 150 | 7 |
+| Porotos negros | 30 | 150 | 7 |
+| Lentejas | 29 | 150 | 5 |
+| Maníes | 7 | 50 | 0 |
+| Nueces | 7 | 50 | 0 |
+| Castañas con sal | 27 | 50 | 3 |
+| Porotos de soja | 15 | 150 | 1 |
+| Pastas y harinas | |||
+| Fetuccini | 32 | 180 | 15 |
+| Macarrones | 47 | 180 | 23 |
+| Raviolis | 47 | 180 | 32 |
+| Spaghetti frescos | 58 | 180 | 26 |
+| Spaghetti integral | 28 | 180 | 14 |
+| Pizza margarita | 60 | 100 | 19 |
+| Pizza cuatro quesos | 80 | 100 | 22 |
+| Vegetales | |||
+| Zanahorias | 45 | 150 | 12 |
+| Patatas blancas | 82 | 150 | 21 |
+| Patatas dulces | 70 | 150 | 22 |
+| Brocoli | 10 | 150 | 4 |
+| Lechuga | 10 | 150 | 3 |
+| Cebolla | 60 | 150 | 16 |
+Tabla completa de carga glucémica de los alimentos (3)(4)
+Un alto valor de carga glucémica de un alimento significará un aumento significativo y rápido de los niveles de glucosa en sangre. Esto a su vez, conducirá a la producción de grandes cantidades de insulina.
+Para bajar la carga glucémica se deben combinar los alimentos con carbohidratos con alimentos con fibra y grasas saludables. Estos dos grupos de alimentos son los de menor valor en las tablas de alimentos.
+Combinarlos con alimentos con alto contenido de fibra o grasas es efectivo para bajar los valores de la carga glucémica en cada comida.
+El índice glucémico de un alimento en particular mide la velocidad de un aumento de glucosa en sangre luego comer una porción.
+La carga glucémica utiliza la base del índice glucémico y agrega el parámetro de cantidad.
+El índice insulínico considera el aumento de insulina (no de glucosa) en sangre y es el indicador más preciso para diabéticos. Este valor tiene en cuenta los efectos de combinaciones de alimentos particulares por ejemplo: lácteos y carnes.
+Es importante saber que para alcanzar un estado de salud óptima a largo plazo, todas las teorías concuerdan en que hay que evitar los alimentos azucarados o que contengan alto contenido de otros carbohidratos simples.
+Evitar el exceso de azúcar en la dieta es esencial para obtener buenos valores tanto de carga glucémica, índice glucémico e índice insulínico.
+La carga glucémica es un indicador que tiene en cuenta no sólo la velocidad en la cual aumentan los niveles de azúcar en sangre, sino también la cantidad total de carbohidratos en cada comida.
+Para calcular la carga glucémica se puede utilizar su fórmula, aunque también existen tablas de alimentos.
+Los alimentos con menor valor de carga glucémica en la tabla son los alimentos ricos en fibra y grasas, por ejemplo vegetales y los frutos secos.
+Este indicador es útil para elaborar un plan de alimentación para personas con diabetes u otros trastornos metabólicos.
+Descubre cómo la textura de los alimentos influye en nuestras decisiones alimenticias y en la percepción de saciedad y hambre. Leer más
+Descubre cómo prevenir la sarcopenia, la pérdida de masa muscular con la edad, y mejora tu salud y calidad de… Leer más
+El colostro bovino, la primera leche que producen las vacas tras el parto, es un poderoso suplemento nutracéutico conocido por… Leer más

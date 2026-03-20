@@ -1,0 +1,31 @@
+---
+tipo: investigacion
+fuente: https://www.cochrane.org/es/CD009646/MOVEMENT_creatina-para-la-enfermedad-de-parkinson
+categoria: Suplementacion
+fecha_scraped: 2024-05-20
+---
+
+Como Investigador de Nutrición Clínica, he analizado el texto proporcionado para extraer la información relevante para su Base de Conocimiento.
+
+---
+
+1.  **Resumen Técnico**:
+    La revisión Cochrane evaluó la eficacia y seguridad de la creatina para el tratamiento de la enfermedad de Parkinson, basándose en dos ensayos controlados aleatorios (ECA) con 194 pacientes que compararon creatina con placebo. Los resultados indicaron que el efecto de la creatina sobre la mejora de la función motora, las actividades cotidianas o la calidad de vida después de uno o dos años de tratamiento fue incierto. Esta incertidumbre se atribuyó a la baja calidad metodológica de los ensayos y al escaso número de participantes. Aunque no se consideraron eventos adversos graves relacionados con la creatina, un ensayo sí reportó un aumento en la incidencia de efectos gastrointestinales (diarrea, náuseas y estreñimiento). Los autores concluyen que las pruebas actuales no son una base fiable para tomar decisiones de tratamiento y enfatizan la necesidad de ECA futuros bien diseñados, con un tamaño de muestra mayor y seguimiento a largo plazo.
+
+2.  **Ficha de Datos**:
+    | Parámetro | Valor |
+    | :-------- | :---- |
+    | Dosis      | No especificada en el texto |
+    | Duración   | Uno o dos años (en los ensayos) |
+    | Participantes | 194 pacientes (en 2 ECA) |
+
+3.  **Mecanismo de Acción**:
+    La hipótesis subyacente es que la creatina podría ser beneficiosa para la enfermedad de Parkinson debido a su capacidad para mejorar la función mitocondrial. La disfunción mitocondrial es reconocida como un factor importante en la patogénesis de este trastorno neurodegenerativo. Por lo tanto, se postula que la creatina podría ser útil para retrasar la progresión de la enfermedad.
+
+4.  **Nivel de Evidencia**:
+    **B: Emergente**
+    (Explicación: La evidencia actual, basada en ensayos controlados aleatorios, es de baja calidad y no proporciona una base fiable para tomar decisiones de tratamiento, con resultados inciertos sobre la eficacia. Sin embargo, la necesidad explícita de futuros ensayos bien diseñados y a largo plazo sugiere que la investigación sobre la creatina para la enfermedad de Parkinson está en una fase de desarrollo y aún no es concluyente.)
+
+5.  **Interacciones/Riesgos**:
+    *   **Efectos gastrointestinales:** Un ensayo informó tasas mayores de efectos gastrointestinales, incluyendo diarrea, náuseas y estreñimiento, en pacientes que recibieron creatina.
+    *   **Eventos adversos graves:** Los eventos adversos graves que ocurrieron en los ensayos no se consideraron relacionados con la creatina.
