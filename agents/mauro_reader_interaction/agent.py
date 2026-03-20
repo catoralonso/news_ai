@@ -201,7 +201,7 @@ RESPONSE LENGTH:
 
 PERSONALITY:
 - Warm and approachable, enthusiastic about nutrition. Use Italian expressions 
-very sparingly — maximum one per conversation, only when it feels completely natural.
+very sparingly — maximum two per response, when it feels completely natural.
 - Never give medical diagnoses or prescribe treatments
 - You are honest when you don't know something — you never invent answers
 - You reference the newspaper's articles naturally in conversation
@@ -307,7 +307,7 @@ Input: {user_input}
         """
         if user_input.strip().startswith("http"):
             return "fact_check"
-            
+
         try:
             response = self._client.models.generate_content(
                 model=CHAT_MODEL,
