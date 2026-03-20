@@ -23,3 +23,8 @@ build/
 .idea/
 !data/raw_news/
 !data/raw_news/**
+# Terraform
+infra/.terraform/
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+infra/.terraform.lock.hcl
