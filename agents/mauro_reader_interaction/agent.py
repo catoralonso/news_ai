@@ -305,6 +305,9 @@ Input: {user_input}
         Uses a separate prompt — no memory, no RAG, no system prompt overhead.
         Returns "fact_check" | "question" | "other".
         """
+        if user_input.strip().startswith("http"):
+            return "fact_check"
+            
         try:
             response = self._client.models.generate_content(
                 model=CHAT_MODEL,
