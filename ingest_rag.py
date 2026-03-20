@@ -571,6 +571,27 @@ def main():
     print("\nAll collections ready.")
     print(f"ChromaDB persisted at: {PERSIST_DIR}")
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Global Nutrition
+# ─────────────────────────────────────────────────────────────────────────────
+import glob
+
+store = VectorStore("global_nutrition", f"{PERSIST_DIR}/global_nutrition")
+files = glob.glob("data/raw_news/global_nutrition/**/*.txt", recursive=True)
+for filepath in files:
+    with open(filepath, encoding="utf-8", errors="ignore") as f:
+        content = f.read().strip()
+    if not content:
+        continue
+    category = filepath.split("/")[-2]  # subcarpeta = categoría
+    title = os.path.basename(filepath).replace(".txt", "").replace("_", " ")
+    store.upsert(
+        texts=[content],
+        metadatas=[{"title": title, "category": category, "source": "content_engineer"}]
+    )
+count = store.count()
+print(f"  global_nutrition    → {count} chunks")
+
 
 if __name__ == "__main__":
     main()
