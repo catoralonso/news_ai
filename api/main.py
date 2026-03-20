@@ -47,7 +47,8 @@ except ImportError:
 
 # ── FastAPI ───────────────────────────────────────────────────────────────────
 from fastapi import FastAPI, HTTPException, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
 
@@ -90,23 +91,34 @@ app = FastAPI(
 )
 
 # CORS — permite llamadas desde la web de Lovable (y localhost para desarrollo)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://*.lovable.app",
-        "https://lovable.app",
-        "https://lovable.dev",
-        "https://*.lovableproject.com",
-        "https://9e934412-07e7-4045-b394-4c9e6fe7b75d.lovableproject.com",
-        "http://localhost:5173",   # Vite dev server
-        "http://localhost:3000",
-        "http://localhost:8080",
-    ],
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["*"],
-)
+class CORSMiddlewareCustom(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        origin = request.headers.get("origin", "")
+        
+        # Handle OPTIONS preflight
+        if request.method == "OPTIONS":
+            from starlette.responses import Response
+            response = Response()
+            response.headers["Access-Control-Allow-Origin"] = origin
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+            return response
+            
+        response = await call_next(request)
+        if any([
+            "lovable.app" in origin,
+            "lovableproject.com" in origin,
+            "lovable.dev" in origin,
+            "localhost" in origin,
+        ]):
+            response.headers["Access-Control-Allow-Origin"] = origin
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+        return response
 
+app.add_middleware(CORSMiddlewareCustom)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Request / Response models
