@@ -233,6 +233,7 @@ async def _run_pipeline_task(job_id: str, request: PipelineRequest):
         ) = _import_agents()
 
         orchestrator = Orchestrator()
+        orchestrator.build_agents() 
 
         # El orquestador ya maneja asyncio.gather internamente (José+Camila en paralelo)
         query = request.topic_hint or "nutrición tendencias salud"
@@ -390,12 +391,11 @@ async def chat(request: ChatRequest):
 
            # Mauro.chat() es síncrono — lo corremos en thread para no bloquear el event loop
             response = await asyncio.to_thread(mauro.chat, request.message)
-            if hasattr(response, "answer"):
-                text = response.answer
-            elif hasattr(response, "text"):
-                text = response.text
+            if hasattr(response, "message"):
+                text = response.message
             else:
                 text = str(response)
+                
             words = text.split(" ")
 
             chunk_size = 5
