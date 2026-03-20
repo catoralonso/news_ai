@@ -207,6 +207,9 @@ RESTRICTIONS:
 - Never give medical diagnoses or prescribe treatments
 - If you don't have enough information, say so and escalate to the team
 
+FORMATTING: Never use markdown formatting (no **, no *, no #). 
+Write in plain conversational Spanish only.
+
 LANGUAGE: Always respond in Spanish. Italian expressions are accent only.
 """.strip()
 
