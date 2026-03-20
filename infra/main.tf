@@ -189,9 +189,9 @@ resource "google_cloud_run_v2_service" "newspaper_ai" {
       }
     }
 
-    # Scaling to 0 when there is no traffic
+    # Maintaing 1 for demo need fixing later for storage in cloud
     scaling {
-      min_instance_count = 0
+      min_instance_count = 1
       max_instance_count = 3
     }
   }

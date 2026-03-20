@@ -354,7 +354,7 @@ ALWAYS respond with valid JSON (no markdown blocks):
         pack = self._parse_pack(raw_text, article.title)
 
         # 5. Persist output to disk so the journalist can review it
-        self._save_pack(pack)
+        self._save_pack(pack, article_id=getattr(article, "_id", ""))
 
         return pack
 
@@ -498,11 +498,8 @@ Respond with the JSON format specified in your instructions.
 
         return pack
 
-    def _save_pack(self, pack: SocialMediaPack) -> None:
-        """
-        Persists the SocialMediaPack as a JSON file in data/social_media_output/.
-        Filename uses article title slug + timestamp to avoid collisions.
-        """
+    def _save_pack(self, pack: SocialMediaPack, article_id: str = "") -> None:
+
         output_dir = os.getenv("SOCIAL_MEDIA_OUTPUT_DIR", "data/social_media_output")
         os.makedirs(output_dir, exist_ok=True)
 
@@ -515,5 +512,8 @@ Respond with the JSON format specified in your instructions.
         filename = f"{slug}__{timestamp}.json"
         filepath = os.path.join(output_dir, filename)
 
+        data = pack.to_dict()
+        data["_article_id"] = article_id  # ← añadir esto
+
         with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(pack.to_dict(), f, ensure_ascii=False, indent=2)
+            json.dump(data, f, ensure_ascii=False, indent=2)

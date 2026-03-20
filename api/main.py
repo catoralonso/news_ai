@@ -244,6 +244,16 @@ async def _run_pipeline_task(job_id: str, request: PipelineRequest):
         # Guardar artículo generado en disco para que GET /api/articles lo encuentre
         article = result.article if hasattr(result, "article") else result
         article_id = _save_article(article, job_id)
+        
+        # Actualizar el social pack más reciente con el article_id
+        social_dir = _get_social_dir()
+        packs = sorted(social_dir.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+        if packs:
+            with open(packs[0], encoding="utf-8") as f:
+                pack_data = json.load(f)
+            pack_data["_article_id"] = article_id
+            with open(packs[0], "w", encoding="utf-8") as f:
+                json.dump(pack_data, f, ensure_ascii=False, indent=2)
 
         _jobs[job_id] = {
             "status": "done",
@@ -331,18 +341,23 @@ async def get_article(article_id: str):
 
 @app.get("/api/social/{article_id}", tags=["content"])
 async def get_social_pack(article_id: str):
-    """
-    Devuelve el SocialMediaPack generado por Asti para un artículo concreto.
-    Lovable puede mostrarlo en la vista de detalle del artículo.
-    """
-    social_dir = _get_social_dir()
-    # Buscamos el JSON que tenga el article_id en el nombre
-    matches = list(social_dir.glob(f"*{article_id}*.json"))
-    if not matches:
-        # Intentar por título aproximado
-        raise HTTPException(status_code=404, detail=f"Social pack for '{article_id}' not found")
 
-    with open(matches[0], encoding="utf-8") as f:
+    social_dir = _get_social_dir()
+    # Buscar cualquier JSON en el directorio
+    matches = list(social_dir.glob("*.json"))
+    if not matches:
+        raise HTTPException(status_code=404, detail=f"No social packs found")
+    
+    # Buscar por article_id o devolver el más reciente
+    for f in matches:
+        with open(f, encoding="utf-8") as fp:
+            data = json.load(fp)
+        if data.get("_article_id") == article_id:
+            return data
+    
+    # Si no encuentra por ID, devuelve el más reciente
+    latest = max(matches, key=lambda p: p.stat().st_mtime)
+    with open(latest, encoding="utf-8") as f:
         return json.load(f)
 
 
