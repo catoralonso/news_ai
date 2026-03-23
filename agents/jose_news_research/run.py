@@ -1,37 +1,35 @@
 """
 agents/jose_news_research/run.py
 ─────────────────────────────────
-Local demo / development script for the News Research Agent.
+Local demo / development script for the News Research Agent — José.
 
-Usage:
-    python agents/jose_news_research/run.py
+Usage (from project root):
+    python -m agents.jose_news_research.run
 
-Environment variables (.env or export):
-    GEMINI_API_KEY=AIza...       <- local development (AI Studio)
-    GOOGLE_CLOUD_PROJECT=...     <- Vertex AI (production)
+Environment (.env or export):
+    GEMINI_API_KEY=AIza...           ← local development (Gemini AI Studio)
+    GOOGLE_CLOUD_PROJECT=my-project  ← Vertex AI (production)
     GOOGLE_CLOUD_REGION=us-central1
+    NEWSPAPER_NAME=Savia
 """
 
+from __future__ import annotations
+
 import json
-import os
-import sys
 
-# Add project root to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-# Load .env if it exists
+# Load .env before importing any project module
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
     pass
 
-from agents.jose_news_research.agent import NewsResearchAgent, KnowledgeBase
+from agents.jose_news_research.agent import KnowledgeBase, NewsResearchAgent
 from core.memory import Memory
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Sample articles to populate the RAG (simulates newspaper archive)
+# Sample articles — seed data for the RAG (simulates the newspaper archive)
 # ─────────────────────────────────────────────────────────────────────────────
 
 SAMPLE_ARTICLES = [
@@ -84,27 +82,24 @@ SAMPLE_ARTICLES = [
 # Demo
 # ─────────────────────────────────────────────────────────────────────────────
 
-def main():
+def main() -> None:
     print("=" * 60)
-    print("  NEWS RESEARCH AGENT — Local Demo")
+    print("  NEWS RESEARCH AGENT — José  |  Local Demo")
     print("=" * 60)
 
-    # 1. Initialize components
-    kb = KnowledgeBase(persist_dir="data/embeddings")
+    # 1. Initialise components
+    kb     = KnowledgeBase()
     memory = Memory(max_turns=10)
 
-    # 2. Load sample articles into the RAG
-    print(f"\nLoading {len(SAMPLE_ARTICLES)} articles into ChromaDB...")
+    # 2. Seed the RAG with sample articles
+    print(f"\nLoading {len(SAMPLE_ARTICLES)} sample articles into ChromaDB...")
     kb.add_documents(SAMPLE_ARTICLES)
-    print(f"   -> {kb.count()} chunks indexed\n")
+    print(f"  → {kb.count()} chunks indexed\n")
 
     # 3. Create agent
-    agent = NewsResearchAgent(
-        knowledge_base=kb,
-        memory=memory,
-    )
+    agent = NewsResearchAgent(knowledge_base=kb, memory=memory)
 
-    # 4. Research query
+    # 4. Run full pipeline
     query = "¿Qué temas de nutrición deberíamos cubrir esta semana?"
     print(f"Query: {query}\n")
 
@@ -113,24 +108,32 @@ def main():
     # 5. Display results
     print("TRENDING TOPICS:")
     for t in report.trending_topics[:5]:
-        print(f"   * {t}")
+        print(f"  * {t}")
 
     print(f"\nARTICLE IDEAS ({len(report.article_ideas)}):")
-    for i, idea in enumerate(report.article_ideas, 1):
-        print(f"\n  [{i}] {idea.title}")
-        print(f"      Angle:    {idea.angle}")
-        print(f"      Category: {idea.category} | Priority: {idea.priority}")
-        print(f"      Local relevance: {idea.local_relevance_score:.0%}")
+    for idx, idea in enumerate(report.article_ideas, 1):
+        print(f"\n  [{idx}] {idea.title}")
+        print(f"       Angle    : {idea.angle}")
+        print(f"       Category : {idea.category}  |  Priority: {idea.priority}")
+        print(f"       Relevance: {idea.local_relevance_score:.0%}")
         if idea.keywords:
-            print(f"      Keywords: {', '.join(idea.keywords)}")
+            print(f"       Keywords : {', '.join(idea.keywords)}")
+        if idea.sources:
+            print(f"       Sources  : {', '.join(idea.sources)}")
 
     print("\n" + "=" * 60)
-    print("  Conversational mode (type 'salir' to exit)")
+    print("  Full report JSON:")
+    print("=" * 60)
+    print(json.dumps(report.to_dict(), ensure_ascii=False, indent=2))
+
+    # 6. Conversational mode
+    print("\n" + "=" * 60)
+    print("  Conversational mode  (escribe 'salir' para salir)")
     print("=" * 60 + "\n")
 
     while True:
         try:
-            user_input = input("You: ").strip()
+            user_input = input("Tú: ").strip()
         except (EOFError, KeyboardInterrupt):
             break
         if not user_input:
