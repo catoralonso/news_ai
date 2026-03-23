@@ -189,9 +189,9 @@ resource "google_cloud_run_v2_service" "newspaper_ai" {
       }
     }
 
-    # Maintaing 1 for demo need fixing later for storage in cloud
+    # scaling for edit according to neccesary
     scaling {
-      min_instance_count = 1
+      min_instance_count = 0
       max_instance_count = 3
     }
   }
