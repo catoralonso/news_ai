@@ -470,30 +470,14 @@ Always present results clearly to the journalist.""",
     # ── Private helpers ───────────────────────────────────────────────────────
 
     def _select_ideas(self, ideas: list[ArticleIdea]) -> list[ArticleIdea]:
-        """
-        In API mode: auto-selects the highest priority idea.
-        In local dev: console-based selection.
-        """
-        # En Cloud Run no hay terminal — seleccionar automáticamente
         if os.getenv("GOOGLE_CLOUD_PROJECT"):
             best = sorted(ideas, key=lambda x: x.local_relevance_score, reverse=True)
             return [best[0]] if best else ideas[:1]
         
-        # Modo local con terminal interactivo
+        # Local dev mode
         print("\n" + "=" * 60)
-        print("  IDEAS FROM JOSÉ + CAMILA — Select which to proceed with")
-        print("=" * 60)
         for i, idea in enumerate(ideas, 1):
-            verdict_icon = {
-                "truthful":   "✓",
-                "doubtful":   "?",
-                "untruthful": "✗",
-            }.get(idea.verdict or "", "·")
             print(f"\n  [{i}] {idea.title}")
-            print(f"      Angle:      {idea.angle}")
-            print(f"      Priority:   {idea.priority} | "
-                f"Relevance: {idea.local_relevance_score:.0%} | "
-                f"Confidence: {verdict_icon} {(idea.confidence_score or 0):.0%}")
         print("\n" + "-" * 60)
         while True:
             raw = input("Enter idea numbers to proceed (comma-separated, e.g. 1,3): ").strip()
@@ -502,6 +486,5 @@ Always present results clearly to the journalist.""",
                 selected = [ideas[i - 1] for i in indices if 1 <= i <= len(ideas)]
                 if selected:
                     return selected
-                print("  No valid selection. Try again.")
             except (ValueError, IndexError):
                 print("  Invalid input. Try again.")
