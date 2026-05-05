@@ -339,17 +339,21 @@ function toast(msg) {
 async function fetchTrends() {
   const topic = document.getElementById('trend-topic').value.trim() || 'nutrición tendencias salud';
   const out = document.getElementById('trends-output');
-  out.innerHTML = '<div class="status-msg">🌿 José está investigando...</div>';
+  out.innerHTML = '<div class="status-msg">🌿 José investigando · ✅ Camila verificando...</div>';
   try {
-    const res = await fetch(`${API}/api/trends?topic=${encodeURIComponent(topic)}`);
+    const res = await fetch(`${API}/api/trends/verified?topic=${encodeURIComponent(topic)}`);
     const data = await res.json();
     const trends = data.trends || [];
     if (!trends.length) { out.innerHTML = '<div class="empty"><div class="empty-illo">🌾</div><p>Sin tendencias — prueba otro tema</p></div>'; return; }
     out.innerHTML = `<p style="font-size:0.75rem;font-weight:600;color:var(--muted);margin-bottom:0.75rem;letter-spacing:0.05em;text-transform:uppercase;">${trends.length} temas encontrados · Pulsa uno para lanzar el pipeline</p>
-    <div class="trend-chips">${trends.map((t,i) => {
+    <div class="trend-chips">${trends.map(t => {
       const label   = typeof t === 'string' ? t : (t.topic || JSON.stringify(t));
-      return `<span class="trend-chip" id="chip-${i}" onclick="verifyAndUseTrend('${label.replace(/'/g,"\\'")}', 'chip-${i}')">
-      <span class="dot"></span>${label}</span>`;
+      const verdict = t.verdict || '';
+      const icons   = { truthful: '🟢', doubtful: '🟡', untruthful: '🔴' };
+      const icon    = icons[verdict] || '';
+      const pct     = t.confidence ? ` · ${Math.round(t.confidence * 100)}%` : '';
+      return `<span class="trend-chip ${verdict}" onclick="useTrend('${label.replace(/'/g,"\\'")}')">
+        <span class="dot"></span>${icon} ${label}${pct}</span>`;
     }).join('')}</div>`;
   } catch(e) { out.innerHTML = `<div class="status-msg error">Error: ${e.message}</div>`; }
 }
