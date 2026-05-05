@@ -322,6 +322,7 @@
 
 <script>
 const API = '';
+
 function showSection(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -329,6 +330,7 @@ function showSection(id, btn) {
   if (btn) btn.classList.add('active');
   if (id === 'articles') loadArticles();
 }
+
 function toast(msg) {
   const el = document.createElement('div');
   el.className = 'toast';
@@ -336,6 +338,7 @@ function toast(msg) {
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 3000);
 }
+
 async function fetchTrends() {
   const topic = document.getElementById('trend-topic').value.trim() || 'nutrición tendencias salud';
   const out = document.getElementById('trends-output');
@@ -351,17 +354,22 @@ async function fetchTrends() {
       const verdict = t.verdict || '';
       const icons   = { truthful: '🟢', doubtful: '🟡', untruthful: '🔴' };
       const icon    = icons[verdict] || '';
-      return `<span class="trend-chip ${verdict}" onclick="useTrend('${label.replace(/'/g,"\\'")}')"><span class="dot"></span>${icon} ${label}</span>`;
+      return `<span class="trend-chip ${verdict}" onclick="useTrend('${label.replace(/'/g,"\\'")}')">
+      <span class="dot"></span>${icon} ${label}</span>`;
+    }).join('')}</div>
   } catch(e) { out.innerHTML = `<div class="status-msg error">Error: ${e.message}</div>`; }
 }
+
 function useTrend(topic) {
   document.getElementById('pipeline-topic').value = topic;
   document.querySelectorAll('.nav-btn')[1].click();
   toast('✦ Tema cargado en el pipeline');
 }
+
 let _pollTimer = null;
 function resetSteps() { ['jose','camila','manuel','asti','mauro'].forEach(a => { document.getElementById('step-' + a).className = 'step-card'; }); }
 function setStep(a, s) { document.getElementById('step-' + a).className = 'step-card ' + s; }
+
 async function runPipeline() {
   const topic = document.getElementById('pipeline-topic').value.trim();
   const btn = document.getElementById('pipeline-btn');
@@ -393,6 +401,7 @@ async function runPipeline() {
     }, 3000);
   } catch(e) { statusEl.className = 'status-msg error'; statusEl.textContent = '⚠ ' + e.message; btn.disabled = false; resetSteps(); }
 }
+
 function camilaBadge(factCheck) {
   if (!factCheck || !factCheck.length) return '✅ Verificado por Camila';
   const approved = factCheck.find(r => r.verdict === 'truthful')
@@ -417,6 +426,7 @@ function showPipelineResult(result) {
       </div>
     </div>`;
 }
+
 async function loadArticles() {
   const list = document.getElementById('articles-list');
   const detail = document.getElementById('article-detail');
@@ -441,6 +451,7 @@ async function loadArticles() {
       </div>`).join('')}</div>`;
   } catch(e) { list.innerHTML = `<div class="status-msg error">⚠ ${e.message}</div>`; }
 }
+
 async function loadArticle(id) {
   const list = document.getElementById('articles-list');
   const detail = document.getElementById('article-detail');
@@ -463,6 +474,7 @@ async function loadArticle(id) {
       <div id="social-panel-${id}" style="margin-top:1.5rem;"></div>`;
   } catch(e) { detail.innerHTML = `<div class="status-msg error">⚠ ${e.message}</div>`; }
 }
+
 async function loadSocialPanel(articleId, panelId) {
   let el;
   if (panelId) {
@@ -503,6 +515,7 @@ async function loadSocialPanel(articleId, panelId) {
       </div>`;
   } catch(e) { el.innerHTML = `<div class="status-msg error">⚠ ${e.message}</div>`; }
 }
+
 let _chatBusy = false;
 async function sendChat() {
   if (_chatBusy) return;
@@ -538,7 +551,9 @@ async function sendChat() {
   _chatBusy = false;
   msgs.scrollTop = msgs.scrollHeight;
 }
+
 function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 loadArticles();
 </script>
 </body>
