@@ -1,6 +1,6 @@
 # 🌿 Savia — AI-Powered Nutrition Newsroom
 
-> An autonomous multi-agent system that runs a nutrition newspaper end-to-end: from trend research to published articles, social media, and reader interaction. For the Demo go to the link:
+An autonomous multi-agent system that runs a nutrition newspaper end-to-end: from trend research to published articles, social media, and reader interaction. For the Demo go to the link:
 > 
 🔗 **[Live Demo](https://huggingface.co/spaces/catoralonso/news_savia)**
 
@@ -33,7 +33,7 @@ No manual intervention. Journalists focus on deep investigative work.
 
 ## Architecture
 
-Frontend for GCP was in Lovable in the tab "Redaccion" were the agents, they dont work due to migration to Anthropic (check live demo above)
+Frontend for GCP was in Lovable in the tab "Redaccion" were the agents, they dont work due to migration to Anthropic
 > 🔗 **[Link](https://savia-nutricion-inteligente.lovable.app/)
 
 ```
