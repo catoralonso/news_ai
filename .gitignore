@@ -21,6 +21,3 @@ data/social_media_output/
 data/clickstream/
 data/raw_news/
 data/embeddings/
-
-# GCP legacy
-gcp_infraestructure/
