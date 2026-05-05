@@ -15,6 +15,7 @@
 **Legacy — Google Cloud Platform**
 ![Cloud Run](https://img.shields.io/badge/Cloud_Run-Deployed-34A853?logo=googlecloud&logoColor=white)
 ![Terraform](https://img.shields.io/badge/Infra-Terraform-7B42BC?logo=terraform&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini_2.5_Flash-Google-4285F4?logo=google&logoColor=white)
 
 ---
 
