@@ -12,8 +12,11 @@ COPY --from=builder /root/.local /home/user/.local
 RUN useradd -m -u 1000 user && \
     chown -R user:user /app /home/user/.local && \
     mkdir -p /app/data/articles /app/data/social_media_output /app/data/clickstream && \
-    chown -R user:user /app/data
+    chown -R user:user /app/data && \
+    mkdir -p /home/user/.cache && \
+    chown -R user:user /home/user
 COPY --chown=user:user . .         
 USER user
 EXPOSE 7860
 CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "7860"]
+
