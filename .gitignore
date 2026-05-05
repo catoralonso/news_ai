@@ -1,0 +1,29 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+
+# Data — generated at runtime
+data/articles/
+data/social_media_output/
+data/clickstream/
+data/raw_news/
+data/embeddings/
+
+# GCP legacy
+gcp_infraestructure/
+
+# Docker
+.dockerignoredata/embeddings/
