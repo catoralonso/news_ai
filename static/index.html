@@ -351,7 +351,7 @@ async function fetchTrends() {
       const verdict = t.verdict || '';
       const icons   = { truthful: '🟢', doubtful: '🟡', untruthful: '🔴' };
       const icon    = icons[verdict] || '';
-      const pct     = t.confidence ? ` · ${Math.round(t.confidence * 100)}%` : '';
+      const pct = t.confidence != null ? ` · ${Math.round(t.confidence * 100)}%` : '';
       return `<span class="trend-chip ${verdict}" onclick="useTrend('${label.replace(/'/g,"\\'")}')">
         <span class="dot"></span>${icon} ${label}${pct}</span>`;
     }).join('')}</div>`;
