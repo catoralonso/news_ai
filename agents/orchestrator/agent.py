@@ -1,331 +1,492 @@
 """
-agents/orchestrator/agent.py
-─────────────────────────────
-Orchestrator — newspaper_ai
-────────────────────────────
-Coordinates all agents using LangChain tools. Exposes each agent
-as a @tool so a LangChain AgentExecutor can call them in sequence.
-
-Pipeline:
-    1. José    → research trending topics → list[ArticleIdea]
-    2. Camila  → fact-check ideas         → list[FactCheckResult]
-    3. [PAUSE] → journalist selects ideas
-    4. Manuel  → generate article         → CreateArticle
-    5. Asti    → generate social pack     → SocialMediaPack  ┐ parallel
-    6. Mauro   → setup context            → ready to chat    ┘
-
-LangChain usage:
-    The AgentExecutor drives the pipeline using the tools below.
-    Each tool is a thin wrapper around the real agent's .run() method.
-
+api_main.py
+───────────
+FastAPI gateway for the Savia newspaper AI system.
+Exposes the endpoints consumed by the Lovable frontend.
+Runs as the single process in the HF Space container.
+Endpoints:
+    GET  /health                    → health check
+    GET  /api/trends                → latest trends (José, no full pipeline)
+    POST /api/pipeline/run          → full pipeline: José→Camila→Manuel→Asti
+    GET  /api/pipeline/status/{id}  → polling for pipeline job status
+    GET  /api/articles              → list generated articles
+    GET  /api/articles/{article_id} → single article
+    GET  /api/social/{article_id}   → SocialMediaPack for an article
+    POST /api/chat                  → Mauro chatbot (SSE streaming)
 Local usage:
-    Set ANTHROPIC_API_KEY in .env 
+    uvicorn api_main:app --reload --port 8080
+Required environment variables:
+    ANTHROPIC_API_KEY=...
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import os
+import sys
 import time
-from dataclasses import dataclass, field
-from typing import Optional
+from pathlib import Path
+from typing import AsyncIterator, Optional
 
-from langchain.tools import tool
-#from langchain.agents import create_tool_calling_agent
-#from langchain_core.agents import AgentExecutor
-from langchain_anthropic import ChatAnthropic
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+# ── Path setup ────────────────────────────────────────────────────────────────
+# → "Allow imports from project root without installing as a package"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT / "agents"))
 
-from core.memory import Memory
-from jose_news_research.agent import (
-    NewsResearchAgent,
-    KnowledgeBase as JoseKnowledgeBase,
-    ResearchReport,
-    ArticleIdea,
-)
-from camila_fact_checking.agent import (
-    FactCheckingAgent,
-    KnowledgeBase as CamilaKnowledgeBase,
-    FactCheckResult,
-)
-from manuel_article_generation.agent import (
-    ArticleGenerationAgent,
-    KnowledgeBase as ManuelKnowledgeBase,
-    CreateArticle,
-)
-from asti_social_media.agent import (
-    SocialMediaAgent,
-    KnowledgeBase as AstiKnowledgeBase,
-    SocialMediaPack,
-)
-from mauro_reader_interaction.agent import (
-    ReaderInteractionAgent,
-    KnowledgeBase as MauroKnowledgeBase,
-    ReaderResponse,
-)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(PROJECT_ROOT / ".env")
+except ImportError:
+    pass
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Config
-# ─────────────────────────────────────────────────────────────────────────────
+# ── FastAPI ───────────────────────────────────────────────────────────────────
+from fastapi import FastAPI, HTTPException, BackgroundTasks
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from fastapi.responses import StreamingResponse, JSONResponse
+from pydantic import BaseModel
 
-from config import NEWSPAPER_NAME, REGION as PAIS, EMBEDDINGS_DIR, ANTHROPIC_API_KEY
+# ── Observabilidad ────────────────────────────────────────────────────────────
+from config import NEWSPAPER_NAME, REGION
+logger = logging.getLogger("newspaper_ai.api")
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Output data model
-# ─────────────────────────────────────────────────────────────────────────────
-
-@dataclass
-class OrchestratorResult:
-    """
-    Full pipeline output. Returned after the journalist approves ideas
-    and Manuel + Asti finish. Mauro has already been set up by this point.
-    """
-    research_report: ResearchReport
-    fact_check_results: list[FactCheckResult]
-    approved_ideas: list[ArticleIdea]       # selected by journalist
-    article: CreateArticle
-    social_pack: SocialMediaPack
-    generated_at: str = field(
-        default_factory=lambda: __import__("datetime").datetime.now().isoformat()
+# ── Agentes ───────────────────────────────────────────────────────────────────
+# → "Lazy imports to avoid blocking startup if an agent fails to load"
+def _import_agents():
+    from jose_news_research.agent import NewsResearchAgent, KnowledgeBase as JoseKB
+    from camila_fact_checking.agent import FactCheckingAgent, KnowledgeBase as CamilaKB
+    from manuel_article_generation.agent import ArticleGenerationAgent, KnowledgeBase as ManuelKB
+    from asti_social_media.agent import SocialMediaAgent, KnowledgeBase as AstiKB
+    from mauro_reader_interaction.agent import ReaderInteractionAgent, KnowledgeBase as MauroKB
+    from orchestrator.agent import Orchestrator
+    from core.memory import Memory
+    return (
+        NewsResearchAgent, JoseKB,
+        FactCheckingAgent, CamilaKB,
+        ArticleGenerationAgent, ManuelKB,
+        SocialMediaAgent, AstiKB,
+        ReaderInteractionAgent, MauroKB,
+        Orchestrator,
+        Memory,
     )
 
-    def to_dict(self) -> dict:
-        return {
-            "article_title":    self.article.title,
-            "article_category": self.article.category,
-            "social_pack":      self.social_pack.to_dict(),
-            "approved_ideas":   [i.to_dict() for i in self.approved_ideas],
-            "generated_at":     self.generated_at,
+
+# ── App ───────────────────────────────────────────────────────────────────────
+app = FastAPI(
+    title="Newspaper AI — API Gateway",
+    description="Multi-agent system for a nutrition newspaper. Powers the Lovable frontend.",
+    version="1.0.0",
+    docs_url="/docs",       # Swagger UI en /docs
+    redoc_url="/redoc",
+)
+
+# "CORS — allow calls from the Lovable frontend and localhost for development"
+#class CORSMiddlewareCustom(BaseHTTPMiddleware):
+#    async def dispatch(self, request: Request, call_next):
+#        origin = request.headers.get("origin", "")
+        
+        # Handle OPTIONS preflight
+#        if request.method == "OPTIONS":
+#            from starlette.responses import Response
+#            response = Response()
+#            response.headers["Access-Control-Allow-Origin"] = origin
+#            response.headers["Access-Control-Allow-Credentials"] = "true"
+#            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+#            response.headers["Access-Control-Allow-Headers"] = "*"
+#            return response
+#            
+#        response = await call_next(request)
+#        if any([
+#            "lovable.app" in origin,
+#            "lovableproject.com" in origin,
+#            "lovable.dev" in origin,
+#            "localhost" in origin,
+#        ]):
+#            response.headers["Access-Control-Allow-Origin"] = origin
+#            response.headers["Access-Control-Allow-Credentials"] = "true"
+#            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+#            response.headers["Access-Control-Allow-Headers"] = "*"
+#        return response
+
+#app.add_middleware(CORSMiddlewareCustom)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Request / Response models
+# ─────────────────────────────────────────────────────────────────────────────
+
+class PipelineRequest(BaseModel):
+    """Parámetros opcionales para lanzar el pipeline completo."""
+    topic_hint: Optional[str] = None   # e.g. "vitamina D en invierno"
+    max_articles: int = 1              # how many articles it generates
+
+
+class ChatRequest(BaseModel):
+    message: str
+    session_id: Optional[str] = "default"
+
+
+class PipelineStatus(BaseModel):
+    status: str        # "running" | "done" | "error"
+    message: str
+    article_id: Optional[str] = None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# In-memory job store (simple; replace with Redis in production)
+# ─────────────────────────────────────────────────────────────────────────────
+
+_jobs: dict[str, dict] = {}          # job_id → {status, result, error}
+_chat_sessions: dict[str, object] = {}  # session_id → MauroAgent instance
+
+
+def _get_articles_dir() -> Path:
+    d = PROJECT_ROOT / "data" / "articles"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+def _get_social_dir() -> Path:
+    d = PROJECT_ROOT / "data" / "social_media_output"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Health check — called by the container health check every 30s
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.get("/health", tags=["infra"])
+async def health():
+    return {
+        "status": "ok",
+        "newspaper": NEWSPAPER_NAME,
+        "region": REGION,
+        "timestamp": time.time(),
+    }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GET /api/trends — Jose search trends without launching the whole pipeline
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.get("/api/trends", tags=["content"])
+async def get_trends(topic: str = "nutrición tendencias salud"):
+    """
+    Returns last nutrition trends detected by Jose.
+    Calls directly to Jose without using the whole pipeline.
+    Useful for a future widget "Trends of the day" for the UI.
+    """
+    try:
+        (
+            NewsResearchAgent, JoseKB,
+            *_rest
+        ) = _import_agents()
+
+        kb = JoseKB()
+        agent = NewsResearchAgent(knowledge_base=kb)
+
+        # Jose has a ligh mode that returns only trends withouth complex ideas
+        # If not available, calls run() for extracting trends 
+        if hasattr(agent, "get_trends"):
+            trends = await asyncio.to_thread(agent.get_trends)
+        else:
+            result = await asyncio.to_thread(agent.run, topic)
+            trends = [
+                {"topic": t, "relevance": 1.0}
+                for t in (result.trending_topics if hasattr(result, "trending_topics") else [str(result)])
+            ]
+
+        logger.info("Trends fetched: %d items", len(trends))
+        return {"trends": trends, "fetched_at": time.time()}
+
+    except Exception as e:
+        logger.exception("Error fetching trends")
+        raise HTTPException(status_code=500, detail=str(e))
+        
+@app.get("/api/trends/verified", tags=["content"])
+async def get_trends_verified(topic: str = "nutrición tendencias salud"):
+    try:
+        (
+            NewsResearchAgent, JoseKB,
+            _, CamilaKB,
+            *_rest
+        ) = _import_agents()
+
+        jose_kb = JoseKB()
+        jose    = NewsResearchAgent(knowledge_base=jose_kb)
+
+        # run() devuelve ResearchReport con article_ideas (ArticleIdea[])
+        report = await asyncio.to_thread(jose.run, topic)
+
+        camila_kb = CamilaKB()
+        from camila_fact_checking.agent import FactCheckingAgent
+        camila    = FactCheckingAgent(knowledge_base=camila_kb)
+
+        fact_results = await asyncio.to_thread(camila.run_batch, report.article_ideas)
+
+        trends = [
+            {
+                "topic":      idea.title,
+                "relevance":  idea.local_relevance_score,
+                "verdict":    fc.verdict,
+                "confidence": fc.confidence,
+            }
+            for idea, fc in zip(report.article_ideas, fact_results)
+        ]
+        # ordenar: truthful → doubtful → untruthful
+        order = {"truthful": 0, "doubtful": 1, "untruthful": 2}
+        trends.sort(key=lambda t: order.get(t["verdict"], 3))
+
+        return {"trends": trends, "fetched_at": time.time()}
+
+    except Exception as e:
+        logger.exception("Error fetching verified trends")
+        raise HTTPException(status_code=500, detail=str(e))    
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# POST /api/pipeline/run — Full async Pipeline      
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.post("/api/pipeline/run", tags=["content"])
+async def run_pipeline(request: PipelineRequest, background_tasks: BackgroundTasks):
+    """
+    Launch full pipeline:
+      José (trends) → Camila (fact-check) simultaneously →
+      Manuel (article) → Asti (social media)
+    Returns a job_id. Client mades polling to
+    GET /api/pipeline/status/{job_id} to know when its finished.
+    """
+    import uuid
+    job_id = str(uuid.uuid4())[:8]
+    _jobs[job_id] = {"status": "running", "result": None, "error": None}
+
+    background_tasks.add_task(_run_pipeline_task, job_id, request)
+
+    return {"job_id": job_id, "status": "running"}
+
+
+async def _run_pipeline_task(job_id: str, request: PipelineRequest):
+    """Backgrund pipeline"""
+    try:
+        (
+            _NRA, _JKB, _FCA, _CKB, _AGA, _MKB,
+            _SMA, _AKB, _RIA, _MauroKB,
+            Orchestrator, Memory,
+        ) = _import_agents()
+
+        orchestrator = Orchestrator()
+        orchestrator.build_agents() 
+
+        # Orchestrator uses asyncio.gather internarly (José+Camila simultaneously)
+        query = request.topic_hint or "nutrición tendencias salud"
+        result = await orchestrator.run_pipeline_async(query)
+
+        # Saves the article as JSON and returns its ID.
+        article = result.article if hasattr(result, "article") else result
+        article_id = _save_article(article, job_id, result.fact_check_results)
+        
+        # Update to more recent social pack with article_id
+        social_dir = _get_social_dir()
+        packs = sorted(social_dir.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+        if packs:
+            with open(packs[0], encoding="utf-8") as f:
+                pack_data = json.load(f)
+            pack_data["_article_id"] = article_id
+            with open(packs[0], "w", encoding="utf-8") as f:
+                json.dump(pack_data, f, ensure_ascii=False, indent=2)
+
+        _jobs[job_id] = {
+            "status": "done",
+            "result": {
+                "article_id":    article_id,
+                "title":         getattr(article, "title", "Sin título"),
+                "social_saved":  True,
+                "fact_check":    [r.to_dict() for r in result.fact_check_results],
+            },
+            "error": None,
         }
+        logger.info("Pipeline job %s completed → article_id=%s", job_id, article_id)
+
+    except Exception as e:
+        logger.exception("Pipeline job %s failed", job_id)
+        _jobs[job_id] = {"status": "error", "result": None, "error": str(e)}
+
+
+def _save_article(article, job_id: str, fact_results=None) -> str:
+    """Saves the article as JSON and returns its ID."""
+    article_id = f"art_{job_id}_{int(time.time())}"
+    path = _get_articles_dir() / f"{article_id}.json"
+    data = article.to_dict() if hasattr(article, "to_dict") else vars(article)
+    data["_id"] = article_id
+    if fact_results:
+        data["_fact_check"] = [r.to_dict() for r in fact_results]
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    return article_id
+
+
+@app.get("/api/pipeline/status/{job_id}", tags=["content"])
+async def pipeline_status(job_id: str):
+    """Polling endpoint to knows if piepeline is over."""
+    job = _jobs.get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found")
+    return job
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Orchestrator
+# GET /api/articles — Article's list          
 # ─────────────────────────────────────────────────────────────────────────────
 
-class Orchestrator:
+@app.get("/api/articles", tags=["content"])
+async def list_articles(limit: int = 10):
     """
-    Coordinates all five agents using LangChain tools.
-
-    Instantiation:
-        orch = Orchestrator()
-        orch.build_agents()   ← initializes all KnowledgeBases and agents
-
-    Pipeline run:
-        result = await orch.run_pipeline(query="nutrition trends this week")
-
-    Reader chat:
-        response = orch.chat_reader("Is intermittent fasting safe?")
+    Lists the latest generated articles (most recent first)
+    Displayed in the main feed on the UI frontend.
     """
+    articles_dir = _get_articles_dir()
+    files = sorted(articles_dir.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
 
-    def __init__(self):
-        # Agents are None until build_agents() is called
-        self._jose:   NewsResearchAgent      | None = None
-        self._camila: FactCheckingAgent      | None = None
-        self._manuel: ArticleGenerationAgent | None = None
-        self._asti:   SocialMediaAgent       | None = None
-        self._mauro:  ReaderInteractionAgent | None = None
+    articles = []
+    for f in files[:limit]:
+        try:
+            with open(f, encoding="utf-8") as fp:
+                data = json.load(fp)
+            # Return summary fields only for the listing
+            articles.append({
+                "id":         data.get("_id", f.stem),
+                "title":      data.get("title", "Sin título"),
+                "category":   data.get("category", ""),
+                "angle":      data.get("angle", ""),
+                "keywords":   data.get("keywords", [])[:5],
+                "relevance":  data.get("local_relevance_score", 0),
+                "created_at": f.stat().st_mtime,
+            })
+        except Exception:
+            continue
 
-        # LangChain executor — built after agents are ready
-        #self._executor: AgentExecutor | None = None
+    return {"articles": articles, "total": len(articles)}
 
-        # Pipeline state — shared across tool calls within a run
-        self._last_report:       ResearchReport      | None = None
-        self._last_fact_results: list[FactCheckResult]      = []
-        self._last_article:      CreateArticle       | None = None
-        self._last_social_pack:  SocialMediaPack     | None = None
+@app.get("/api/articles/{article_id}", tags=["content"])
+async def get_article(article_id: str):
+    """Returns the full article including article_content."""
+    path = _get_articles_dir() / f"{article_id}.json"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail=f"Article '{article_id}' not found")
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
 
-    # ── Initialization ────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# GET /api/social/{article_id} — SocialMediaPack               
+# ─────────────────────────────────────────────────────────────────────────────
 
-    def build_agents(self) -> None:
-        """
-        Instantiates all agents with their KnowledgeBases.
-        Call this once before running the pipeline.
-        """
-        print("Building agents...")
+@app.get("/api/social/{article_id}", tags=["content"])
+async def get_social_pack(article_id: str):
 
-        # José
-        jose_kb = JoseKnowledgeBase(persist_dir=EMBEDDINGS_DIR)
-        self._jose = NewsResearchAgent(
-            knowledge_base=jose_kb,
-            memory=Memory(max_turns=10),
-            newspaper_name=NEWSPAPER_NAME,
-            region=PAIS,
-        )
+    social_dir = _get_social_dir()
+    # Find any JSON file in the directory
+    matches = list(social_dir.glob("*.json"))
+    if not matches:
+        raise HTTPException(status_code=404, detail=f"No social packs found")
+    
+    # Search by article_id or fall back to the most recent
+    for f in matches:
+        with open(f, encoding="utf-8") as fp:
+            data = json.load(fp)
+        if data.get("_article_id") == article_id:
+            return data
+    
+    # If no match by ID, return the most recent
+    latest = max(matches, key=lambda p: p.stat().st_mtime)
+    with open(latest, encoding="utf-8") as f:
+        return json.load(f)
 
-        # Camila — instanced separately so Mauro can share the same instance
-        camila_kb = CamilaKnowledgeBase(persist_dir=EMBEDDINGS_DIR)
-        self._camila = FactCheckingAgent(
-            knowledge_base=camila_kb,
-            memory=Memory(max_turns=10),
-            newspaper_name=NEWSPAPER_NAME,
-            region=PAIS,
-        )
+# ─────────────────────────────────────────────────────────────────────────────
+# POST /api/chat — Chatbot Mauro with streaming SSE
+# ─────────────────────────────────────────────────────────────────────────────
 
-        # Manuel
-        manuel_kb = ManuelKnowledgeBase(persist_dir=EMBEDDINGS_DIR)
-        self._manuel = ArticleGenerationAgent(
-            knowledge_base=manuel_kb,
-            memory=Memory(max_turns=10),
-            newspaper_name=NEWSPAPER_NAME,
-            region=PAIS,
-        )
+@app.post("/api/chat", tags=["chat"])
+async def chat(request: ChatRequest):
+    """
+    Chatbot Mauro — answer user's inquiries.
+    Returns Server-Sent Events (SSE) for word-by-word streaming in the frontend.
+    """
+    session_id = request.session_id or "default"
 
-        # Asti
-        asti_kb = AstiKnowledgeBase(persist_dir=EMBEDDINGS_DIR)
-        self._asti = SocialMediaAgent(
-            knowledge_base=asti_kb,
-            memory=Memory(max_turns=10),
-            newspaper_name=NEWSPAPER_NAME,
-            region=PAIS,
-        )
+    async def generate() -> AsyncIterator[str]:
+        try:
+            (
+                NewsResearchAgent, JoseKB,
+                FactCheckingAgent, CamilaKB,
+                ArticleGenerationAgent, ManuelKB,
+                SocialMediaAgent, AstiKB,
+                ReaderInteractionAgent, MauroKB,
+                Orchestrator, Memory,
+            ) = _import_agents()
 
-        # Mauro — receives the same Camila instance (shared, not duplicated)
-        mauro_kb = MauroKnowledgeBase(persist_dir=EMBEDDINGS_DIR)
-        self._mauro = ReaderInteractionAgent(
-            knowledge_base=mauro_kb,
-            camila=self._camila,            # ← injected, not created internally
-            memory=Memory(max_turns=20),
-            newspaper_name=NEWSPAPER_NAME,
-            region=PAIS,
-        )
+            # Reuse Mauro instance per session to preserve conversation memory
+            if session_id not in _chat_sessions:
+                # Camila
+                camila_kb = CamilaKB()
+                camila = FactCheckingAgent(knowledge_base=camila_kb)
 
-        # Build LangChain executor with tools wired to this instance
-        self._executor = self._build_executor()
-        print("All agents ready.\n")
+                # Mauro with Camila injected
+                kb = MauroKB()
+                memory = Memory(max_turns=20)
+                _chat_sessions[session_id] = ReaderInteractionAgent(
+                    knowledge_base=kb,
+                    camila=camila,
+                    memory=memory,
+                )
 
-    def _build_executor(self) -> AgentExecutor:
-        llm = ChatAnthropic(
-            model="claude-haiku-4-5-20251001",
-            api_key=ANTHROPIC_API_KEY,
-        )
+            mauro = _chat_sessions[session_id]
 
-    # ── Public interface ──────────────────────────────────────────────────────
+           # Mauro.chat() is sync — run in thread to avoid blocking the event loop
+            response = await asyncio.to_thread(mauro.chat, request.message)
+            if hasattr(response, "message"):
+                text = response.message
+            else:
+                text = str(response)
+                
+            words = text.split(" ")
 
-    def run(self, user_input: str) -> str:        
-        """
-        Main entry point for the LangChain pipeline.
-        Accepts free-form input from the journalist and routes accordingly.
+            chunk_size = 5
+            for i in range(0, len(words), chunk_size):
+                chunk = " ".join(words[i:i + chunk_size])
+                if i + chunk_size < len(words):
+                    chunk += " "
+                yield f"data: {json.dumps({'text': chunk, 'done': False})}\n\n"
+                await asyncio.sleep(0.03)  # streaming speed ~150 words/second
 
-        Args:
-            user_input: e.g. "Research nutrition trends and write an article"
+            yield f"data: {json.dumps({'text': '', 'done': True})}\n\n"
 
-        Returns:
-            Orchestrator's final response as a string.
-        """
-        raise NotImplementedError("LangChain mode disabled — use run_pipeline_async().")
-        if not self._executor:
-            raise RuntimeError("Call build_agents() before run().")
+        except Exception as e:
+            logger.exception("Chat error for session %s", session_id)
+            yield f"data: {json.dumps({'error': str(e), 'done': True})}\n\n"
 
-        result = self._executor.invoke({"input": user_input})
-        return result["output"]
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",  
+        },
+    )
 
-    def chat_reader(self, message: str) -> ReaderResponse:
-        """
-        Direct entry point for reader chat — bypasses LangChain executor.
-        Used by the Streamlit UI's reader chatbot component.
+# ─────────────────────────────────────────────────────────────────────────────
+# Startup / Shutdown
+# ─────────────────────────────────────────────────────────────────────────────
 
-        Args:
-            message: Reader's message.
+from fastapi.staticfiles import StaticFiles
+static_path = PROJECT_ROOT / "static"
+if static_path.exists():
+    app.mount("/", StaticFiles(directory=static_path, html=True), name="frontend")
 
-        Returns:
-            ReaderResponse with Mauro's reply and metadata.
-        """
-        if not self._mauro:
-            raise RuntimeError("Call build_agents() before chat_reader().")
-        return self._mauro.chat(message)
+@app.on_event("startup")
+async def startup():
+    logger.info("newspaper_ai API started | newspaper=%s region=%s", NEWSPAPER_NAME, REGION,)
 
-    async def run_pipeline_async(self, query: str) -> OrchestratorResult:
-        """
-        Async version of the pipeline for production use.
-        Runs José + Camila in parallel, then Manuel, then Asti + Mauro setup
-        in parallel.
-
-        Args:
-            query: Research query for José.
-
-        Returns:
-            OrchestratorResult with all pipeline outputs.
-        """
-        if not self._jose:
-            raise RuntimeError("Call build_agents() before run_pipeline_async().")
-        
-        t0 = time.time()
-
-        # ── Step 1: José + Camila in parallel ─────────────────────────────────
-        print("Step 1/3 — José researching trends + Camila pre-loading sources...")
-        report, _ = await asyncio.gather(
-            asyncio.to_thread(self._jose.run, query),
-            asyncio.to_thread(self._camila.kb.retrieve, query, 4),
-        )
-        self._last_report = report
-
-        t1=time.time()
-        print(f"[TIMING] Stage 1 parallel (José + Camila warmup): {t1-t0:.2f}s")
-
-        # ── Step 2: Camila scores José's ideas ────────────────────────────────
-        print("Step 2/3 — Camila fact-checking ideas...")
-        fact_results = await asyncio.to_thread(
-            self._camila.run_batch, report.article_ideas
-        )
-        self._last_fact_results = fact_results
-        t2 = time.time()
-        print(f"[TIMING] Stage 2 (Camila fact-check batch): {t2-t1:.2f}s")
-
-        # Attach verdict + confidence to each ArticleIdea
-        for idea, result in zip(report.article_ideas, fact_results):
-            idea.confidence_score = result.confidence
-            idea.verdict = result.verdict
-
-        # ── Step 3: Journalist selects (console fallback) ─────────────────────
-        approved_ideas = self._select_ideas(report.article_ideas)
-
-        # ── Step 4: Manuel generates article ─────────────────────────────────
-        print("Step 3/3 — Manuel writing article...")
-        article = await asyncio.to_thread(self._manuel.run, approved_ideas[0])
-        self._last_article = article
-        t3 = time.time()
-        print(f"[TIMING] Stage 3 (Manuel article): {t3-t2:.2f}s")
-
-        # ── Step 5: Asti + Mauro setup in parallel ────────────────────────────
-        print("Publishing — Asti creating social pack, Mauro setting up...")
-        social_pack, _ = await asyncio.gather(
-            asyncio.to_thread(self._asti.run, article),
-            asyncio.to_thread(lambda: None),  # placeholder — Mauro.setup is sync
-        )
-        self._last_social_pack = social_pack
-        self._mauro.setup(article, social_pack)
-        t4 = time.time()
-        print(f"[TIMING] Stage 4 parallel (Asti + Mauro): {t4-t3:.2f}s")
-        print(f"[TIMING] ──────────────────────────────────")
-        print(f"[TIMING] Total pipeline: {t4-t0:.2f}s")
-        print(f"[TIMING] Throughput: {3600/(t4-t0):.0f} articles/hour (theoretical)")
-        
-        return OrchestratorResult(
-            research_report=report,
-            fact_check_results=fact_results,
-            approved_ideas=approved_ideas,
-            article=article,
-            social_pack=social_pack,
-        )
-
-    # ── Private helpers ───────────────────────────────────────────────────────
-    def _select_ideas(self, ideas: list[ArticleIdea]) -> list[ArticleIdea]:
-        if not os.isatty(0) or os.getenv("AUTO_SELECT_IDEAS"):
-            best = sorted(ideas, key=lambda x: x.local_relevance_score, reverse=True)
-            return [best[0]] if best else ideas[:1]        
-        # Local dev mode
-        print("\n" + "=" * 60)
-        for i, idea in enumerate(ideas, 1):
-            print(f"\n  [{i}] {idea.title}")
-        print("\n" + "-" * 60)
-        while True:
-            raw = input("Enter idea numbers to proceed (comma-separated, e.g. 1,3): ").strip()
-            try:
-                indices = [int(x.strip()) for x in raw.split(",")]
-                selected = [ideas[i - 1] for i in indices if 1 <= i <= len(ideas)]
-                if selected:
-                    return selected
-            except (ValueError, IndexError):
-                print("  Invalid input. Try again.")
+@app.on_event("shutdown")
+async def shutdown():
+    _chat_sessions.clear()
+    logger.info("newspaper_ai API shutdown")
