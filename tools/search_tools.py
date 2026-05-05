@@ -1,29 +1,32 @@
 """
 tools/search_tools.py
 ─────────────────────
-Herramientas que el News Research Agent puede invocar.
-Cada tool es una función Python pura + su descriptor para ADK/LangChain.
-Diseñadas para correr 100 % local; sin dependencias de GCloud.
-Búsqueda web:
-    Fuente principal → RSS de PubMed + Healthline
-    Fallback         → mock para desarrollo offline
-Tendencias:
-    Fuente principal → CSV de Google Trends (manual y local)
-    Fallback         → mock para desarrollo offline
+Tools that the News Research Agent can invoke.
+Each tool is a pure Python function + its descriptor for ADK/LangChain.
+Designed to run 100% locally; no GCloud dependencies.
+ 
+Web search:
+    Primary source → RSS from PubMed + Healthline
+    Fallback        → mock for offline development
+ 
+Trends:
+    Primary source → Google Trends CSV (manually exported, local)
+    Fallback        → mock for offline development
+ 
 Clickstream:
-    El sitio web del periódico escribirá eventos en
-    data/clickstream/events.jsonl con este formato por línea:
+    The newspaper website will write events to
+    data/clickstream/events.jsonl with this format per line:
     {
-      "article_id":   "dieta-mediterranea-2025-02-15",
-      "title":        "Dieta mediterránea y diabetes tipo 2",
-      "category":     "enfermedades y dieta",
+      "article_id":   "mediterranean-diet-2025-02-15",
+      "title":        "Mediterranean diet and type 2 diabetes",
+      "category":     "diseases and diet",
       "event":        "read" | "click" | "scroll",
-      "duration_sec": 142,      # solo en event="read"
-      "scroll_pct":   87,       # solo en event="scroll" (0-100)
+      "duration_sec": 142,      # only for event="read"
+      "scroll_pct":   87,       # only for event="scroll" (0-100)
       "timestamp":    "2025-03-10T14:32:00"
     }
-    Mientras el sitio no exista, get_clickstream_insights() genera datos
-    mock realistas para que José pueda usarlo desde ahora.
+    While the site does not exist, get_clickstream_insights() generates
+    realistic mock data so José can use it from the start.
 """
 from __future__ import annotations
 
@@ -39,7 +42,7 @@ import feedparser
 import requests
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 1. Búsqueda web (RSS de PubMed + Healthline → fallback mock)
+# 1. Web search (PubMed + Healthline RSS → mock fallback)
 # ─────────────────────────────────────────────────────────────────────────────
 
 RSS_SOURCES = {
@@ -49,10 +52,10 @@ RSS_SOURCES = {
 
 def web_search(query: str, num_results: int = 5) -> list[dict]:
     """
-    Busca artículos recientes de nutrición y salud.
-    Fuente principal: RSS de PubMed + Healthline (gratis, sin API key).
-    Fallback:         mock para desarrollo offline.
-    Devuelve lista de:
+    Searches for recent nutrition and health articles.
+    Primary source: PubMed + Healthline RSS (free, no API key required).
+    Fallback:       mock for offline development.
+    Returns a list of:
         {"title": str, "url": str, "snippet": str, "source": str}
     """
     results = _rss_search(query, num_results)
@@ -62,12 +65,12 @@ def web_search(query: str, num_results: int = 5) -> list[dict]:
 
 def _rss_search(query: str, num: int) -> list[dict]:
     """
-    Busca en RSS de PubMed (query-specific) y Healthline (feed general).
-    Devuelve lista vacía si ambas fuentes fallan — web_search cae al mock.
+    Searches PubMed RSS (query-specific) and Healthline (general feed).
+    Returns an empty list if both sources fail — web_search falls back to mock.
     """
     results: list[dict] = []
 
-    # PubMed — RSS específico por query
+    # PubMed — query-specific RSS
     try:
         pubmed_url = RSS_SOURCES["pubmed"].format(query=requests.utils.quote(query))
         feed = feedparser.parse(pubmed_url)
@@ -81,7 +84,7 @@ def _rss_search(query: str, num: int) -> list[dict]:
     except Exception:
         pass
 
-    # Healthline — feed general, filtramos por query en título/resumen
+    # Healthline — general feed, filtered by query in title/summary
     if len(results) < num:
         try:
             feed = feedparser.parse(RSS_SOURCES["healthline"])
@@ -107,18 +110,18 @@ def _mock_search(query: str, num: int) -> list[dict]:
     return []
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 2. Tendencias (CSV de Google Trends → fallback mock)
+# 2. Trends (Google Trends CSV → mock fallback)
 # ─────────────────────────────────────────────────────────────────────────────
 
 TRENDS_CSV = os.getenv("TRENDS_CSV_PATH", "data/trends/trends.csv")
 
 def get_trending_topics(region: str = "ES") -> list[str]:
     """
-    Obtiene temas en tendencia de nutrición.
-    Fuente principal: CSV exportado manualmente de Google Trends.
-    Fallback:         mock para desarrollo offline.
-    El parámetro `region` se mantiene para cuando el orchestrador lo pase,
-    aunque el CSV ya viene filtrado por región desde Google Trends.
+    Retrieves trending nutrition topics.
+    Primary source: CSV manually exported from Google Trends.
+    Fallback:       mock for offline development.
+    The `region` parameter is kept for when the orchestrator passes it,
+    although the CSV is already filtered by region from Google Trends.
     """
     if os.path.exists(TRENDS_CSV):
         return _read_trends_csv(TRENDS_CSV)
@@ -126,20 +129,19 @@ def get_trending_topics(region: str = "ES") -> list[str]:
 
 def _read_trends_csv(path: str) -> list[str]:
     """
-    Lee el CSV exportado de Google Trends.
-    TODO: ajustar el nombre de columna cuando el compañero suba el CSV real.
-    Formato esperado (Google Trends export):
-        Término de búsqueda, Valor
-        proteínas y músculo,  100
-        dieta cetogénica,      85
+    Reads the CSV exported from Google Trends.
+    TODO: adjust column name once the teammate uploads the real CSV.
+    Expected format (Google Trends export):
+        Search term, Value
+        proteins and muscle,  100
+        ketogenic diet,        85
         ...
     """
     topics: list[str] = []
     try:
         with open(path, encoding="utf-8") as f:
             reader = csv.DictReader(f)
-            for row in reader:
-                # TODO: confirmar nombre exacto de columna con el compañero
+            for row in reader:            
                 term = row.get("Término de búsqueda") or row.get("term") or ""
                 if term:
                     topics.append(term.strip())
@@ -162,7 +164,7 @@ def _mock_trending_topics() -> list[str]:
     ]
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 3. Clickstream — comportamiento real de lectores en el sitio
+# 3. Clickstream — real reader behavior on the site
 # ─────────────────────────────────────────────────────────────────────────────
 
 CLICKSTREAM_DIR  = os.getenv("CLICKSTREAM_DIR", "data/clickstream")
@@ -172,14 +174,14 @@ def log_event(
     article_id: str,
     title: str,
     category: str,
-    event: str,                     # "read" | "click" | "scroll"
-    duration_sec: int = 0,          # segundos leyendo (event="read")
-    scroll_pct: int = 0,            # % de scroll completado (event="scroll")
+    event: str,                     
+    duration_sec: int = 0,          
+    scroll_pct: int = 0,          
 ) -> None:
     """
-    Registra un evento de comportamiento del lector.
-    Llamado desde el sitio web del diario cuando se construya.
-    El archivo events.jsonl crece con una línea JSON por evento.
+    Logs a reader behavior event.
+    Called from the newspaper website once it is built.
+    The events.jsonl file grows with one JSON line per event.
     """
     Path(CLICKSTREAM_DIR).mkdir(parents=True, exist_ok=True)
     entry = {
@@ -194,16 +196,15 @@ def log_event(
     with open(CLICKSTREAM_FILE, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
-
 def get_clickstream_insights(days: int = 7) -> dict:
     """
-    Lee events.jsonl y devuelve métricas de engagement por categoría
-    y por artículo para los últimos `days` días.
-    Retorna:
+    Reads events.jsonl and returns engagement metrics by category
+    and by article for the last `days` days.
+    Returns:
     {
       "by_category": {
-        "recetas":         {"clicks": 312, "avg_read_sec": 198, "avg_scroll_pct": 84},
-        "pérdida de peso": {"clicks": 287, "avg_read_sec": 231, "avg_scroll_pct": 79},
+        "recipes":           {"clicks": 312, "avg_read_sec": 198, "avg_scroll_pct": 84},
+        "weight loss":       {"clicks": 287, "avg_read_sec": 231, "avg_scroll_pct": 79},
         ...
       },
       "top_articles": [
@@ -220,7 +221,7 @@ def get_clickstream_insights(days: int = 7) -> dict:
     return _mock_clickstream_insights()
 
 def _parse_clickstream(days: int) -> dict:
-    """Procesa el archivo real de eventos."""
+    """Processes the real events file."""
     cutoff = datetime.now() - timedelta(days=days)
 
     by_category: dict[str, dict] = defaultdict(lambda: {
@@ -295,9 +296,9 @@ def _parse_clickstream(days: int) -> dict:
 
 def _mock_clickstream_insights() -> dict:
     """
-    Datos mock realistas para cuando el sitio aún no existe.
-    Simula una semana típica del periódico de nutrición.
-    TODO: actualizar categorías cuando el Content Engineer defina las oficiales.
+    Realistic mock data for when the site does not yet exist.
+    Simulates a typical week for the nutrition newspaper.
+    TODO: update categories once the Content Engineer defines the official ones.
     """
     return {
         "by_category": {
@@ -334,8 +335,8 @@ def _mock_clickstream_insights() -> dict:
 
 def format_insights_for_prompt(insights: dict) -> str:
     """
-    Convierte el dict de insights en texto legible para inyectar
-    en el prompt de José.
+    Converts the insights dict into readable text to inject
+    into José's prompt.
     """
     lines = [
         f"COMPORTAMIENTO DE LECTORES (últimos {insights['period_days']} días)"
@@ -363,7 +364,7 @@ def format_insights_for_prompt(insights: dict) -> str:
     return "\n".join(lines)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 4. Descriptores para ADK / LangChain function-calling
+# 4. Descriptors for ADK / LangChain function-calling
 # ─────────────────────────────────────────────────────────────────────────────
 
 TOOL_SCHEMAS: list[dict[str, Any]] = [
@@ -414,7 +415,7 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
     },
 ]
 
-# Dispatch map para el agente (nombre → función)
+# Dispatch map for the agent (name → function)
 TOOL_DISPATCH: dict[str, Any] = {
     "web_search":               web_search,
     "get_trending_topics":      get_trending_topics,
