@@ -218,6 +218,34 @@ async def fact_check_single(text: str):
     except Exception as e:
         logger.exception("Error in fact-check")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/trends/verified", tags=["content"])
+async def get_trends_verified(topic: str = "nutrición tendencias salud"):
+    try:
+        (NewsResearchAgent, JoseKB, _, CamilaKB, *_rest) = _import_agents()
+        from camila_fact_checking.agent import FactCheckingAgent
+
+        jose   = NewsResearchAgent(knowledge_base=JoseKB())
+        camila = FactCheckingAgent(knowledge_base=CamilaKB())
+
+        report  = await asyncio.to_thread(jose.run, topic)
+        trending = report.trending_topics or []
+
+        async def verify_one(t):
+            r = await asyncio.to_thread(camila.verify_url, t)
+            return {"topic": t, "relevance": 1.0,
+                    "verdict": r.verdict, "confidence": r.confidence}
+
+        verified = await asyncio.gather(*[verify_one(t) for t in trending])
+
+        order    = {"truthful": 0, "doubtful": 1, "untruthful": 2}
+        verified = sorted(verified, key=lambda x: order.get(x["verdict"], 3))
+
+        return {"trends": list(verified), "fetched_at": time.time()}
+
+    except Exception as e:
+        logger.exception("Error fetching verified trends")
+        raise HTTPException(status_code=500, detail=str(e))
     
 # ─────────────────────────────────────────────────────────────────────────────
 # POST /api/pipeline/run — Full async Pipeline      
