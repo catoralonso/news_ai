@@ -2,10 +2,8 @@
 api_main.py
 ───────────
 FastAPI gateway for the Savia newspaper AI system.
-
 Exposes the endpoints consumed by the Lovable frontend.
 Runs as the single process in the HF Space container.
-
 Endpoints:
     GET  /health                    → health check
     GET  /api/trends                → latest trends (José, no full pipeline)
@@ -15,10 +13,8 @@ Endpoints:
     GET  /api/articles/{article_id} → single article
     GET  /api/social/{article_id}   → SocialMediaPack for an article
     POST /api/chat                  → Mauro chatbot (SSE streaming)
-
 Local usage:
     uvicorn api_main:app --reload --port 8080
-
 Required environment variables:
     ANTHROPIC_API_KEY=...
 """
@@ -88,34 +84,34 @@ app = FastAPI(
 )
 
 # "CORS — allow calls from the Lovable frontend and localhost for development"
-class CORSMiddlewareCustom(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        origin = request.headers.get("origin", "")
+#class CORSMiddlewareCustom(BaseHTTPMiddleware):
+#    async def dispatch(self, request: Request, call_next):
+#        origin = request.headers.get("origin", "")
         
         # Handle OPTIONS preflight
-        if request.method == "OPTIONS":
-            from starlette.responses import Response
-            response = Response()
-            response.headers["Access-Control-Allow-Origin"] = origin
-            response.headers["Access-Control-Allow-Credentials"] = "true"
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-            response.headers["Access-Control-Allow-Headers"] = "*"
-            return response
-            
-        response = await call_next(request)
-        if any([
-            "lovable.app" in origin,
-            "lovableproject.com" in origin,
-            "lovable.dev" in origin,
-            "localhost" in origin,
-        ]):
-            response.headers["Access-Control-Allow-Origin"] = origin
-            response.headers["Access-Control-Allow-Credentials"] = "true"
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-            response.headers["Access-Control-Allow-Headers"] = "*"
-        return response
+#        if request.method == "OPTIONS":
+#            from starlette.responses import Response
+#            response = Response()
+#            response.headers["Access-Control-Allow-Origin"] = origin
+#            response.headers["Access-Control-Allow-Credentials"] = "true"
+#            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+#            response.headers["Access-Control-Allow-Headers"] = "*"
+#            return response
+#            
+#        response = await call_next(request)
+#        if any([
+#            "lovable.app" in origin,
+#            "lovableproject.com" in origin,
+#            "lovable.dev" in origin,
+#            "localhost" in origin,
+#        ]):
+#            response.headers["Access-Control-Allow-Origin"] = origin
+#            response.headers["Access-Control-Allow-Credentials"] = "true"
+#            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+#            response.headers["Access-Control-Allow-Headers"] = "*"
+#        return response
 
-app.add_middleware(CORSMiddlewareCustom)
+#app.add_middleware(CORSMiddlewareCustom)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Request / Response models
@@ -207,7 +203,22 @@ async def get_trends(topic: str = "nutrición tendencias salud"):
         logger.exception("Error fetching trends")
         raise HTTPException(status_code=500, detail=str(e))
 
-
+@app.get("/api/fact-check", tags=["content"])
+async def fact_check_single(text: str):
+    try:
+        (_, _, _, CamilaKB, *_rest) = _import_agents()
+        from camila_fact_checking.agent import FactCheckingAgent
+        camila = FactCheckingAgent(knowledge_base=CamilaKB())
+        result = await asyncio.to_thread(camila.verify_url, text)
+        return {
+            "verdict":    result.verdict,
+            "confidence": result.confidence,
+            "reason":     result.reason,
+        }
+    except Exception as e:
+        logger.exception("Error in fact-check")
+        raise HTTPException(status_code=500, detail=str(e))
+    
 # ─────────────────────────────────────────────────────────────────────────────
 # POST /api/pipeline/run — Full async Pipeline      
 # ─────────────────────────────────────────────────────────────────────────────
@@ -218,7 +229,6 @@ async def run_pipeline(request: PipelineRequest, background_tasks: BackgroundTas
     Launch full pipeline:
       José (trends) → Camila (fact-check) simultaneously →
       Manuel (article) → Asti (social media)
-
     Returns a job_id. Client mades polling to
     GET /api/pipeline/status/{job_id} to know when its finished.
     """
@@ -249,7 +259,7 @@ async def _run_pipeline_task(job_id: str, request: PipelineRequest):
 
         # Saves the article as JSON and returns its ID.
         article = result.article if hasattr(result, "article") else result
-        article_id = _save_article(article, job_id)
+        article_id = _save_article(article, job_id, result.fact_check_results)
         
         # Update to more recent social pack with article_id
         social_dir = _get_social_dir()
@@ -264,9 +274,10 @@ async def _run_pipeline_task(job_id: str, request: PipelineRequest):
         _jobs[job_id] = {
             "status": "done",
             "result": {
-                "article_id": article_id,
-                "title": getattr(article, "title", "Sin título"),
-                "social_saved": True,
+                "article_id":    article_id,
+                "title":         getattr(article, "title", "Sin título"),
+                "social_saved":  True,
+                "fact_check":    [r.to_dict() for r in result.fact_check_results],
             },
             "error": None,
         }
@@ -277,12 +288,14 @@ async def _run_pipeline_task(job_id: str, request: PipelineRequest):
         _jobs[job_id] = {"status": "error", "result": None, "error": str(e)}
 
 
-def _save_article(article, job_id: str) -> str:
+def _save_article(article, job_id: str, fact_results=None) -> str:
     """Saves the article as JSON and returns its ID."""
     article_id = f"art_{job_id}_{int(time.time())}"
     path = _get_articles_dir() / f"{article_id}.json"
     data = article.to_dict() if hasattr(article, "to_dict") else vars(article)
     data["_id"] = article_id
+    if fact_results:
+        data["_fact_check"] = [r.to_dict() for r in fact_results]
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     return article_id
