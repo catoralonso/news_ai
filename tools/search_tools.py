@@ -2,18 +2,14 @@
 tools/search_tools.py
 ─────────────────────
 Herramientas que el News Research Agent puede invocar.
-
 Cada tool es una función Python pura + su descriptor para ADK/LangChain.
 Diseñadas para correr 100 % local; sin dependencias de GCloud.
-
 Búsqueda web:
     Fuente principal → RSS de PubMed + Healthline
     Fallback         → mock para desarrollo offline
-
 Tendencias:
     Fuente principal → CSV de Google Trends (manual y local)
     Fallback         → mock para desarrollo offline
-
 Clickstream:
     El sitio web del periódico escribirá eventos en
     data/clickstream/events.jsonl con este formato por línea:
@@ -29,7 +25,6 @@ Clickstream:
     Mientras el sitio no exista, get_clickstream_insights() genera datos
     mock realistas para que José pueda usarlo desde ahora.
 """
-
 from __future__ import annotations
 
 import csv
@@ -40,9 +35,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-import feedparser  # pip install feedparser
+import feedparser
 import requests
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 1. Búsqueda web (RSS de PubMed + Healthline → fallback mock)
@@ -53,14 +47,11 @@ RSS_SOURCES = {
     "healthline": "https://www.healthline.com/rss/health-news",
 }
 
-
 def web_search(query: str, num_results: int = 5) -> list[dict]:
     """
     Busca artículos recientes de nutrición y salud.
-
     Fuente principal: RSS de PubMed + Healthline (gratis, sin API key).
     Fallback:         mock para desarrollo offline.
-
     Devuelve lista de:
         {"title": str, "url": str, "snippet": str, "source": str}
     """
@@ -68,7 +59,6 @@ def web_search(query: str, num_results: int = 5) -> list[dict]:
     if results:
         return results
     return _mock_search(query, num_results)
-
 
 def _rss_search(query: str, num: int) -> list[dict]:
     """
@@ -112,25 +102,9 @@ def _rss_search(query: str, num: int) -> list[dict]:
 
     return results[:num]
 
-
 def _mock_search(query: str, num: int) -> list[dict]:
     """Resultados ficticios para desarrollo offline."""
-    today = datetime.now().strftime("%d/%m/%Y")
-    return [
-        {
-            "title":   f"[MOCK] Evidencia científica: {query}",
-            "url":     "https://example.com/mock-1",
-            "snippet": f"Estudio reciente sobre '{query}'. Expertos en nutrición señalan nuevos hallazgos.",
-            "source":  "mock-nutrition.local",
-        },
-        {
-            "title":   f"[MOCK] Guía práctica: {query} ({today})",
-            "url":     "https://example.com/mock-2",
-            "snippet": f"Recomendaciones dietéticas basadas en evidencia sobre '{query}'.",
-            "source":  "mock-nutrition.local",
-        },
-    ][:num]
-
+    return []
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 2. Tendencias (CSV de Google Trends → fallback mock)
@@ -141,10 +115,8 @@ TRENDS_CSV = os.getenv("TRENDS_CSV_PATH", "data/trends/trends.csv")
 def get_trending_topics(region: str = "ES") -> list[str]:
     """
     Obtiene temas en tendencia de nutrición.
-
     Fuente principal: CSV exportado manualmente de Google Trends.
     Fallback:         mock para desarrollo offline.
-
     El parámetro `region` se mantiene para cuando el orchestrador lo pase,
     aunque el CSV ya viene filtrado por región desde Google Trends.
     """
@@ -152,12 +124,10 @@ def get_trending_topics(region: str = "ES") -> list[str]:
         return _read_trends_csv(TRENDS_CSV)
     return _mock_trending_topics()
 
-
 def _read_trends_csv(path: str) -> list[str]:
     """
     Lee el CSV exportado de Google Trends.
     TODO: ajustar el nombre de columna cuando el compañero suba el CSV real.
-
     Formato esperado (Google Trends export):
         Término de búsqueda, Valor
         proteínas y músculo,  100
@@ -176,7 +146,6 @@ def _read_trends_csv(path: str) -> list[str]:
     except Exception:
         pass
     return topics[:10]
-
 
 def _mock_trending_topics() -> list[str]:
     return [
@@ -199,7 +168,6 @@ def _mock_trending_topics() -> list[str]:
 CLICKSTREAM_DIR  = os.getenv("CLICKSTREAM_DIR", "data/clickstream")
 CLICKSTREAM_FILE = os.path.join(CLICKSTREAM_DIR, "events.jsonl")
 
-
 def log_event(
     article_id: str,
     title: str,
@@ -211,7 +179,6 @@ def log_event(
     """
     Registra un evento de comportamiento del lector.
     Llamado desde el sitio web del diario cuando se construya.
-
     El archivo events.jsonl crece con una línea JSON por evento.
     """
     Path(CLICKSTREAM_DIR).mkdir(parents=True, exist_ok=True)
@@ -232,7 +199,6 @@ def get_clickstream_insights(days: int = 7) -> dict:
     """
     Lee events.jsonl y devuelve métricas de engagement por categoría
     y por artículo para los últimos `days` días.
-
     Retorna:
     {
       "by_category": {
@@ -252,7 +218,6 @@ def get_clickstream_insights(days: int = 7) -> dict:
     if os.path.exists(CLICKSTREAM_FILE):
         return _parse_clickstream(days)
     return _mock_clickstream_insights()
-
 
 def _parse_clickstream(days: int) -> dict:
     """Procesa el archivo real de eventos."""
@@ -328,7 +293,6 @@ def _parse_clickstream(days: int) -> dict:
         "source":       "real",
     }
 
-
 def _mock_clickstream_insights() -> dict:
     """
     Datos mock realistas para cuando el sitio aún no existe.
@@ -368,7 +332,6 @@ def _mock_clickstream_insights() -> dict:
         "source":       "mock",
     }
 
-
 def format_insights_for_prompt(insights: dict) -> str:
     """
     Convierte el dict de insights en texto legible para inyectar
@@ -398,7 +361,6 @@ def format_insights_for_prompt(insights: dict) -> str:
         lines.append(f"  {i}. [{art['category']}] {art['title']} — {art['clicks']} clicks")
 
     return "\n".join(lines)
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 4. Descriptores para ADK / LangChain function-calling
@@ -451,7 +413,6 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         },
     },
 ]
-
 
 # Dispatch map para el agente (nombre → función)
 TOOL_DISPATCH: dict[str, Any] = {
