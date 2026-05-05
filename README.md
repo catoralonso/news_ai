@@ -1,30 +1,24 @@
----
-title: Savia
-emoji: 🌿
-colorFrom: pink
-colorTo: green
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # 🌿 Savia — AI-Powered Nutrition Newsroom
 
-> An autonomous multi-agent system that runs a nutrition newspaper end-to-end: from trend research to published articles, social media, and reader interaction — fully automated on Google Cloud. For the Demo go to the tab 'Redaccion'
+> An autonomous multi-agent system that runs a nutrition newspaper end-to-end: from trend research to published articles, social media, and reader interaction. For the Demo go to the link:
+> 
+🔗 **[Live Demo](https://huggingface.co/spaces/catoralonso/news_savia)**
 
-![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
-![Claude](https://img.shields.io/badge/Claude_Haiku-Anthropic-D97706?logo=anthropic&logoColor=white)
-![Cloud Run](https://img.shields.io/badge/Cloud_Run-Deployed-34A853?logo=googlecloud&logoColor=white)
+**General**
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Gateway-009688?logo=fastapi&logoColor=white)
-![Terraform](https://img.shields.io/badge/Infra-Terraform-7B42BC?logo=terraform&logoColor=white)
 
-🔗 **[Live Demo](https://savia-nutricion-inteligente.lovable.app/)**
+**Current — Anthropic + Hugging Face**
+![HuggingFace](https://img.shields.io/badge/Hosted-HuggingFace_Spaces-FFD21E?logo=huggingface&logoColor=black)
+![Claude](https://img.shields.io/badge/Claude_Haiku_4.5_·_Sonnet_4.6-Anthropic-D97706?logo=anthropic&logoColor=white)
+
+**Legacy — Google Cloud Platform**
+![Cloud Run](https://img.shields.io/badge/Cloud_Run-Deployed-34A853?logo=googlecloud&logoColor=white)
+![Terraform](https://img.shields.io/badge/Infra-Terraform-7B42BC?logo=terraform&logoColor=white)
 
 ---
 
 ## What does it do?
-
-Every morning at 07:00 CET, the system wakes up and runs automatically:
 
 1. **Researches** trending nutrition topics from RSS feeds, Google Trends, and reader clickstream
 2. **Fact-checks** the findings before anything gets written
@@ -38,11 +32,14 @@ No manual intervention. Journalists focus on deep investigative work.
 
 ## Architecture
 
+Frontedn for GCP was in Lovable in the tab "Redaccion" were the agents, they dont work due to migration to Anthropic (check live demo above)
+🔗 **[Link](https://savia-nutricion-inteligente.lovable.app/)
+
 ```
-Lovable (React frontend)
-        │  HTTPS + CORS
+Vanilla JS (static frontend · Hugging Face Spaces) 
+        │  HTTPS
         ▼
-FastAPI Gateway  ←  Cloud Run (single container)
+FastAPI Gateway  ←  Hugging Face Spaces (Docker) | Cloud Run in GCP (legacy)
         │
         ▼
    Orchestrator
@@ -63,6 +60,7 @@ Asti (social media)        Mauro (reader chatbot)
 Research and fact-checking run **in parallel**. Social media and chatbot spin up **in parallel** once the article is ready. Two `asyncio.gather` stages cut total pipeline time significantly.
 
 ---
+
 ## Performance (measured)
 
 | Stage | Time | Notes |
@@ -80,6 +78,8 @@ Research and fact-checking run **in parallel**. Social media and chatbot spin up
 
 **Chatbot:** Live demo at the March 2026 university exposition. Mauro answered reader questions in real-time, grounded in articles generated minutes earlier by the pipeline.
 
+---
+
 ## The Agents
 
 | Agent | Role | Key decisions |
@@ -87,9 +87,9 @@ Research and fact-checking run **in parallel**. Social media and chatbot spin up
 | **José** | Trend research · topic discovery | RSS (PubMed, Healthline) + Google Trends + clickstream; `temp=0.4` |
 | **Camila** | Dual-mode fact-checking | Batch pipeline + live reader verification; 3-class verdict (`truthful / doubtful / untruthful`) |
 | **Manuel** | Article generation | RAG-grounded writing with style examples; `temp=0.2` for consistency |
-| **Asti** | Social media distribution | Twitter/X live; Instagram caption + Imagen prompt; `temp=0.7` |
+| **Asti** | Social media distribution | Twitter/X live; Instagram caption + image prompt; `temp=0.7` |
 | **Mauro** | Reader chatbot | SSE streaming; routes fact-check requests to Camila in real-time |
-| **Orchestrator** | Pipeline coordination | Manual trigger via API or daily cron via Cloud Scheduler |
+| **Orchestrator** | Pipeline coordination | Manual trigger via API or daily cron |
 
 ---
 
@@ -107,14 +107,23 @@ reader_interaction  ← Mauro: FAQs, recurring question patterns
 social_media        ← Asti: high-performing post examples
 ```
 
-**Embeddings:** `gemini-embedding-001` via Vertex AI  
+**Embeddings:** `all-MiniLM-L6-v2` (ChromaDB default)  
 **Camila's RAG is selective:** only `untruthful` verdicts are persisted — keeps the collection signal-dense.
 
 ---
 
 ## Infrastructure
 
-Everything provisioned with a single `terraform apply`. No manual GCP console steps.
+### Current — Hugging Face Spaces
+
+| Service | Purpose |
+|---------|---------|
+| **Hugging Face Spaces** | Hosts FastAPI container + static frontend (Docker) |
+| **Anthropic API** | LLM inference · Haiku 4.5 + Sonnet 4.6 |
+
+### Legacy — Google Cloud Platform
+
+Full GCP infrastructure preserved in [`/gcp_infrastructure`](./gcp_infrastructure).
 
 | Service | Purpose |
 |---------|---------|
@@ -125,7 +134,7 @@ Everything provisioned with a single `terraform apply`. No manual GCP console st
 | **Cloud Logging** | Structured logs from all agents |
 | **Cloud Trace (OTel)** | Per-request spans · auto-activates in GCP, no-op locally |
 
-Observability uses module-level auto-detection: if `GOOGLE_CLOUD_PROJECT` is set → full tracing + logging. Otherwise → silent local fallback. Zero code branches between environments.
+GCP infra was provisioned with a single `terraform apply`. Migrated to HF Spaces to eliminate GCP billing dependency — Anthropic's free tier covers the full pipeline at this scale.
 
 ---
 
@@ -146,23 +155,23 @@ Observability uses module-level auto-detection: if `GOOGLE_CLOUD_PROJECT` is set
 ## Stack
 
 ```
-LLM          Claude Haiku 4.5 (José, Camila, Asti, Mauro) · Claude Sonnet 4.6 (Manuel)
+LLM            Claude Haiku 4.5 (José, Camila, Asti, Mauro) · Claude Sonnet 4.6 (Manuel) · Gemini 2.5 flash (GCP legacy)
 Orchestration  LangChain · asyncio.gather
-RAG          ChromaDB · gemini-embedding-001
-API          FastAPI · SSE streaming
-Frontend     Lovable (React) · CORS configured
-Infra        Terraform · Cloud Run · Cloud Scheduler · Secret Manager
-Observability  Cloud Logging · Cloud Trace · OpenTelemetry
-Social       Twitter/X API · Vertex AI Imagen (Instagram)
+RAG            ChromaDB · all-MiniLM-L6-v2
+API            FastAPI · SSE streaming
+Frontend       Vanilla JS in Hugging Face Spaces · Lovable/React (GCP legacy)
+Infra          Hugging Face Spaces (Docker) · GCP legacy in /gcp_infrastructure
+Observability  Python logging
+Social         Twitter/X · Instagram · Carrousel · Newsletter (mockups)
 ```
 
 ---
 
 ## Engineering Decisions Worth Noting
 
-- **ChromaDB over Vertex AI Vector Search** — local-first, no GCP dependency during dev; swappable via the `VectorStore` wrapper
+- **ChromaDB over Vertex AI Vector Search** — local-first, no GCP dependency during dev; swappable via the `VectorStore` wrapper. Only to avoid GCP billing.
 - **FastAPI over Streamlit** — proper async support, background jobs, SSE streaming
-- **Claude over Gemini** — migrated from Vertex AI due to API instability; Anthropic's API is significantly more reliable for production pipelines. Haiku for speed (José, Camila, Asti), Sonnet for quality (Manuel)
+- **Claude over Gemini** — migrated from Vertex AI to avoid GCP billing; Anthropic's free tier covers the full pipeline at this scale. Haiku for speed (José, Camila, Asti), Sonnet for quality (Manuel)
 - **Temperature is intentional per agent** — `0.2` for Manuel (factual precision), `0.7` for Asti (creative copy)
 - **Camila's fallback verdict is `no_information`** — avoids false positives polluting the fact-check collection
 
@@ -183,8 +192,8 @@ NEWSPAPER_NAME=Savia
 python orchestrator_run.py
 ```
 
-For production deploy → see [Infrastructure](#infrastructure) section and `infra/main.tf`.
+For legacy GCP deploy → see [`/gcp_infrastructure`](./gcp_infrastructure).
 
 ---
 
-*Built as a course capstone project. Live exposition: March 2025.*
+*Built as a course capstone project. Live exposition: March 2026.*
