@@ -24,6 +24,3 @@ data/embeddings/
 
 # GCP legacy
 gcp_infraestructure/
-
-# Docker
-.dockerignoredata/embeddings/
