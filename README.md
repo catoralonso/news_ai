@@ -33,8 +33,8 @@ No manual intervention. Journalists focus on deep investigative work.
 
 ## Architecture
 
-Frontedn for GCP was in Lovable in the tab "Redaccion" were the agents, they dont work due to migration to Anthropic (check live demo above)
-🔗 **[Link](https://savia-nutricion-inteligente.lovable.app/)
+Frontend for GCP was in Lovable in the tab "Redaccion" were the agents, they dont work due to migration to Anthropic (check live demo above)
+> 🔗 **[Link](https://savia-nutricion-inteligente.lovable.app/)
 
 ```
 Vanilla JS (static frontend · Hugging Face Spaces) 
