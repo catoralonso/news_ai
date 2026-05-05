@@ -119,6 +119,12 @@
   .trend-chip { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--cream); border: 1.5px solid var(--border); border-radius: 100px; padding: 0.45rem 1rem; font-size: 0.8rem; font-weight: 600; color: var(--brown); cursor: pointer; transition: all 0.2s; }
   .trend-chip:hover { background: var(--blush); border-color: var(--rose); transform: translateY(-1px); }
   .trend-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); flex-shrink: 0; }
+  .trend-chip.truthful  { border-color: #2d6a4f; }
+  .trend-chip.truthful .dot  { background: #2d6a4f; }
+  .trend-chip.doubtful  { border-color: #e9a800; }
+  .trend-chip.doubtful .dot  { background: #e9a800; }
+  .trend-chip.untruthful{ border-color: #c1121f; }
+  .trend-chip.untruthful .dot{ background: #c1121f; }
 
   /* ── PIPELINE ── */
   .pipeline-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; margin-bottom: 1.75rem; }
@@ -240,6 +246,11 @@
       <input type="text" id="trend-topic" placeholder="ej. vitamina D, dieta mediterránea…" style="max-width:340px;"/>
       <button class="btn btn-rose" onclick="fetchTrends()">🔍 Buscar tendencias</button>
     </div>
+    <div style="display:flex;gap:0.75rem;margin-top:0.75rem;font-size:0.72rem;font-weight:600;color:var(--muted);">
+      <span>🟢 truthful</span>
+      <span>🟡 doubtful</span>
+      <span>🔴 untruthful</span>
+    </div>
     <div id="trends-output">
       <div class="empty"><div class="empty-illo">🌱</div><p>Escribe un tema y pulsa buscar para que José investigue</p></div>
     </div>
@@ -311,7 +322,6 @@
 
 <script>
 const API = '';
-
 function showSection(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -319,7 +329,6 @@ function showSection(id, btn) {
   if (btn) btn.classList.add('active');
   if (id === 'articles') loadArticles();
 }
-
 function toast(msg) {
   const el = document.createElement('div');
   el.className = 'toast';
@@ -327,34 +336,32 @@ function toast(msg) {
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 3000);
 }
-
 async function fetchTrends() {
   const topic = document.getElementById('trend-topic').value.trim() || 'nutrición tendencias salud';
   const out = document.getElementById('trends-output');
   out.innerHTML = '<div class="status-msg">🌿 José está investigando...</div>';
   try {
-    const res = await fetch(`${API}/api/trends?topic=${encodeURIComponent(topic)}`);
+    const res = await fetch(`${API}/api/trends/verified?topic=${encodeURIComponent(topic)}`);
     const data = await res.json();
     const trends = data.trends || [];
     if (!trends.length) { out.innerHTML = '<div class="empty"><div class="empty-illo">🌾</div><p>Sin tendencias — prueba otro tema</p></div>'; return; }
     out.innerHTML = `<p style="font-size:0.75rem;font-weight:600;color:var(--muted);margin-bottom:0.75rem;letter-spacing:0.05em;text-transform:uppercase;">${trends.length} temas encontrados · Pulsa uno para lanzar el pipeline</p>
     <div class="trend-chips">${trends.map(t => {
-      const label = typeof t === 'string' ? t : (t.topic || JSON.stringify(t));
-      return `<span class="trend-chip" onclick="useTrend('${label.replace(/'/g,"\\'")}')"><span class="dot"></span>${label}</span>`;
-    }).join('')}</div>`;
+      const label   = typeof t === 'string' ? t : (t.topic || JSON.stringify(t));
+      const verdict = t.verdict || '';
+      const icons   = { truthful: '🟢', doubtful: '🟡', untruthful: '🔴' };
+      const icon    = icons[verdict] || '';
+      return `<span class="trend-chip ${verdict}" onclick="useTrend('${label.replace(/'/g,"\\'")}')"><span class="dot"></span>${icon} ${label}</span>`;
   } catch(e) { out.innerHTML = `<div class="status-msg error">Error: ${e.message}</div>`; }
 }
-
 function useTrend(topic) {
   document.getElementById('pipeline-topic').value = topic;
   document.querySelectorAll('.nav-btn')[1].click();
   toast('✦ Tema cargado en el pipeline');
 }
-
 let _pollTimer = null;
 function resetSteps() { ['jose','camila','manuel','asti','mauro'].forEach(a => { document.getElementById('step-' + a).className = 'step-card'; }); }
 function setStep(a, s) { document.getElementById('step-' + a).className = 'step-card ' + s; }
-
 async function runPipeline() {
   const topic = document.getElementById('pipeline-topic').value.trim();
   const btn = document.getElementById('pipeline-btn');
@@ -386,20 +393,30 @@ async function runPipeline() {
     }, 3000);
   } catch(e) { statusEl.className = 'status-msg error'; statusEl.textContent = '⚠ ' + e.message; btn.disabled = false; resetSteps(); }
 }
-
+function camilaBadge(factCheck) {
+  if (!factCheck || !factCheck.length) return '✅ Verificado por Camila';
+  const approved = factCheck.find(r => r.verdict === 'truthful')
+                || factCheck.find(r => r.verdict === 'doubtful')
+                || factCheck[0];
+  const icons = { truthful: '🟢', doubtful: '🟡', untruthful: '🔴' };
+  const icon = icons[approved.verdict] || '✅';
+  const pct  = Math.round((approved.confidence || 0) * 100);
+  return `${icon} Camila: ${approved.verdict} · ${pct}% confianza`;
+}
+  
 function showPipelineResult(result) {
   if (!result) return;
   document.getElementById('pipeline-result').innerHTML = `
     <div class="card" style="margin-top:1.5rem;background:linear-gradient(135deg,var(--warm),#FFF0EA);">
       <div class="card-meta"><span class="pill pill-sage">✓ Artículo generado</span></div>
       <div class="card-title">${result.title || 'Sin título'}</div>
+      <div class="art-byline" style="margin-top:0.5rem;">✍️ Manuel · ${camilaBadge(result.fact_check)} · 🌿 Savia</div>
       <div style="margin-top:1rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
         <button class="btn btn-outline" onclick="document.querySelectorAll('.nav-btn')[2].click()">📰 Ver artículo</button>
         <button class="btn btn-sage" onclick="loadSocialPanel('${result.article_id}', null)">🎨 Ver social pack</button>
       </div>
     </div>`;
 }
-
 async function loadArticles() {
   const list = document.getElementById('articles-list');
   const detail = document.getElementById('article-detail');
@@ -424,7 +441,6 @@ async function loadArticles() {
       </div>`).join('')}</div>`;
   } catch(e) { list.innerHTML = `<div class="status-msg error">⚠ ${e.message}</div>`; }
 }
-
 async function loadArticle(id) {
   const list = document.getElementById('articles-list');
   const detail = document.getElementById('article-detail');
@@ -438,7 +454,7 @@ async function loadArticle(id) {
       <button class="back-btn" onclick="loadArticles()">← Volver a artículos</button>
       <div class="card-meta"><span class="pill pill-rose">${a.category||'general'}</span>${a.verdict?`<span class="pill pill-sage">${a.verdict}</span>`:''}</div>
       <h1 class="art-title">${a.title}</h1>
-      <div class="art-byline">✍️ Redactado por Manuel · ✅ Verificado por Camila · 🌿 Savia Nutrición</div>
+      <div class="art-byline">✍️ Redactado por Manuel · ${camilaBadge(a._fact_check)} · 🌿 Savia Nutrición</div>
       <div class="art-content">${paragraphs||'<p style="color:var(--muted)">Sin contenido.</p>'}</div>
       ${(a.sources||[]).length?`<div style="margin-top:2rem;padding-top:1.25rem;border-top:1.5px solid var(--border);"><div class="card-meta" style="margin-bottom:0.6rem;">Fuentes</div>${a.sources.map(s=>`<div style="font-size:0.82rem;color:var(--muted);margin-bottom:0.3rem;">· ${s}</div>`).join('')}</div>`:''}
       <div style="margin-top:1.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
@@ -447,7 +463,6 @@ async function loadArticle(id) {
       <div id="social-panel-${id}" style="margin-top:1.5rem;"></div>`;
   } catch(e) { detail.innerHTML = `<div class="status-msg error">⚠ ${e.message}</div>`; }
 }
-
 async function loadSocialPanel(articleId, panelId) {
   let el;
   if (panelId) {
@@ -488,7 +503,6 @@ async function loadSocialPanel(articleId, panelId) {
       </div>`;
   } catch(e) { el.innerHTML = `<div class="status-msg error">⚠ ${e.message}</div>`; }
 }
-
 let _chatBusy = false;
 async function sendChat() {
   if (_chatBusy) return;
@@ -524,9 +538,7 @@ async function sendChat() {
   _chatBusy = false;
   msgs.scrollTop = msgs.scrollHeight;
 }
-
 function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
 loadArticles();
 </script>
 </body>
