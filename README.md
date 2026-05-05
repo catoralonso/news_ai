@@ -1,6 +1,8 @@
 # 🌿 Savia — AI-Powered Nutrition Newsroom
 
-An autonomous multi-agent system that runs a nutrition newspaper end-to-end: from trend research to published articles, social media, and reader interaction. For the Demo go to the link:
+An autonomous multi-agent system that runs a nutrition newspaper end-to-end: from trend research to published articles, social media, and reader interaction. Originally biuld for Google Cloud, launch via Cloud Run using Terraform and Gemini. Due to billing costs a migration to HuggingFace using Anthropic key was needed.
+>
+For the Demo go to the link:
 > 
 🔗 **[Live Demo](https://huggingface.co/spaces/catoralonso/news_savia)**
 
