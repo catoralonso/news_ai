@@ -2,8 +2,10 @@
 api_main.py
 ───────────
 FastAPI gateway for the Savia newspaper AI system.
+
 Exposes the endpoints consumed by the Lovable frontend.
 Runs as the single process in the HF Space container.
+
 Endpoints:
     GET  /health                    → health check
     GET  /api/trends                → latest trends (José, no full pipeline)
@@ -13,8 +15,10 @@ Endpoints:
     GET  /api/articles/{article_id} → single article
     GET  /api/social/{article_id}   → SocialMediaPack for an article
     POST /api/chat                  → Mauro chatbot (SSE streaming)
+
 Local usage:
     uvicorn api_main:app --reload --port 8080
+
 Required environment variables:
     ANTHROPIC_API_KEY=...
 """
@@ -231,11 +235,14 @@ async def get_trends_verified(topic: str = "nutrición tendencias salud"):
         report  = await asyncio.to_thread(jose.run, topic)
         trending = report.trending_topics or []
 
-        async def verify_one(t):
-            r = await asyncio.to_thread(camila.verify_url, t)
-            return {"topic": t, "relevance": 1.0,
-                    "verdict": r.verdict, "confidence": r.confidence}
+        sem = asyncio.Semaphore(3) 
 
+        async def verify_one(t):
+            async with sem:
+                r = await asyncio.to_thread(camila.verify_url, t)
+                return {"topic": t, "relevance": 1.0,
+                        "verdict": r.verdict, "confidence": r.confidence}
+                        
         verified = await asyncio.gather(*[verify_one(t) for t in trending])
 
         order    = {"truthful": 0, "doubtful": 1, "untruthful": 2}
@@ -257,6 +264,7 @@ async def run_pipeline(request: PipelineRequest, background_tasks: BackgroundTas
     Launch full pipeline:
       José (trends) → Camila (fact-check) simultaneously →
       Manuel (article) → Asti (social media)
+
     Returns a job_id. Client mades polling to
     GET /api/pipeline/status/{job_id} to know when its finished.
     """
