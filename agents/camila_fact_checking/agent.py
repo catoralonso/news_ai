@@ -5,7 +5,6 @@ Fact Checking Agent — Camila
 ─────────────────────────────
 Responsibility: Verifies ArticleIdeas from Jose and handles
 fact-checking requests from Mauro's reader chatbot.
-
 Architecture:
      Orchestrator / Mauro
           │
@@ -18,10 +17,8 @@ Architecture:
                     │
                     ├── FactCheckResult   (pipeline: idea + verdict + confidence + reason + sources)
                     └── VerificationResult (reader: input_text + verdict + confidence + reason + sources)
-
 Dependencies:
     pip install google-genai chromadb requests feedparser
-
 Local usage (without GCloud):
     Set ANTHROPIC_API_KEY in .env 
 """
@@ -116,7 +113,6 @@ class KnowledgeBase:
 class FactCheckingAgent:
     """
     Verifies ArticleIdeas produced by Jose and claims submitted via Mauro.
-
     run(idea) flow:
     ┌─────────────────────────────────────────────────────────────────┐
     │ 1. Retrieve fake news patterns and context from RAG             │
@@ -126,7 +122,6 @@ class FactCheckingAgent:
     │ 5. Parse response → FactCheckResult                             │
     │ 6. If untruthful → persist to fact_checking RAG                 │
     └─────────────────────────────────────────────────────────────────┘
-
     verify_url(text) flow: same steps but input is free text from a reader,
     returns VerificationResult instead of FactCheckResult.
     """
@@ -135,29 +130,24 @@ class FactCheckingAgent:
 You are Camila, the Fact-Checking Agent of a local nutrition newspaper.
 Your mission: evaluate the credibility of article ideas produced by Jose
 and claims submitted by readers through Mauro's chatbot.
-
 PERSONALITY:
 - Observant, analytical, and committed to the truth
 - You always cross-reference information against reliable sources
 - You pay close attention to detail — fake news often hides in plain sight
 - You rely on verified sources: WHO, Spanish Ministry of Health, PubMed
-
 RESTRICTIONS:
 - Never invent data or specific sources; if you don't have information, say so
 - Do not verify topics outside the nutrition and health domain
 - Always prioritize verifiability over speed
-
 VERIFICATION RULES:
 - Cross-reference the claim against at least 2 independent sources
 - Evaluate both the title and the angle of the article idea
 - Consider whether the claim is supported by scientific consensus
 - Assign a confidence score based on the evidence found
-
 VERDICT SCALE:
 - "truthful"   → confidence 0.7 - 1.0  (supported by reliable sources)
 - "doubtful"   → confidence 0.4 - 0.69 (conflicting or insufficient evidence)
 - "untruthful" → confidence 0.0 - 0.39 (contradicted by reliable sources)
-
 OUTPUT FORMAT:
 When asked to verify a claim, ALWAYS respond with valid JSON:
 {
@@ -185,10 +175,8 @@ When asked to verify a claim, ALWAYS respond with valid JSON:
     def run(self, idea: ArticleIdea) -> FactCheckResult:
         """
         Verifies an ArticleIdea and returns a fact-check verdict.
-
         Args:
             idea: ArticleIdea produced by Jose's NewsResearchAgent.
-
         Returns:
             FactCheckResult with verdict, confidence, reason and sources.
         """
@@ -241,10 +229,8 @@ When asked to verify a claim, ALWAYS respond with valid JSON:
         """
         Verifies a raw claim or URL submitted by a reader via Mauro.
         Unlike run(), this method has no ArticleIdea — it works with free text.
-
         Args:
             input_text: Raw claim, headline, or URL from the reader.
-
         Returns:
             VerificationResult with verdict, confidence, reason and sources.
         """
@@ -280,13 +266,10 @@ When asked to verify a claim, ALWAYS respond with valid JSON:
         user_prompt = f"""
 READER CLAIM TO VERIFY:
 {input_text}
-
 SIMILAR PATTERNS FROM FACT-CHECKING RAG:
 {ctx_block}
-
 WEB SEARCH RESULTS:
 {web_block}
-
 Evaluate this claim and respond with the JSON format specified in your instructions.
 """.strip()
 
@@ -342,13 +325,10 @@ CLAIM TO VERIFY: {idea.title}
 ANGLE: {idea.angle}
 CATEGORY: {idea.category}
 SOURCES PROVIDED BY JOSE: {sources_block}
-
 FAKE NEWS PATTERNS FROM RAG:
 {ctx_block}
-
 WEB SEARCH RESULTS:
 {web_block}
-
 Based on all the above, verify the credibility of this article idea
 for {self.newspaper_name}. Respond in the JSON format specified.
 """.strip()
@@ -391,7 +371,7 @@ for {self.newspaper_name}. Respond in the JSON format specified.
             logger.warning("Parse failed, raw: %s", raw_text[:200])
             return FactCheckResult(
                 idea=idea,
-                verdict="no_information",
+                verdict="doubtful",
                 reason="No se pudo verificar la información.",
                 confidence=0.0,
                 sources=[],
